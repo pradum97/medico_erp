@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.prescription.Frequency">
+   <top>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <VBox>
+               <children>
+                  <HBox alignment="CENTER" prefHeight="40.0" prefWidth="600.0" style="-fx-background-color: #04852f;">
+                     <children>
+                        <Label text="Frequency" textFill="WHITE">
+                           <font>
+                              <Font name="Arial Black" size="18.0" />
+                           </font>
+                        </Label>
+                     </children></HBox>
+                  <HBox alignment="CENTER" prefHeight="62.0" prefWidth="600.0" spacing="10.0">
+                     <children>
+                        <TextField fx:id="frequencyTf" prefHeight="35.0" prefWidth="388.0" style="-fx-border-color: grey; -fx-border-radius: 4;" />
+                        <Button minHeight="30.0" mnemonicParsing="false" onAction="#addClick" prefHeight="30.0" prefWidth="64.0" style="-fx-background-color: BLUE; -fx-cursor: HAND;" text="ADD" textFill="WHITE">
+                           <font>
+                              <Font size="13.0" />
+                           </font>
+                        </Button>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <Separator prefWidth="200.0" />
+         </children>
+      </VBox>
+   </top>
+   <center>
+      <TableView fx:id="tableView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <columns>
+          <TableColumn fx:id="colSr" maxWidth="80.0" minWidth="80.0" prefWidth="75.0" text="SR #" />
+          <TableColumn fx:id="colFrequency" prefWidth="75.0" text="Frequency" />
+        </columns>
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
+      </TableView>
+   </center>
+   <bottom>
+      <HBox alignment="CENTER" prefHeight="40.0">
+         <children>
+            <Button mnemonicParsing="false" onAction="#closeButton" prefHeight="11.0" prefWidth="120.0" style="-fx-cursor: hand; -fx-background-color: RED; -fx-text-fill: WHITE; -fx-font-size: 12; -fx-font-weight: bold; -fx-background-radius: 20;" text="CLOSE" />
+         </children>
+      </HBox>
+   </bottom>
+</BorderPane>

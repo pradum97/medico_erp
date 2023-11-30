@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane stylesheets="@../css/main.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.patient.PatientMain">
+    <center>
+        <VBox BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+                <Insets top="15.0" />
+            </BorderPane.margin>
+            <children>
+                <VBox VBox.vgrow="ALWAYS">
+                    <children>
+                        <TableView fx:id="tableView" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colSrNo" editable="false" maxWidth="50.0" minWidth="50.0" prefWidth="-1.0" sortable="false" text="SL #" />
+                                <TableColumn fx:id="colAdmNum" editable="false" maxWidth="135.0" minWidth="135.0" prefWidth="-1.0" sortable="false" text="Adm #" />
+                        <TableColumn fx:id="colUhidNum" editable="false" maxWidth="60.0" minWidth="60.0" prefWidth="-1.0" sortable="false" text="UHID #" />
+                                <TableColumn fx:id="colName" editable="false" maxWidth="320.0" minWidth="180.0" prefWidth="190.0" sortable="false" text="NAME" />
+                                <TableColumn fx:id="colAge" editable="false" maxWidth="50.0" minWidth="60.0" prefWidth="-1.0" sortable="false" text="AGE" />
+                                <TableColumn fx:id="colGender" editable="false" maxWidth="75.0" minWidth="70.0" prefWidth="-1.0" sortable="false" text="GENDER" />
+                                <TableColumn fx:id="colAddress" editable="false" maxWidth="260.0" minWidth="200.0" prefWidth="200.0" sortable="false" text="ADDRESS" />
+                        <TableColumn fx:id="colEdit" editable="false" maxWidth="350.0" minWidth="300.0" sortable="false" text="ACTION" />
+                            </columns>
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                            </columnResizePolicy>
+                        </TableView>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </center>
+    <bottom>
+        <HBox BorderPane.alignment="CENTER">
+            <children>
+                <Pagination fx:id="pagination" visible="false" HBox.hgrow="ALWAYS" />
+            </children>
+        </HBox>
+    </bottom>
+    <top>
+      <VBox BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets top="5.0" />
+         </BorderPane.margin>
+         <children>
+            <HBox alignment="CENTER">
+               <children>
+                  <Label text="Patients Master">
+                     <font>
+                        <Font name="Arial Black" size="14.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
+            <Separator prefWidth="200.0" />
+              <HBox alignment="CENTER_RIGHT" prefWidth="891.0" spacing="20.0" style="-fx-border-color: transparent transparent grey transparent;">
+                  <children>
+                      <HBox>
+                          <HBox.margin>
+                              <Insets right="15.0" />
+                          </HBox.margin>
+                          <children>
+                              <TextField fx:id="searchTf" prefWidth="290.0" promptText="Enter ID / PHONE NUM / NAME" style="-fx-border-color: grey; -fx-border-radius: 3;">
+                                  <padding>
+                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                  </padding>
+                              </TextField>
+                          </children>
+                      </HBox>
+                      <Button graphicTextGap="10.0" mnemonicParsing="false" onAction="#addPatient" prefHeight="31.0" prefWidth="134.0" style="-fx-cursor: hand; -fx-background-color: white; -fx-text-fill: black; -fx-font-weight: BOLD; -fx-background-radius: 3; -fx-border-color: grey; -fx-border-radius: 3;" text="ADD PATIENT">
+                          <HBox.margin>
+                              <Insets right="70.0" />
+                          </HBox.margin>
+                          <graphic>
+                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                  <image>
+                                      <Image url="@../img/icon/add_ic_black.png" />
+                                  </image>
+                              </ImageView>
+                          </graphic>
+                      </Button>
+                  </children>
+                  <padding>
+                      <Insets bottom="5.0" />
+                  </padding>
+              </HBox>
+         </children>
+      </VBox>
+    </top>
+</BorderPane>

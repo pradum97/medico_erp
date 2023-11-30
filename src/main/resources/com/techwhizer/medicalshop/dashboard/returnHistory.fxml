@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefWidth="800.0" stylesheets="@../css/main.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.dashboard.ReturnHistoryMain">
+   <center>
+      <VBox>
+         <children>
+            <TableView fx:id="tableview" VBox.vgrow="ALWAYS">
+              <columns>
+                  <TableColumn fx:id="colSrNo" editable="false" maxWidth="100.0" minWidth="80.0" sortable="false" text="Sr#" />
+                  <TableColumn fx:id="colPatientName" editable="false" maxWidth="400.0" minWidth="220.0" sortable="false" text="PATIENT NAME" />
+                  <TableColumn fx:id="colInvoiceNumber" editable="false" maxWidth="400.0" minWidth="220.0" sortable="false" text="INVOICE NUMBER" />
+                  <TableColumn fx:id="colRefundAmount" editable="false" maxWidth="400.0" minWidth="220.0" sortable="false" text="REFUND AMOUNT" />
+                  <TableColumn fx:id="colReturnDate" editable="false" maxWidth="300.0" minWidth="200.0" sortable="false" text="RETURNED DATE" />
+                  <TableColumn fx:id="colRemark" editable="false" maxWidth="500.0" minWidth="200.0" sortable="false" text="REMARK" />
+                  <TableColumn fx:id="colItems" editable="false" minWidth="150.0" prefWidth="150.0" sortable="false" text="VIEW ITEMS" />
+              </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
+            </TableView>
+         </children>
+      </VBox>
+   </center>
+   <top>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <HBox alignment="CENTER">
+               <children>
+                  <Label text="Return History">
+                     <font>
+                        <Font name="Arial Black" size="14.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
+            <Separator prefWidth="200.0" />
+            <HBox alignment="CENTER_RIGHT" prefHeight="40.0" prefWidth="600.0">
+               <children>
+                  <TextField fx:id="searchTf" prefHeight="37.0" prefWidth="302.0" promptText="Enter invoice number" style="-fx-border-color: grey; -fx-border-radius: 50; -fx-background-radius: 50;" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </HBox>
+         </children>
+      </VBox>
+   </top>
+   <bottom>
+      <HBox prefHeight="55.0" prefWidth="1052.0" BorderPane.alignment="CENTER">
+         <children>
+            <Pagination fx:id="pagination" prefHeight="200.0" prefWidth="200.0" visible="false" HBox.hgrow="ALWAYS" />
+         </children>
+      </HBox>
+   </bottom>
+</BorderPane>
