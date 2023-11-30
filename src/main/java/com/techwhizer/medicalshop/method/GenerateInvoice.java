@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -468,6 +469,7 @@ public class GenerateInvoice {
         try {
             connection = new DBConnection().getConnection();
 
+
             if (Objects.equals(slipType, "Consultant")) {
 
                 String query = """
@@ -501,11 +503,19 @@ public class GenerateInvoice {
                     String receipt_date = rs.getString("receipt_date");
                     String gender_age = rs.getString("gender_age");
                     String phone = rs.getString("phone");
-                    String fee_valid_date = rs.getString("fee_valid_date");
+                    String consult_date = rs.getString("consult_date");
                     String preparedBy = rs.getString("preparedby");
                     String receipt_type = rs.getString("receipt_type");
                     String patient_category = rs.getString("patient_category");
 
+                    System.out.println(consult_date);
+
+                    DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+                    LocalDate lDate = LocalDate.parse(consult_date,format);
+
+                    ConsultationSetupModel csm = CommonUtil.getConsultationSetup();
+
+                    String feeValidUpTo = lDate.plusDays(csm == null?25:csm.getFee_valid_days()).format(format).toString();
 
                     param.put("patientName", patient_name);
                     param.put("uhidNum", uhid_no);
@@ -516,7 +526,7 @@ public class GenerateInvoice {
                     param.put("ReceiptDateAndTime", receipt_date);
                     param.put("genderAge", gender_age);
                     param.put("MobileNum", phone);
-                    param.put("feeVaildDate", fee_valid_date);
+                    param.put("feeVaildDate", feeValidUpTo);
                     param.put("printedBy", preparedBy);
                     param.put("receiptType", receipt_type);
                     param.put("patientCategory", patient_category);

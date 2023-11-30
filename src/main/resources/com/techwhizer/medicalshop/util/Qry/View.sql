@@ -16,7 +16,7 @@ select consultation_id,
        pc.receipt_num,
        (TO_CHAR(pc.creation_date, 'DD-MM-YYYY HH12:MI AM')) as receipt_date,
        concat(tp.gender,'/',tp.age) as gender_age,tp.phone,
-       (TO_CHAR(pc.creation_date + INTERVAL '15 days', 'DD-MM-YYYY'))  AS fee_valid_date,
+       TO_CHAR(pc.creation_date,'DD-MM-YYYY')  AS consult_date,
        tu.username as preparedBy,pc.receipt_type,tp.patient_category
 
 from patient_consultation pc

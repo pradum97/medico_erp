@@ -484,6 +484,7 @@ CREATE TABLE payment_information
 
 
 ----------New Added------------
+--alter print_consultant_slip_v view
 
 CREATE TABLE consultation_setup(
     consultation_setup_ID SERIAL PRIMARY KEY ,
