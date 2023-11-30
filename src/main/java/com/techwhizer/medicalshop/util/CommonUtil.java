@@ -1,5 +1,6 @@
 package com.techwhizer.medicalshop.util;
 
+import com.techwhizer.medicalshop.model.ConsultationSetupModel;
 import com.techwhizer.medicalshop.model.DoctorModel;
 import com.techwhizer.medicalshop.model.SalutationModel;
 import com.techwhizer.medicalshop.util.type.DoctorType;
@@ -12,6 +13,44 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class CommonUtil {
+
+    public static ConsultationSetupModel getConsultationSetup(){
+
+        ConsultationSetupModel csm = new  ConsultationSetupModel(0,400,25,0,"");
+
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+
+            connection = new DBConnection().getConnection();
+
+            String query = """
+                    select *,to_char(creation_date,'DD/MM/YYYY') as creation_date from consultation_setup order by 1 desc limit 1 
+                    """;
+            ps = connection.prepareStatement(query);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                int consultation_setup_id = rs.getInt("consultation_setup_id");
+                int createdById = rs.getInt("created_by");
+                double consultation_fee = rs.getDouble("consultation_fee");
+                int fee_valid_days = rs.getInt("fee_valid_days");
+                String creation_date = rs.getString("creation_date");
+
+               csm = new  ConsultationSetupModel(consultation_setup_id,consultation_fee,
+                        fee_valid_days,createdById,creation_date);
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBConnection.closeConnection(connection, ps, rs);
+        }
+
+        return csm;
+    }
 
     public static ObservableList<String> getDocumentType() {
 

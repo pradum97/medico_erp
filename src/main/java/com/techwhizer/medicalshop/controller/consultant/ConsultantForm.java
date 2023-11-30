@@ -7,6 +7,7 @@ import com.techwhizer.medicalshop.method.GenerateBillNumber;
 import com.techwhizer.medicalshop.method.GenerateInvoice;
 import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.model.ConsultantModel;
+import com.techwhizer.medicalshop.model.ConsultationSetupModel;
 import com.techwhizer.medicalshop.model.DoctorModel;
 import com.techwhizer.medicalshop.model.PatientModel;
 import com.techwhizer.medicalshop.util.CommonUtil;
@@ -173,8 +174,14 @@ public class ConsultantForm implements Initializable {
                 consultNameCom.setItems(CommonUtil.getDoctor(DoctorType.IN_HOUSE));
                 paymentMethodCom.setItems(CommonUtil.getPaymentMethod());
 
+                ConsultationSetupModel csm = CommonUtil.getConsultationSetup();
+                Platform.runLater(()->{
+                    consultantFeeTf.setText(csm == null?"": String.valueOf(csm.getConsultation_fee()));
+                });
+
+
                 Platform.runLater(() -> {
-                    paymentMethodCom.getSelectionModel().select("Cash");
+                    paymentMethodCom.getSelectionModel().select(0);
                     referByCom.getSelectionModel().select(0);
                 });
             } else if (type == Type.CREATE) {

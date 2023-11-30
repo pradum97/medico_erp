@@ -5,6 +5,7 @@ import com.techwhizer.medicalshop.FileLoader;
 import com.techwhizer.medicalshop.ImageLoader;
 import com.techwhizer.medicalshop.InvoiceModel.PaymentChargeModel;
 import com.techwhizer.medicalshop.model.*;
+import com.techwhizer.medicalshop.util.CommonUtil;
 import com.techwhizer.medicalshop.util.DBConnection;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -419,6 +420,10 @@ public class GenerateInvoice {
                 param.put("phone", phone);
                 param.put("invoiceNumber",invoiceNum);
                 param.put("uhidNum",uhid_no);
+
+                ConsultationSetupModel csm = CommonUtil.getConsultationSetup();
+
+                param.put("fee_valid_days",csm==null?25:csm.getFee_valid_days());
 
                 String companyLogoPath = "img/company/gangotri_company_logo.png";
 

@@ -6,7 +6,7 @@
         DB_NAME = medical_shop
 */
 
-drop table if exists tbl_cart cascade;
+/*drop table if exists tbl_cart cascade;
 drop table if exists tbl_company cascade;
 drop table if exists tbl_dealer cascade;
 drop table if exists tbl_discount cascade;
@@ -30,6 +30,12 @@ drop table if exists TBL_RETURN_MAIN cascade;
 drop table if exists tbl_frequency cascade;
 drop table if exists TBL_MEDICINE_TIME cascade;
 
+drop table if exists TBL_SALUTATION cascade;
+drop table if exists patient_consultation cascade;
+drop table if exists PRESCRIBE_MEDICINE_MASTER cascade;
+drop table if exists PRESCRIBE_MEDICINE_ITEMS cascade;
+drop table if exists payment_information cascade;
+*/
 CREATE TABLE tbl_users
 (
     USER_ID        SERIAL PRIMARY KEY       NOT NULL,
@@ -363,15 +369,6 @@ CREATE TABLE TBL_MEDICINE_TIME
     CREATED_BY       INT
 );
 
-
-
-----------New Added------------
-
---Notes:
--- drop tbl_patients
--- drop table PATIENT_MEDICAL_HISTORY_MAIN-- name change
--- drop table PATIENT_MEDICAL_HISTORY_ITEM-- name change
------------------------------------------
 CREATE TABLE TBL_SALUTATION
 (
     SALUTATION_ID SERIAL PRIMARY KEY,
@@ -484,6 +481,20 @@ CREATE TABLE payment_information
     payment_status  VARCHAR(20) DEFAULT 'SUCCESS',
     CREATION_DATE   TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
 );
+
+
+----------New Added------------
+
+CREATE TABLE consultation_setup(
+    consultation_setup_ID SERIAL PRIMARY KEY ,
+    consultation_fee numeric not null ,
+    fee_valid_days int not null,
+    CREATED_BY INT NOT NULL ,
+    CREATION_DATE TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+insert into consultation_setup(consultation_fee, fee_valid_days, CREATED_BY)
+VALUES(400,25,1)
 
 
 

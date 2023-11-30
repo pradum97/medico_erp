@@ -16,9 +16,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane stylesheets="@../css/main.css" xmlns="http://javafx.com/javafx/20.0.1"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.techwhizer.medicalshop.controller.consultant.ConsultantForm">
+<BorderPane stylesheets="@../css/main.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.consultant.ConsultantForm">
    <center>
       <VBox alignment="TOP_CENTER" prefHeight="444.0" prefWidth="700.0" style="-fx-border-color: grey; -fx-border-radius: 3;" BorderPane.alignment="CENTER">
          <children>
@@ -250,7 +248,7 @@
                                                 <HBox prefWidth="263.0">
                                                    <children>
                                                       <ComboBox fx:id="paymentMethodCom" minHeight="26.0" minWidth="125.0" prefHeight="26.0" prefWidth="200.0" style="-fx-border-radius: 3 0 0 3; -fx-border-color: grey;" />
-                                                      <TextField fx:id="consultantFeeTf" minHeight="26.0" prefHeight="26.0" promptText="Fee" style="-fx-border-radius: 0 3 3 0; -fx-border-color: grey;" text="400" HBox.hgrow="ALWAYS" />
+                                                      <TextField fx:id="consultantFeeTf" minHeight="26.0" prefHeight="26.0" promptText="Fee" style="-fx-border-radius: 0 3 3 0; -fx-border-color: grey;" HBox.hgrow="ALWAYS" />
                                                    </children>
                                                 </HBox>
                                              </children>
