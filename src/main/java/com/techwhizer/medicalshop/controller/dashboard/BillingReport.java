@@ -139,11 +139,17 @@ public class BillingReport implements Initializable {
             String query = """
                     select tsm.sale_main_id ,tc.patient_id,tsm.seller_id,tsm.additional_discount,
                            tsm.tot_tax_amount,tsm.net_amount,tsm.payment_mode,tsm.invoice_number,
-                           tsm.bill_type, (TO_CHAR(tsm.sale_date , 'YYYY-MM-DD HH12:MI:SS AM')) as saleDate,tc.name,tc.phone,tc.address ,
+                           tsm.bill_type, (TO_CHAR(tsm.sale_date , 'YYYY-MM-DD HH12:MI:SS AM')) as saleDate,
+                           regexp_replace(trim( concat(COALESCE(ts.name, ''), ' ',
+                    COALESCE(tc.first_name, ''), ' ',
+                    COALESCE(tc.middle_name, ''), ' ',
+                    COALESCE(tc.last_name, '')) ),'  ',' ' ) as name
+                           ,tc.phone,tc.address ,
                            tu.first_name,tu.last_name ,(select sum(tsi.net_amount) as netAmount from tbl_sale_items tsi
                                                                        where tsi.sale_main_id = tsm.sale_main_id group by tsm.sale_main_id)
                     from tbl_sale_main tsm
                              LEFT JOIN tbl_patient tc on (tsm.patient_id = tc.patient_id)
+                             left join tbl_salutation ts on ts.salutation_id = tc.salutation_id 
                              LEFT JOIN tbl_users tu on (tsm.seller_id = tu.user_id)""";
 
 

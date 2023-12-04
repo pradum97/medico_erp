@@ -344,7 +344,7 @@ public class Dashboard implements Initializable {
 
     public void saleProductBnClick(MouseEvent actionEvent) {
 
-        customDialog.showFxmlDialog2("dashboard/billing.fxml","SALE ENTRY");
+        customDialog.showFxmlFullDialog("dashboard/billing.fxml","SALE ENTRY");
     }
 
     public void saleReportBnClick(ActionEvent actionEvent) {

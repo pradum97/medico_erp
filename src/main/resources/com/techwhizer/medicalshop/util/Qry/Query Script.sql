@@ -387,7 +387,7 @@ CREATE TABLE TBL_PATIENT
     MIDDLE_NAME      VARCHAR(100),
     LAST_NAME        VARCHAR(100),
     GENDER           VARCHAR(10),
-    AGE              VARCHAR(5),
+    AGE              VARCHAR(50),
     ADDRESS          VARCHAR(200),
     DOB              VARCHAR(50),
     PHONE            VARCHAR(30),
@@ -482,10 +482,6 @@ CREATE TABLE payment_information
     CREATION_DATE   TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
 );
 
-
-----------New Added------------
---alter print_consultant_slip_v view
-
 CREATE TABLE consultation_setup(
     consultation_setup_ID SERIAL PRIMARY KEY ,
     consultation_fee numeric not null ,
@@ -495,7 +491,13 @@ CREATE TABLE consultation_setup(
 );
 
 insert into consultation_setup(consultation_fee, fee_valid_days, CREATED_BY)
-VALUES(400,25,1)
+VALUES(400,25,1);
+
+ALTER TABLE TBL_SALE_MAIN
+    ADD COLUMN PAYMENT_REFERENCE_NUM VARCHAR(300),
+    ADD COLUMN REMARKS VARCHAR(500),
+    ADD COLUMN CREATED_BY INT;
+
 
 
 

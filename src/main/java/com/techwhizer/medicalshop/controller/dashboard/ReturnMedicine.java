@@ -179,7 +179,7 @@ public class ReturnMedicine implements Initializable {
     }
 
     public void search(ActionEvent event) {
-
+        itemList.clear();
         String invoiceNum = invoiceNumberTf.getText();
 
         if (invoiceNum.isEmpty()) {
@@ -201,17 +201,16 @@ public class ReturnMedicine implements Initializable {
             connection = new DBConnection().getConnection();
 
             String query = """
-                                        
-                    select tsi.sale_item_id ,(TO_CHAR(tsm.sale_date, 'dd-MM-yyyy')) as sale_date,tsi.item_name,
-                            concat(tsi.strip*tsi.strip_tab+tsi.pcs,'-','TAB') as quantity , tsi.discount as discountPercentage,
-                            (tsi.sale_rate/tsi.strip_tab) as mrpPerTab,
-                            tsi.sale_rate,tsi.stock_id,tsm.additional_discount,
-                          ((( tsi.strip*tsi.strip_tab)+tsi.pcs)*(tsi.sale_rate/tsi.strip_tab)-
-                           (((( tsi.strip*tsi.strip_tab)+tsi.pcs)*(tsi.sale_rate/tsi.strip_tab))*tsi.discount/100)) as netAmount,
-                           (((( tsi.strip*tsi.strip_tab)+tsi.pcs)*(tsi.sale_rate/tsi.strip_tab))*tsi.discount/100) as discountAmount
-                            from tbl_sale_main tsm
-                        left join tbl_sale_items tsi on tsm.sale_main_id = tsi.sale_main_id
-                            where invoice_number = ?
+                             select tsi.sale_item_id ,(TO_CHAR(tsm.sale_date, 'dd-MM-yyyy')) as sale_date,tsi.item_name,
+                                    concat(tsi.strip*case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end+tsi.pcs,'-','TAB') as quantity , tsi.discount as discountPercentage,
+                                    (tsi.sale_rate/case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end) as mrpPerTab,
+                                    tsi.sale_rate,tsi.stock_id,tsm.additional_discount,
+                                    ((( tsi.strip*case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end)+tsi.pcs)*(tsi.sale_rate/case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end)-
+                                     (((( tsi.strip*case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end)+tsi.pcs)*(tsi.sale_rate/case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end))*tsi.discount/100)) as netAmount,
+                                    (((( tsi.strip*case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end)+tsi.pcs)*(tsi.sale_rate/case when case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end > 0 then case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end else 1 end))*tsi.discount/100) as discountAmount
+                             from tbl_sale_main tsm
+                                      left join tbl_sale_items tsi on tsm.sale_main_id = tsi.sale_main_id
+                             where invoice_number = ?
                                         
                     """;
             ps = connection.prepareStatement(query);
@@ -225,6 +224,8 @@ public class ReturnMedicine implements Initializable {
                 int saleItemId = rs.getInt("sale_item_id");
                 int stockId = rs.getInt("stock_id");
                 String productName = rs.getString("item_name");
+
+                System.out.println(productName);
                 String saleDate = rs.getString("sale_date");
                 String quantity = rs.getString("quantity");
                 double netAmount = rs.getDouble("netAmount");
@@ -238,9 +239,9 @@ public class ReturnMedicine implements Initializable {
 
                 int returnedQty = Integer.parseInt(getReturnableQuantity(saleItemId).split("-")[0]);
                 int totalQuantity = Integer.parseInt(quantity.split("-")[0]);
-                
+
                 String returnable = ((totalQuantity-returnedQty)+"-TAB");
-                
+
                 ReturnProductModel returnProductModel = new ReturnProductModel(saleItemId, productName, netAmount, mrp,
                         quantity, saleDate, discountAmount, "0", false, stockId, mrpPerTab, discountPercentage,returnable);
                 itemList.add(returnProductModel);

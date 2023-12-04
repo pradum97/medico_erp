@@ -57,7 +57,10 @@ public class GenerateInvoice {
 
             String query = """
 
-                    select tsi.item_name,td.dr_name , tp.name as patient_name,tp.phone as patient_phone ,
+                    select tsi.item_name,td.dr_name , regexp_replace(trim( concat(COALESCE(sal.name, ''), ' ',
+                    COALESCE(tp.first_name, ''), ' ',
+                    COALESCE(tp.middle_name, ''), ' ',
+                    COALESCE(tp.last_name, '')) ),'  ',' ' ) as patient_name,tp.phone as patient_phone ,
                            tp.address as patient_address ,
                            tml.manufacturer_name,tsi.batch,
                            case when ts.quantity_unit = 'TAB' then (coalesce(tsi.sale_rate,0)/coalesce(tsi.strip_tab,0))
@@ -78,6 +81,8 @@ public class GenerateInvoice {
                              LEFT JOIN tbl_doctor td on tsm.doctor_id = td.doctor_id
                              left join tbl_stock ts on tsi.stock_id = ts.stock_id
                              LEFT JOIN tbl_patient tp on tsm.patient_id = tp.patient_id
+                            left join tbl_salutation sal on sal.salutation_id = tp.salutation_id
+
                              left join tbl_manufacturer_list tml on tsi.mfr_id = tml.mfr_id
                              CROSS JOIN tbl_shop_details tsd
                     where tsm.sale_main_id = ?
@@ -248,8 +253,12 @@ public class GenerateInvoice {
         try {
             connection = new DBConnection().getConnection();
             String query = """
-                    select tsi.item_name,td.dr_name , tp.name as patient_name,tp.phone as patient_phone ,
-                           tp.address as patient_address ,
+                    select tsi.item_name,td.dr_name , 
+                    regexp_replace(trim( concat(COALESCE(sal.name, ''), ' ',
+                    COALESCE(tp.first_name, ''), ' ',
+                    COALESCE(tp.middle_name, ''), ' ',
+                    COALESCE(tp.last_name, '')) ),'  ',' ' ) as patient_name ,
+                           tp.address as patient_address ,tp.phone as patient_phone,
                            tml.manufacturer_name,tsi.batch,
                            case when ts.quantity_unit = 'TAB' then (coalesce(tsi.sale_rate,0)/coalesce(tsi.strip_tab,0))
                                else coalesce(tsi.sale_rate,0) end as sale_rate,
@@ -266,11 +275,13 @@ public class GenerateInvoice {
                     from tbl_sale_main tsm
                              Left Join tbl_sale_items tsi on tsm.sale_main_id = tsi.sale_main_id
                              LEFT JOIN tbl_doctor td on tsm.doctor_id = td.doctor_id
-                        left join tbl_stock ts on tsi.stock_id = ts.stock_id
+                             left join tbl_stock ts on tsi.stock_id = ts.stock_id
                              LEFT JOIN tbl_patient tp on tsm.patient_id = tp.patient_id
+                            left join tbl_salutation sal on sal.salutation_id = tp.salutation_id
+                             
                              left join tbl_manufacturer_list tml on tsi.mfr_id = tml.mfr_id
                              CROSS JOIN tbl_shop_details tsd
-                                                            where tsm.sale_main_id = ?""";
+                             where tsm.sale_main_id = ?""";
 
             ps = connection.prepareStatement(query);
             ps.setInt(1, saleMainId);
