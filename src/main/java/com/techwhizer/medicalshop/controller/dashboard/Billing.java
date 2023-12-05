@@ -428,6 +428,17 @@ public class Billing implements Initializable {
     }
 
     public void addPatient(ActionEvent actionEvent) {
+
+        customDialog.showFxmlDialog2("patient/addPatient.fxml", "Add New Patient");
+
+        if (Main.primaryStage.getUserData() instanceof Boolean) {
+
+            boolean isSuccess = (Boolean) Main.primaryStage.getUserData();
+
+            if(isSuccess){
+                callThread(Type.GET_PATIENT);
+            }
+        }
     }
 
     public void addItemToListClick(ActionEvent actionEvent) {

@@ -113,9 +113,6 @@ public class AddPatient implements Initializable {
         }
     }
 
-    public void cancel_Bn(ActionEvent event) {
-        closeStage();
-    }
 
     public void submit_bn(ActionEvent event) {
        addNewPatient();
@@ -310,10 +307,9 @@ public class AddPatient implements Initializable {
     }
 
     public void cancelBn(ActionEvent event) {
+        closeStage();
     }
 
-    public void submitBn(ActionEvent event) {
-    }
 
     private void callTask(String type,PatientInsertUpdateModel pium) {
 
