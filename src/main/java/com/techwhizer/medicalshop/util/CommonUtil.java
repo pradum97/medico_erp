@@ -11,8 +11,35 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class CommonUtil {
+
+    private static final String DATE_PATTERN = "dd/MM/yyyy";
+
+    public static LocalDate calculateDOBFromAge(int age) {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate tentativeDOB = currentDate.minusYears(age);
+
+        if (tentativeDOB.plusYears(age).isBefore(currentDate)) {
+            return tentativeDOB;
+        } else {
+            return tentativeDOB.minusYears(1);
+        }
+    }
+
+    public static LocalDate stringToLocalDate(String date,String pattern){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+        return LocalDate.parse(date, formatter);
+    }
+
+    public String formatLocalDate(LocalDate localDate){
+        DateTimeFormatter format = DateTimeFormatter.ofPattern(DATE_PATTERN);
+        return localDate.format(format);
+    }
 
     public static ConsultationSetupModel getConsultationSetup(){
 

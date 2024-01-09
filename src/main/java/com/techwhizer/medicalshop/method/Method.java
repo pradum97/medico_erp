@@ -628,9 +628,10 @@ public class Method extends StaticData {
     }
     public String tabToStrip(double tablet, int stripPerTab, String unitType) {
         String val = "";
-        int strip = (int) (tablet / stripPerTab);
-        int tab = (int) (tablet % stripPerTab);
+
         if (unitType.equalsIgnoreCase("tab")) {
+            int strip = (int) (tablet / stripPerTab);
+            int tab = (int) (tablet % stripPerTab);
 
             if (strip > 0) {
                 val = strip + "-STR";

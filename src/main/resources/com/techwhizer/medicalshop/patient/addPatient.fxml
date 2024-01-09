@@ -154,7 +154,7 @@
                                        <Font name="Arial Bold" size="12.0" />
                                     </font>
                                  </Label>
-                                 <DatePicker fx:id="dobDb" editable="false" prefHeight="30.0" style="-fx-border-color: grey; -fx-border-radius: 3;" />
+                                 <DatePicker fx:id="dobDb" editable="false" prefHeight="30.0" style="-fx-border-color: #ff3300; -fx-border-radius: 3;" />
                               </children>
                            </VBox>
                                     <VBox alignment="CENTER_LEFT" prefHeight="60.0" prefWidth="169.0" spacing="2.0" HBox.hgrow="ALWAYS">

@@ -113,15 +113,10 @@ public class PatientMain implements Initializable {
         try {
             connection = dbConnection.getConnection();
 
-            String qry = """
-                                     select (TO_CHAR(tp.creation_date, 'DD-MM-YYYY')) as creation_date,
-                                    (TO_CHAR(tp.last_update, 'DD-MM-YYYY')) as last_update,
-                                  concat ( COALESCE(ts.name,''),' ',COALESCE(tp.first_name,''),' ',
-                                 COALESCE(tp.middle_name,''),' ',COALESCE(tp.last_name,'')) as fullName,
-                                 ts.name as salutation_name , * from tbl_patient tp
-                             left join tbl_salutation ts on tp.salutation_id = ts.salutation_id
-                             order by patient_id  desc
-                              """;
+            String qry = """ 
+                     select * from patient_v
+                    order by patient_id  desc
+                     """;
 
             ps = connection.prepareStatement(qry);
             rs = ps.executeQuery();

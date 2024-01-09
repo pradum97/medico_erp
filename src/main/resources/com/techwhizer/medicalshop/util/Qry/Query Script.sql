@@ -387,7 +387,6 @@ CREATE TABLE TBL_PATIENT
     MIDDLE_NAME      VARCHAR(100),
     LAST_NAME        VARCHAR(100),
     GENDER           VARCHAR(10),
-    AGE              VARCHAR(50),
     ADDRESS          VARCHAR(200),
     DOB              VARCHAR(50),
     PHONE            VARCHAR(30),
@@ -497,6 +496,11 @@ ALTER TABLE TBL_SALE_MAIN
     ADD COLUMN PAYMENT_REFERENCE_NUM VARCHAR(300),
     ADD COLUMN REMARKS VARCHAR(500),
     ADD COLUMN CREATED_BY INT;
+-------------------09-Jan-2024---------------------
+
+--drop patient_age_column
+--alter view and create patient view
+-- create function
 
 
 

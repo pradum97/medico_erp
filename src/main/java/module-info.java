@@ -14,6 +14,8 @@ module com.techwhizer.medicalshop {
     opens com.techwhizer.medicalshop to javafx.fxml;
     exports com.techwhizer.medicalshop;
     requires java.naming;
+    requires org.apache.poi.ooxml;
+    requires org.apache.poi.poi;
 
 
     opens com.techwhizer.medicalshop.controller to javafx.fxml;

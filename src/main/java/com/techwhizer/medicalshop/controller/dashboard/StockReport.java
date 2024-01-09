@@ -1,10 +1,11 @@
 package com.techwhizer.medicalshop.controller.dashboard;
 
 import com.techwhizer.medicalshop.CustomDialog;
-import com.techwhizer.medicalshop.ImageLoader;
+import com.techwhizer.medicalshop.Main;
 import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.model.StockModel;
 import com.techwhizer.medicalshop.util.DBConnection;
+import com.techwhizer.medicalshop.util.ExcelExporter;
 import com.victorlaerte.asynctask.AsyncTask;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -17,15 +18,17 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.stage.DirectoryChooser;
 import javafx.util.Callback;
 
+import java.io.File;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.ResourceBundle;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class StockReport implements Initializable {
 
@@ -35,14 +38,17 @@ public class StockReport implements Initializable {
     public Label createdDate;
     public Label statusL;
     public Button refresh_bn;
-    int rowsPerPage = 50;
+    public ComboBox<String> filterCom;
+    public Button excelExportBn;
+    int rowsPerPage = 60;
+    int lowQuantity = 10, expiryLeftDays = 60;
 
     public TextField searchTf;
     public TableView<StockModel> tableView;
     public TableColumn<StockModel, Integer> colSrNo;
     public TableColumn<StockModel, String> colProductName;
     public TableColumn<StockModel, String> colPack;
-    public TableColumn<StockModel, String> colAction;
+    //    public TableColumn<StockModel, String> colAction;
     public TableColumn<StockModel, String> colBatch;
     public TableColumn<StockModel, String> colExpiryDate;
     public TableColumn<StockModel, String> colPurchaseRate;
@@ -54,35 +60,88 @@ public class StockReport implements Initializable {
     private Method method;
     private CustomDialog customDialog;
     private ObservableList<StockModel> itemList = FXCollections.observableArrayList();
+    private ObservableList<String> filterList =
+            FXCollections.observableArrayList("All", "Out Of Stock", "Expired Medicine",
+                    "Low Quantity", "Expiring Soon");
     private FilteredList<StockModel> filteredData;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         method = new Method();
         customDialog = new CustomDialog();
-        colAction.setVisible(false);
+//        colAction.setVisible(false);
         tableView.setFixedCellSize(28.0);
-       callThread();
+
+        filterCom.setItems(filterList);
+        filterCom.getSelectionModel().select(0);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("filter_type", "All");
+        callThread(data);
+
+
 
     }
 
-    private void callThread() {
-        MyAsyncTask myAsyncTask = new MyAsyncTask();
-        myAsyncTask.setDaemon(false);
+    private void callThread(Map<String, Object> data) {
+        MyAsyncTask myAsyncTask = new MyAsyncTask(data);
         myAsyncTask.execute();
     }
 
     public void refresh(ActionEvent event) {
-        callThread();
+        searchTf.setText("");
+        Map<String, Object> data = new HashMap<>();
+        data.put("filter_type", "All");
+        callThread(data);
+    }
+
+    public void filterBn(ActionEvent actionEvent) {
+
+        String filterType = filterCom.getSelectionModel().getSelectedItem();
+        Map<String, Object> data = new HashMap<>();
+        data.put("filter_type", filterType);
+        callThread(data);
+    }
+
+    public <T> void excelExportBn(ActionEvent actionEvent) {
+
+
+        if (!tableView.getItems().isEmpty()) {
+
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            File selectedDirectory = directoryChooser.showDialog(Main.primaryStage);
+
+            if (selectedDirectory != null) {
+                String filterType = filterCom.getSelectionModel().getSelectedItem();
+                String pattern = "dd_MM_yyyy hh_mm_ss";
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+                String date = simpleDateFormat.format(new Date());
+
+                String path = selectedDirectory.getAbsolutePath() + "/StockReport " + date +"_"+filterType+".xlsx";
+
+                List<T> hideColumnList = new ArrayList<>();
+                hideColumnList.add((T) colSrNo);
+                hideColumnList.add((T) colMrp);
+
+                new ExcelExporter().exportToExcel(tableView, filterType, path, excelExportBn, hideColumnList);
+            }
+        } else {
+            customDialog.showAlertBox("", "Item Not Available!");
+        }
+
+
     }
 
     private class MyAsyncTask extends AsyncTask<String, Integer, Boolean> {
-        private String msg;
+        private Map<String, Object> data;
+
+        public MyAsyncTask(Map<String, Object> data) {
+            this.data = data;
+        }
 
         @Override
         public void onPreExecute() {
             refresh_bn.setDisable(true);
-            msg = "";
             if (null != tableView) {
                 tableView.setItems(null);
                 tableView.refresh();
@@ -93,7 +152,7 @@ public class StockReport implements Initializable {
 
         @Override
         public Boolean doInBackground(String... params) {
-            getStock();
+            getStock(data);
 
             return false;
         }
@@ -114,27 +173,66 @@ public class StockReport implements Initializable {
         }
     }
 
-    private void getStock() {
+    private void getStock(Map<String, Object> data) {
+        itemList.clear();
+        String filterType = "All";
 
-        if (null != itemList){
-            itemList.clear();
+        if (data != null) {
+
+            filterType = (String) data.get("filter_type");
         }
-
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
-            Thread.sleep(100);
             connection = new DBConnection().getConnection();
 
-            String qry = "select ts.stock_id,tim.strip_tab, tim.items_name,tim.packing,tpi.batch,tpi.expiry_date,tpi.purchase_rate,tpi.mrp,tpi.sale_price,\n" +
-                    "       ts.quantity,ts.quantity_unit from tbl_stock ts\n" +
-                    "left join tbl_items_master tim on tim.item_id = ts.item_id\n" +
-                    "left join tbl_purchase_items tpi on ts.purchase_items_id = tpi.purchase_items_id order by quantity asc";
-            ps = connection.prepareStatement(qry);
-            rs = ps.executeQuery();
+            String order_by = """
+                                        
+                     order by  expiry_date, quantity asc 
+                                        
+                    """;
 
+            String qry = """
+                    select * from stock_v
+                    """;
+
+            String whereCondition = "";
+
+            if (Objects.equals(filterType, "Expired Medicine")) {
+                whereCondition = """
+                          where TO_DATE(concat(EXTRACT(DAY FROM (date_trunc('MONTH', concat(split_part(expiry_date, '/', 2), '-',
+                                                                                          split_part(expiry_date, '/', 1), '-', '01')::date) +
+                                                               INTERVAL '1 MONTH' - INTERVAL '1 day')),'/',expiry_date),'dd/MM/yyyy') <= now() 
+                        """ + order_by;
+            } else if (Objects.equals(filterType, "Low Quantity")) {
+                whereCondition = """
+                          where cast(split_part(full_quantity,'-',1) as int) < ?
+                        """ + order_by;
+            } else if (Objects.equals(filterType, "Expiring Soon")) {
+                whereCondition = """
+                          where expiry_days_left < ?
+                        """ + order_by;
+            } else {
+
+                whereCondition = """
+                          where quantity = case when ? = 'Out Of Stock' then 0 else quantity end
+                                           
+                        """ + order_by;
+
+            }
+            ps = connection.prepareStatement(qry + " " + whereCondition);
+
+            if (Objects.equals(filterType, "Out Of Stock") || Objects.equals(filterType, "All")) {
+                ps.setString(1, filterType);
+            } else if (Objects.equals(filterType, "Low Quantity")) {
+                ps.setInt(1, lowQuantity);
+            } else if (Objects.equals(filterType, "Expiring Soon")) {
+                ps.setInt(1, expiryLeftDays);
+            }
+
+            rs = ps.executeQuery();
             while (rs.next()) {
                 int stockId = rs.getInt("stock_id");
                 String productName = rs.getString("ITEMS_NAME");
@@ -146,13 +244,18 @@ public class StockReport implements Initializable {
                 double purRate =rs.getDouble("purchase_rate");
                 double mrp =rs.getDouble("mrp");
                 double saleRate =rs.getDouble("sale_price");
-                int stripTab = rs.getInt("strip_tab");
 
-                String qty = method.tabToStrip(quantity,stripTab,quantityUnit);
+                String qty = rs.getString("full_quantity");
+                String composition = rs.getString("composition");
+                String dose = rs.getString("dose");
+                String fullExpiryDate = rs.getString("full_expiry_date");
+                long expiry_days_left = rs.getLong("expiry_days_left");
 
                 StockModel im = new StockModel(stockId,productName,packing,quantity,
-                        quantityUnit,batch,expiry,purRate,mrp,saleRate,qty);
+                        quantityUnit, batch, expiry, purRate, mrp, saleRate, qty,
+                        composition, dose, fullExpiryDate, expiry_days_left);
                 itemList.add(im);
+
             }
 
         } catch (Exception e) {
@@ -208,10 +311,7 @@ public class StockReport implements Initializable {
                 tableView.getItems().indexOf(cellData.getValue()) + 1));
         colProductName.setCellValueFactory(new PropertyValueFactory<>("itemName"));
         colPack.setCellValueFactory(new PropertyValueFactory<>("packing"));
-        colQty.setCellValueFactory(new PropertyValueFactory<>("fullQty"));
         colBatch.setCellValueFactory(new PropertyValueFactory<>("batch"));
-
-        colExpiryDate.setCellValueFactory(new PropertyValueFactory<>("expiry"));
         colPurchaseRate.setCellValueFactory(new PropertyValueFactory<>("purchaseRate"));
         colMrp.setCellValueFactory(new PropertyValueFactory<>("mrp"));
         colSale.setCellValueFactory(new PropertyValueFactory<>("saleRate"));
@@ -232,7 +332,7 @@ public class StockReport implements Initializable {
     private void setOptionalCell() {
 
         Callback<TableColumn<StockModel, String>, TableCell<StockModel, String>>
-                cellFactory = (TableColumn<StockModel, String> param) -> new TableCell<>() {
+                cellQty = (TableColumn<StockModel, String> param) -> new TableCell<>() {
             @Override
             public void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -242,30 +342,26 @@ public class StockReport implements Initializable {
 
                 } else {
 
-                    Button editBn = new Button();
+                    String qtyStr = tableView.getItems().get(getIndex()).getFullQty();
+                    int qty = qtyStr == null ? 0 : Integer.parseInt(qtyStr.split("-")[0]);
 
+                    Label qtyLabel = new Label(qtyStr);
 
-                    ImageView ivEdit = new ImageView(new ImageLoader().load("img/icon/update_ic.png"));
-                    ivEdit.setFitHeight(17);
-                    ivEdit.setFitWidth(17);
+                    if (qty > 0 && qty < lowQuantity) {
+                        qtyLabel.setStyle("-fx-text-fill: white;-fx-font-weight: bold;-fx-background-color: #ff9933;" +
+                                "-fx-padding: 0px 3px 0px 3px;-fx-background-radius: 3px");
+                    } else if (qty == 0) {
+                        qtyLabel.setStyle("-fx-text-fill: white;-fx-font-weight: bold;-fx-background-color: red;" +
+                                "-fx-padding: 0px 3px 0px 3px;-fx-background-radius: 3px");
+                    } else {
+                        qtyLabel.setStyle("-fx-text-fill: black;-fx-font-weight:bold;-fx-background-color: inherit");
+                    }
 
-
-                    editBn.setGraphic(ivEdit);
-                    editBn.setStyle("-fx-cursor: hand ; -fx-background-color: #06a5c1 ; -fx-background-radius: 3 ");
-
-                    editBn.setOnAction((event) -> {
-                        method.selectTable(getIndex(), tableView);
-                        StockModel icm = tableView.getSelectionModel().getSelectedItem();
-
-
-                    });
-
-                    HBox managebtn = new HBox(editBn);
-                    managebtn.setStyle("-fx-alignment:center");
-                    HBox.setMargin(editBn, new Insets(10, 10, 10, 10));
+                    HBox managebtn = new HBox(qtyLabel);
+                    managebtn.setStyle("-fx-alignment:CENTER-LEFT");
+                    HBox.setMargin(qtyLabel, new Insets(0, 0, 0, 5));
 
                     setGraphic(managebtn);
-
                     setText(null);
 
                 }
@@ -273,7 +369,51 @@ public class StockReport implements Initializable {
 
         };
 
-        colAction.setCellFactory(cellFactory);
+        Callback<TableColumn<StockModel, String>, TableCell<StockModel, String>>
+                cellExpiryDate = (TableColumn<StockModel, String> param) -> new TableCell<>() {
+            @Override
+            public void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                    setText(null);
+
+                } else {
+
+                    String expiryDate = tableView.getItems().get(getIndex()).getExpiry();
+                    long expiryDaysLeft = tableView.getItems().get(getIndex()).getExpiry_days_left();
+                    Label label = getExpiryDateLabel(expiryDate, expiryDaysLeft);
+                    HBox manage = new HBox(label);
+                    manage.setStyle("-fx-alignment:CENTER-LEFT");
+                    HBox.setMargin(label, new Insets(0, 0, 0, 5));
+                    setGraphic(manage);
+                    setText(null);
+
+                }
+            }
+
+        };
+
+        colExpiryDate.setCellFactory(cellExpiryDate);
+        colQty.setCellFactory(cellQty);
+    }
+
+    private Label getExpiryDateLabel(String expiryDate, long expiryDaysLeft) {
+        Label label = new Label(expiryDate);
+
+        String style = "", tooltipText = expiryDaysLeft + " Days Left.";
+        if (expiryDaysLeft < 1) {
+            tooltipText = "Medicine Has Expired.";
+            style = "-fx-cursor: hand;-fx-text-fill: white;-fx-font-weight: bold;-fx-background-color: red;-fx-padding: 0px 3px 0px 3px;-fx-background-radius: 3px";
+        } else if (expiryDaysLeft < expiryLeftDays) {
+            style = "-fx-cursor: hand;-fx-text-fill: white;-fx-font-weight: bold;-fx-background-color: #ff9933;-fx-padding: 0px 3px 0px 3px;-fx-background-radius: 3px";
+        } else {
+            style = "-fx-cursor: hand;-fx-text-fill: black;-fx-font-weight: bold;-fx-background-color: inherit;-fx-padding: 0px 3px 0px 3px;-fx-background-radius: 3px";
+        }
+
+        label.setTooltip(new Tooltip(tooltipText));
+        label.setStyle(style);
+        return label;
     }
 
 }
