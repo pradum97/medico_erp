@@ -51,7 +51,7 @@ public class ReturnMedicine implements Initializable {
     private CustomDialog customDialog;
     private ObservableList<ReturnProductModel> itemList = FXCollections.observableArrayList();
     private String saleInvoiceNumber;
-    private double additionalDiscount, totalRefundAmount, totalDiscountAmount;
+    private double totalRefundAmount, totalDiscountAmount;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -85,7 +85,6 @@ public class ReturnMedicine implements Initializable {
         String remark = remarkTf.getText();
         String invoiceNumber = new GenerateBillNumber().getReturnBillNumb();
         int returnBy = Login.currentlyLogin_Id;
-
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -110,58 +109,69 @@ public class ReturnMedicine implements Initializable {
                     ps = null;
                     rs = null;
 
-                    String returnItemQuery = """
-                            INSERT INTO TBL_RETURN_ITEMS(STOCK_ID, SALE_ITEM_ID, QUANTITY, QUANTITY_UNIT,return_main_id) VALUES (?,?,?,?,?);
-                            """;
-                    ps = connection.prepareStatement(returnItemQuery);
-                    PreparedStatement psStockUpdate = null;
+                    int count = 0, totalItems = 0;
 
                     ObservableList<ReturnProductModel> returnProductModelsList = tableview.getItems();
+
+                    for (ReturnProductModel rm : returnProductModelsList) {
+                        if (rm.isReturn()) {
+                            totalItems += 1;
+                        }
+                    }
+
                     for (ReturnProductModel rm : returnProductModelsList) {
 
-                        if (rm.isReturn()){
-                            int quantity = Integer.parseInt(rm.getReturnQuantity());
+                        if (rm.isReturn()) {
 
+                            String returnItemQuery = """
+                                            INSERT INTO TBL_RETURN_ITEMS(STOCK_ID, SALE_ITEM_ID, QUANTITY,
+                                             QUANTITY_UNIT,return_main_id,discount_amount,amount,net_amount) VALUES (?,?,?,?,?,?,?,?);
+                            """;
+                            ps = connection.prepareStatement(returnItemQuery);
+
+                            int quantity = Integer.parseInt(rm.getReturnQuantity());
                             ps.setInt(1, rm.getStockId());
                             ps.setInt(2, rm.getSaleItemID());
                             ps.setInt(3, quantity);
                             ps.setString(4, "TAB");
                             ps.setInt(5, returnMainId);
-                            ps.executeUpdate();
+                            ps.setDouble(6, rm.getReturnDiscountAmount());
+                            ps.setDouble(7, rm.getAmount());
+                            ps.setDouble(8, rm.getReturnNetAmount());
 
-                            String saleMainUpdate = """
-                                update tbl_sale_main set additional_discount = 0 where invoice_number = ?
-                                """;
-                            psStockUpdate = connection.prepareStatement(saleMainUpdate);
-                            psStockUpdate.setString(1, saleInvoiceNumber);
-                            psStockUpdate.executeUpdate();
 
-                            String stockUpdateQuery = """
+                            if (ps.executeUpdate() > 0) {
+
+                                ps = null;
+
+                                String stockUpdateQuery = """
                                 update tbl_stock set quantity = quantity+? where stock_id = ?
                                 """;
-                            psStockUpdate = connection.prepareStatement(stockUpdateQuery);
-                            psStockUpdate.setInt(1, quantity);
-                            psStockUpdate.setInt(2, rm.getStockId());
-                            psStockUpdate.executeUpdate();
-
-                            if (null != psStockUpdate) {
-                                psStockUpdate.close();
+                                ps = connection.prepareStatement(stockUpdateQuery);
+                                ps.setInt(1, quantity);
+                                ps.setInt(2, rm.getStockId());
+                                if (ps.executeUpdate() > 0) {
+                                    count += 1;
+                                }
                             }
                         }
                     }
 
-                    connection.commit();
-                    customDialog.showAlertBox("success", "Successfully Returned.");
-                    invoiceNumberTf.setText("");
-                    if (!itemList.isEmpty()) {
-                        itemList.clear();
-                        tableview.setItems(itemList);
+
+                    if (totalItems == count) {
+                        connection.commit();
+                        customDialog.showAlertBox("success", "Successfully Returned.");
                         totalDiscountAmount = 0;
                         totalRefundAmount = 0;
-                        additionalDiscount = 0;
                         saleInvoiceNumber = "";
                         refundAmountL.setText("0");
+                        search(null);
+
+                    } else {
+                        customDialog.showAlertBox("success", "Something went wrong. Please try again");
                     }
+
+
                 }
             }
 
@@ -202,12 +212,16 @@ public class ReturnMedicine implements Initializable {
 
             String query = """
                              select tsi.sale_item_id ,(TO_CHAR(tsm.sale_date, 'dd-MM-yyyy')) as sale_date,tsi.item_name,
-                                    concat(tsi.strip*case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end+tsi.pcs,'-','TAB') as quantity , tsi.discount as discountPercentage,
+                                    concat(tsi.strip*case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end+tsi.pcs,'-',
+                                    (case when tsi.strip > 0 then 'TAB' ELSE 'PCS' END)) as quantity , tsi.discount as discountPercentage,
                                     (tsi.sale_rate/case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end) as mrpPerTab,
-                                    tsi.sale_rate,tsi.stock_id,tsm.additional_discount,
+                                    tsi.sale_rate,tsi.stock_id,additional_discount_amount as additional_discount,
+                                    (tsi.discount/case when tsi.strip_tab > 0 then (tsi.strip_tab*tsi.strip) else tsi.pcs end) as discountPerTabPercentage,
+                                    case when tsi.strip > 0 then 'TAB' ELSE 'PCS' END as display_unit,
                                     ((( tsi.strip*case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end)+tsi.pcs)*(tsi.sale_rate/case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end)-
                                      (((( tsi.strip*case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end)+tsi.pcs)*(tsi.sale_rate/case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end))*tsi.discount/100)) as netAmount,
-                                    (((( tsi.strip*case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end)+tsi.pcs)*(tsi.sale_rate/case when case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end > 0 then case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end else 1 end))*tsi.discount/100) as discountAmount
+                                    (((( tsi.strip*case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end)+tsi.pcs)*(tsi.sale_rate/case when 
+                                    case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end > 0 then case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end else 1 end))*tsi.discount/100) as discountAmount
                              from tbl_sale_main tsm
                                       left join tbl_sale_items tsi on tsm.sale_main_id = tsi.sale_main_id
                              where invoice_number = ?
@@ -228,22 +242,28 @@ public class ReturnMedicine implements Initializable {
                 System.out.println(productName);
                 String saleDate = rs.getString("sale_date");
                 String quantity = rs.getString("quantity");
+                String displayUnit = rs.getString("display_unit");
                 double netAmount = rs.getDouble("netAmount");
                 double mrp = rs.getDouble("sale_rate");
 
                 double discountPercentage = rs.getDouble("discountPercentage");
                 double mrpPerTab = rs.getDouble("mrpPerTab");
 
-                additionalDiscount = rs.getDouble("additional_discount");
                 double discountAmount = rs.getDouble("discountAmount");
+                double discountPerPCSPercentage = rs.getDouble("discountPerTabPercentage");
 
                 int returnedQty = Integer.parseInt(getReturnableQuantity(saleItemId).split("-")[0]);
                 int totalQuantity = Integer.parseInt(quantity.split("-")[0]);
+                String returnable = ((totalQuantity - returnedQty) + "-" + displayUnit);
 
-                String returnable = ((totalQuantity-returnedQty)+"-TAB");
 
-                ReturnProductModel returnProductModel = new ReturnProductModel(saleItemId, productName, netAmount, mrp,
-                        quantity, saleDate, discountAmount, "0", false, stockId, mrpPerTab, discountPercentage,returnable);
+                String displayMrp = mrpPerTab + " / " + displayUnit;
+
+                ReturnProductModel returnProductModel = new ReturnProductModel(saleItemId, productName,
+                        Double.parseDouble(method.decimalFormatter(netAmount)), mrp,
+                        quantity, saleDate, Double.parseDouble(method.decimalFormatter(discountAmount)),
+                        "0", false, stockId, mrpPerTab, discountPercentage, returnable, displayMrp,
+                        discountPerPCSPercentage, displayUnit, 0, 0, 0);
                 itemList.add(returnProductModel);
             }
 
@@ -259,7 +279,7 @@ public class ReturnMedicine implements Initializable {
 
             colProductName.setCellValueFactory(new PropertyValueFactory<>("itemName"));
             colQty.setCellValueFactory(new PropertyValueFactory<>("quantity"));
-            colMrp.setCellValueFactory(new PropertyValueFactory<>("mrp"));
+            colMrp.setCellValueFactory(new PropertyValueFactory<>("displayMrp"));
             colDiscountAmount.setCellValueFactory(new PropertyValueFactory<>("discountAmount"));
             colNetAmount.setCellValueFactory(new PropertyValueFactory<>("netAmount"));
             colPurchaseDate.setCellValueFactory(new PropertyValueFactory<>("saleDate"));
@@ -267,13 +287,16 @@ public class ReturnMedicine implements Initializable {
             colReturnableQty.setCellValueFactory(new PropertyValueFactory<>("returnableQuantity"));
             colReturnQuantity.setCellFactory(TextFieldTableCell.forTableColumn());
             colReturnQuantity.setOnEditCommit(e -> {
-                String qtyUnit = "TAB";
 
+                ReturnProductModel rmp = e.getTableView().getItems().get(e.getTablePosition()
+                        .getRow());
                 int avlQuantity = Integer.parseInt(e.getTableView().getItems().get(e.getTablePosition()
                         .getRow()).getReturnableQuantity().split("-")[0].replaceAll("[^0-9.]", ""));
                 int inputQuantity = 0;
                 try {
                     inputQuantity = Integer.parseInt(e.getNewValue().replaceAll("[^0-9.]", ""));
+                    String qtyUnit = e.getTableView().getItems().get(e.getTablePosition()
+                            .getRow()).getDisplayUnit();
                     if (inputQuantity>=0){
                         if (inputQuantity > avlQuantity) {
                             String msg = "Available Quantity:  " + avlQuantity + " -" + qtyUnit
@@ -289,6 +312,18 @@ public class ReturnMedicine implements Initializable {
                         } else {
                             e.getTableView().getItems().get(e.getTablePosition().getRow()).setReturn(inputQuantity > 0);
                             e.getTableView().getItems().get(e.getTablePosition().getRow()).setReturnQuantity(String.valueOf(inputQuantity));
+                            double rate = rmp.getMrpPerTab();
+                            double disPer = inputQuantity * rmp.getDiscountPerPCSPercentage();
+                            double disAmt = (((rate * inputQuantity) * disPer) / 100);
+
+                            double reAmt = (rate * inputQuantity);
+
+
+                            rmp.setAmount(reAmt);
+                            rmp.setReturnDiscountAmount(disAmt);
+                            rmp.setReturnNetAmount(reAmt - disAmt);
+
+
                             calculate();
                         }
                     }else {
@@ -344,22 +379,12 @@ public class ReturnMedicine implements Initializable {
         for (ReturnProductModel rp : tableview.getItems()) {
             if (rp.isReturn()) {
                 submitBn.setDisable(false);
-                int returnQuantity = 0;
-                try {
-                    returnQuantity = Integer.parseInt(rp.getReturnQuantity().replaceAll("[^0-9.]", ""));
-                } catch (NumberFormatException e) {
-                    e.printStackTrace();
-                }
-                double rate = rp.getMrpPerTab();
-                double disAmt = ((rate * rp.getDiscountPercentage()) / 100) * returnQuantity;
-                double reAmt = (rate * returnQuantity);
-
-                totalRefundAmount += reAmt;
-                totalDiscountAmount += disAmt;
+                totalRefundAmount += rp.getAmount();
+                totalDiscountAmount += rp.getReturnDiscountAmount();
             }
         }
-        double refundAmount = ((totalRefundAmount - totalDiscountAmount) - additionalDiscount);
-        refundAmountL.setText(String.valueOf(refundAmount));
+        double refundAmount = ((totalRefundAmount - totalDiscountAmount));
+        refundAmountL.setText(String.valueOf(Math.round(refundAmount)));
     }
 
     public void keyPress(KeyEvent keyEvent) {

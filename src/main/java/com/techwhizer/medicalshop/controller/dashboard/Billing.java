@@ -18,6 +18,8 @@ import com.techwhizer.medicalshop.util.DBConnection;
 import com.victorlaerte.asynctask.AsyncTask;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -58,7 +60,6 @@ public class Billing implements Initializable {
     public TableColumn<SaleEntryModel, String> colAmount;
 
     public TableColumn<SaleEntryModel, String> colAction;
-    public Button saleButton;
     public Label totAmountL;
     public Label totDisAmountL;
     public Label totGstAmountL;
@@ -94,6 +95,7 @@ public class Billing implements Initializable {
     public Pagination pagination;
     public Label genderL;
     public Label guardianNameL;
+    public Label addDisAmountL;
     private CustomDialog customDialog;
     private Method method;
     private DBConnection dbConnection;
@@ -119,10 +121,15 @@ public class Billing implements Initializable {
         staticData = new StaticData();
         dbConnection = new DBConnection();
         method.hideElement(progressBar);
-        tableViewPatient.setFixedCellSize(30);
+        tableViewPatient.setFixedCellSize(26);
         setData();
         callThread(Type.GET_PATIENT);
         callThread(Type.GET_CART_DATA);
+    }
+
+    private void setInvoiceAmount(double amount){
+
+        Platform.runLater(()-> invoiceValueTf.setText(String.valueOf(Math.round(amount))));
     }
 
     private void setData() {
@@ -154,7 +161,8 @@ public class Billing implements Initializable {
             totGstAmountL.setText(method.decimalFormatter(totGstAmount));
             totDisAmountL.setText(method.decimalFormatter(totalDiscount));
 
-            invoiceValueTf.setText(method.removeZeroAfterDecimal(Math.round((netTotalAmount))));
+            setInvoiceAmount(netTotalAmount);
+
         });
     }
 
@@ -171,24 +179,24 @@ public class Billing implements Initializable {
 
                 } else {
 
-                    Button selectBn = new Button();
+                    Button deleteBn = new Button();
                     ImageView iv = new ImageView(new ImageLoader().load("img/icon/delete_ic_white.png"));
-                    iv.setFitHeight(17);
-                    iv.setFitWidth(17);
+                    iv.setFitHeight(12);
+                    iv.setFitWidth(12);
 
-                    selectBn.setGraphic(iv);
-                    selectBn.setStyle("-fx-cursor: hand ; -fx-background-color: #c1061c ; -fx-background-radius: 3 ");
+                    deleteBn.setGraphic(iv);
+                    deleteBn.setStyle("-fx-cursor: hand ; -fx-background-color: #c1061c ; -fx-background-radius: 3;-fx-padding: 2 4 2 4 ");
 
-                    selectBn.setOnAction((event) -> {
+                    deleteBn.setOnAction((event) -> {
                         method.selectTable(getIndex(), tableView);
                         SaleEntryModel sem = tableView.getSelectionModel().getSelectedItem();
                         removeItem(sem.getCartId());
 
                     });
 
-                    HBox managebtn = new HBox(selectBn);
+                    HBox managebtn = new HBox(deleteBn);
                     managebtn.setStyle("-fx-alignment:center");
-                    HBox.setMargin(selectBn, new Insets(0, 0, 0, 0));
+                    HBox.setMargin(deleteBn, new Insets(0, 0, 0, 0));
 
                     setGraphic(managebtn);
 
@@ -295,29 +303,41 @@ public class Billing implements Initializable {
             setTableDate();
             Platform.runLater(()->{
                 addDiscTF.textProperty().addListener((observableValue, s, val1) -> {
-                    double mainValue = Math.round((netTotalAmount));
-
+                    double mainValue = netTotalAmount;
                     String val = addDiscTF.getText();
+
+                    double invoiceValue = 0,discountAmount = 0;
                     if (!val.isEmpty()){
+
                         try {
-                            double addDis = Double.parseDouble(val);
-                            if (addDis>mainValue){
+                            double addDisPercentage = Double.parseDouble(val);
+                            if(addDisPercentage > 100){
+                                method.show_popup("You cannot discount more than 100 percent",addDiscTF);
+                                addDiscTF.setText(String.valueOf(0));
+                                return;
+                            }
+                            discountAmount = mainValue*Double.parseDouble(val)/100;
+
+                            if (discountAmount>mainValue){
                                 method.show_popup("Please enter amount less then invoice value",addDiscTF);
-                                addDiscTF.setText("");
+                                addDiscTF.setText(String.valueOf(0));
+                                discountAmount = 0;
                                 return;
                             }else {
-                                double invVal = Math.round(mainValue-addDis);
-                                Platform.runLater(()->invoiceValueTf.setText(String.valueOf(invVal)));
+                                invoiceValue = mainValue-discountAmount;
                             }
                         } catch (NumberFormatException e) {
-                            invoiceValueTf.setText(String.valueOf(mainValue));
+                            invoiceValue = mainValue;
                             method.show_popup("Please enter amount less then invoice value",addDiscTF);
-                            addDiscTF.setText("");
+                            addDiscTF.setText(String.valueOf(0));
+                            discountAmount = 0;
                         }
                     }else {
-                        invoiceValueTf.setText(String.valueOf(mainValue));
+                        invoiceValue = mainValue;
+                        discountAmount = 0;
                     }
-
+                    addDisAmountL.setText(String.valueOf(method.decimalFormatter(discountAmount)));
+                    setInvoiceAmount(invoiceValue);
                 });
             });
 
@@ -801,12 +821,7 @@ public class Billing implements Initializable {
             connection = new DBConnection().getConnection();
 
             String qry = """
-                            select (TO_CHAR(tp.creation_date, 'DD-MM-YYYY')) as creation_date,
-                           (TO_CHAR(tp.last_update, 'DD-MM-YYYY')) as last_update,
-                         concat ( COALESCE(ts.name,''),' ',COALESCE(tp.first_name,''),' ',
-                        COALESCE(tp.middle_name,''),' ',COALESCE(tp.last_name,'')) as fullName,
-                        ts.name as salutation_name , * from tbl_patient tp
-                    left join tbl_salutation ts on tp.salutation_id = ts.salutation_id
+                            select * from patient_v
                     order by patient_id  desc
                      """;
 
@@ -1069,28 +1084,59 @@ public class Billing implements Initializable {
 
             connection = dbConnection.getConnection();
             connection.setAutoCommit(false);
-            double addiDisc = 0;
+            double addiDiscAmt = 0,addDiscountPercentage = 0,totalDiscountAmount = 0,discountPerItem = 0.0;
 
             if (!addDiscTF.getText().isEmpty()){
                 try {
-                    addiDisc = Double.parseDouble(addDiscTF.getText());
+                    addDiscountPercentage =addDiscTF.getText().isEmpty()?0:
+                            Double.parseDouble(addDiscTF.getText());
+
+                    discountPerItem = addDiscountPercentage/(items.isEmpty()?0:items.size());
+
+                    System.out.println("discountPerItem-"+discountPerItem);
+
                 } catch (NumberFormatException ignored) {
                     customDialog.showAlertBox("", "Please enter valid additional discount");
                     return;
                 }
             }
 
+            if (!totDisAmountL.getText().isEmpty()){
+                try {
+                double totDisAmount =Double.parseDouble(totDisAmountL.getText());
+
+                if (totDisAmount > 0){
+                    totalDiscountAmount = totDisAmount;
+                }
+                } catch (NumberFormatException ignored) {
+
+                }
+            }
+
+            if (!addDisAmountL.getText().isEmpty()){
+                try {
+                    double totAddDisAmount =Double.parseDouble(addDisAmountL.getText());
+
+                    if (totAddDisAmount > 0){
+                        addiDiscAmt = totAddDisAmount;
+                    }
+                } catch (NumberFormatException ignored) {
+
+                }
+            }
+
 
             String invoiceNumber = new GenerateBillNumber().getSaleBillNum();
 
-            String saleMainQuery = "INSERT INTO TBL_SALE_MAIN(PATIENT_ID, SELLER_ID, ADDITIONAL_DISCOUNT," +
-                    " PAYMENT_MODE, TOT_TAX_AMOUNT, NET_AMOUNT, INVOICE_NUMBER, BILL_TYPE,doctor_id,payment_reference_num,remarks,created_by) " +
-                    "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)\n";
+            String saleMainQuery = "INSERT INTO TBL_SALE_MAIN(PATIENT_ID, SELLER_ID, additional_discount_amount," +
+                    " PAYMENT_MODE, TOT_TAX_AMOUNT, NET_AMOUNT, INVOICE_NUMBER, BILL_TYPE,doctor_id," +
+                    "payment_reference_num,remarks,created_by,additional_discount_percentage,total_discount_amount) " +
+                    "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)\n";
 
             ps = connection.prepareStatement(saleMainQuery, new String[]{"sale_main_id"});
             ps.setInt(1, patientId);
             ps.setInt(2, Login.currentlyLogin_Id);
-            ps.setDouble(3, addiDisc);
+            ps.setDouble(3, addiDiscAmt);
             ps.setString(4, paytmModeS);
             ps.setDouble(5, totalTaxAmtD);
             ps.setDouble(6, invoiceValue);
@@ -1106,6 +1152,8 @@ public class Billing implements Initializable {
             ps.setString(10, referenceNumTf.getText());
             ps.setString(11, remarksTf.getText());
             ps.setInt(12, Login.currentlyLogin_Id);
+            ps.setDouble(13,addDiscountPercentage);
+            ps.setDouble(14,totalDiscountAmount);
 
             int resMain = ps.executeUpdate();
 
@@ -1131,7 +1179,7 @@ public class Billing implements Initializable {
                         ps.setDouble(4, model.getSaleRate());
                         ps.setInt(5, model.getStrip());
                         ps.setInt(6, model.getPcs());
-                        ps.setDouble(7, model.getDiscount());
+                        ps.setDouble(7, (model.getDiscount()+discountPerItem));
                         ps.setLong(8, model.getHsn());
                         ps.setInt(9, model.getiGst());
                         ps.setInt(10, model.getsGst());

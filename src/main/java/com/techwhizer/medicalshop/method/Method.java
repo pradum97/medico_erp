@@ -740,7 +740,7 @@ public class Method extends StaticData {
     }
 
     public String decimalFormatter(Object o) {
-        DecimalFormat formatter = new DecimalFormat("#0.0");
+        DecimalFormat formatter = new DecimalFormat("#0.00");
         return formatter.format(o);
     }
 

@@ -154,7 +154,7 @@
                                     <Font name="Arial Bold" size="12.0" />
                                  </font>
                               </Label>
-                              <Label fx:id="itemNameL" alignment="CENTER" minHeight="30.0" minWidth="300.0" onKeyPressed="#enterKeyPress" onMouseClicked="#chooseItem" prefHeight="30.0" prefWidth="300.0" style="-fx-border-color: grey; -fx-border-radius: 3; -fx-cursor: hand;" text="SELECT ITEM" textAlignment="CENTER" />
+                              <Label fx:id="itemNameL" alignment="CENTER" minHeight="27.0" minWidth="300.0" onKeyPressed="#enterKeyPress" onMouseClicked="#chooseItem" prefWidth="300.0" style="-fx-border-color: grey; -fx-border-radius: 3; -fx-cursor: hand;" text="SELECT ITEM" textAlignment="CENTER" />
                            </children>
                         </VBox>
                         <VBox minWidth="220.0" prefHeight="30.0">
@@ -169,7 +169,7 @@
                               </Label>
                               <HBox alignment="CENTER">
                                  <children>
-                                    <TextField fx:id="stripTf" minHeight="30.0" minWidth="90.0" onKeyPressed="#enterKeyPress" prefHeight="30.0" prefWidth="100.0" promptText="Enter strip" style="-fx-border-color: grey; -fx-border-radius: 3;" />
+                                    <TextField fx:id="stripTf" minHeight="27.0" minWidth="90.0" onKeyPressed="#enterKeyPress" prefHeight="27.0" prefWidth="100.0" promptText="Enter strip" style="-fx-border-color: grey; -fx-border-radius: 3;" />
                                     <Label alignment="CENTER" minWidth="10.0" text="/" textAlignment="CENTER" textFill="#04852f">
                                        <font>
                                           <Font name="Arial Bold" size="14.0" />
@@ -178,7 +178,7 @@
                                           <Insets />
                                        </HBox.margin>
                                     </Label>
-                                    <TextField fx:id="pcsTf" minHeight="32.0" minWidth="90.0" onKeyPressed="#enterKeyPress" prefHeight="32.0" prefWidth="100.0" promptText="Enter pcs" style="-fx-border-color: grey; -fx-border-radius: 3;" />
+                                    <TextField fx:id="pcsTf" minHeight="27.0" minWidth="90.0" onKeyPressed="#enterKeyPress" prefHeight="27.0" prefWidth="100.0" promptText="Enter pcs" style="-fx-border-color: grey; -fx-border-radius: 3;" />
                                  </children>
                               </HBox>
                            </children>
@@ -204,7 +204,7 @@
                               </HBox>
                               <HBox prefHeight="40.0" prefWidth="295.0">
                                  <children>
-                                    <TextField fx:id="saleRateTf" minHeight="30.0" onKeyPressed="#enterKeyPress" prefHeight="30.0" prefWidth="209.0" promptText="Enter sale rate" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
+                                    <TextField fx:id="saleRateTf" minHeight="27.0" onKeyPressed="#enterKeyPress" prefHeight="27.0" prefWidth="209.0" promptText="Enter sale rate" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
                                  </children>
                               </HBox>
                            </children>
@@ -212,7 +212,7 @@
                         <VBox alignment="TOP_CENTER">
                            <children>
                               <Label />
-                              <Button fx:id="addItemToList" graphicTextGap="3.0" minWidth="80.0" mnemonicParsing="false" onAction="#addItemToListClick" prefHeight="29.0" prefWidth="80.0" style="-fx-cursor: hand; -fx-background-radius: 3; -fx-border-radius: 3; -fx-background-color: #04852f;" text="ADD" textFill="WHITE">
+                              <Button fx:id="addItemToList" graphicTextGap="3.0" minHeight="24.0" minWidth="60.0" mnemonicParsing="false" onAction="#addItemToListClick" prefWidth="60.0" style="-fx-cursor: hand; -fx-background-radius: 3; -fx-border-radius: 3; -fx-background-color: #04852f;" text="ADD" textFill="WHITE">
                                  <font>
                                     <Font name="System Bold" size="10.0" />
                                  </font>
@@ -294,17 +294,17 @@
                </padding>
             </VBox>
             <Separator prefWidth="200.0" />
-                  <TableView fx:id="tableView" editable="true" focusTraversable="false" VBox.vgrow="ALWAYS">
+                  <TableView fx:id="tableView" focusTraversable="false" VBox.vgrow="ALWAYS">
                       <columns>
                           <TableColumn fx:id="colSrNo" editable="false" maxWidth="35.0" minWidth="35.0" sortable="false" text="#" />
-                          <TableColumn fx:id="colProductName" editable="false" maxWidth="230.0" minWidth="200.0" sortable="false" text="PRODUCT NAME" />
+                          <TableColumn fx:id="colProductName" editable="false" maxWidth="270.0" minWidth="200.0" sortable="false" text="PRODUCT NAME" />
                           <TableColumn fx:id="colStrip" maxWidth="55.0" minWidth="55.0" prefWidth="-1.0" sortable="false" text="STRIP" />
-                  <TableColumn fx:id="colPcs" maxWidth="70.0" minWidth="70.0" prefWidth="-1.0" sortable="false" text="PCS/TAB" />
+                  <TableColumn fx:id="colPcs" maxWidth="73.0" minWidth="73.0" prefWidth="-1.0" sortable="false" text="PCS/TAB" />
                           <TableColumn fx:id="colMrp" maxWidth="100.0" minWidth="90.0" sortable="false" text="MRP" />
                           <TableColumn fx:id="colExpiryDate" editable="false" maxWidth="90.0" minWidth="90.0" sortable="false" text="EXP DATE" />
                   <TableColumn fx:id="colDiscount" maxWidth="60.0" minWidth="55.0" prefWidth="-1.0" sortable="false" text="DIS %" />
                   <TableColumn fx:id="colGst" maxWidth="60.0" minWidth="55.0" prefWidth="-1.0" sortable="false" text="GST%" />
-                  <TableColumn fx:id="colAmount" editable="false" maxWidth="120.0" minWidth="100.0" sortable="false" text="AMOUNT" />
+                  <TableColumn fx:id="colAmount" editable="false" maxWidth="130.0" minWidth="120.0" sortable="false" text="AMOUNT" />
                           <TableColumn fx:id="colAction" editable="false" maxWidth="90.0" minWidth="90.0" sortable="false" text="#" />
                       </columns>
                       <columnResizePolicy>
@@ -361,6 +361,26 @@
                                                               </Label>
                                                           </children>
                                                       </HBox>
+                                       <HBox alignment="CENTER_LEFT" layoutX="290.0" layoutY="15.0">
+                                          <children>
+                                             <Label alignment="CENTER_RIGHT" minWidth="60.0" prefHeight="15.0" style="-fx-text-fill: BLACK;" text="Add. Disc Amt :">
+                                                <font>
+                                                   <Font name="Arial Bold" size="12.0" />
+                                                </font>
+                                                <HBox.margin>
+                                                   <Insets left="7.0" />
+                                                </HBox.margin>
+                                             </Label>
+                                             <Label fx:id="addDisAmountL" layoutX="10.0" layoutY="10.0" minWidth="70.0" style="-fx-text-fill: BLACK;" textFill="#04852f">
+                                                <HBox.margin>
+                                                   <Insets left="10.0" />
+                                                </HBox.margin>
+                                                <font>
+                                                   <Font name="Arial" size="13.0" />
+                                                </font>
+                                             </Label>
+                                          </children>
+                                       </HBox>
                                                       <HBox alignment="CENTER_LEFT">
                                                           <children>
                                                               <Label fx:id="taxTitleL" alignment="CENTER_RIGHT" minWidth="62.0" prefHeight="15.0" style="-fx-text-fill: BLACK;" text="Gst Amt :">
@@ -381,26 +401,6 @@
                                                               </Label>
                                                           </children>
                                                       </HBox>
-                                                    <HBox alignment="CENTER_LEFT" fillHeight="false" maxWidth="1.0" visible="false">
-                                                        <children>
-                                                            <Label alignment="CENTER_RIGHT" style="-fx-text-fill: BLACK;" text="ADDITI DIS  ₹ : " textAlignment="CENTER">
-                                                                <font>
-                                                                    <Font name="Arial Bold" size="12.0" />
-                                                                </font>
-                                                                <HBox.margin>
-                                                                    <Insets left="7.0" />
-                                                                </HBox.margin>
-                                                            </Label>
-                                                            <TextField fx:id="addDiscTF" focusTraversable="false" style="-fx-text-fill: #04852f; -fx-border-color: grey; -fx-border-radius: 4;" text="0">
-                                                                <HBox.margin>
-                                                                    <Insets left="2.0" />
-                                                                </HBox.margin>
-                                                                <font>
-                                                                    <Font name="Arial" size="11.0" />
-                                                                </font>
-                                                            </TextField>
-                                                        </children>
-                                                    </HBox>
                                                     <HBox alignment="CENTER_LEFT">
                                                         <children>
                                                             <Label alignment="CENTER_RIGHT" minWidth="120.0" text="INVOICE VALUE   ₹ : " textFill="#d91111">
@@ -447,7 +447,7 @@
                                                                                     <Insets left="5.0" />
                                                                                 </VBox.margin>
                                                                             </Label>
-                                                                            <ComboBox fx:id="billingTypeC" focusTraversable="false" maxWidth="130.0" minWidth="110.0" prefHeight="30.0" prefWidth="130.0" style="-fx-background-radius: 1; -fx-border-color: grey; -fx-border-radius: 4; -fx-background-radius: 4;" />
+                                                                            <ComboBox fx:id="billingTypeC" focusTraversable="false" maxWidth="120.0" minHeight="24.0" minWidth="110.0" prefHeight="24.0" prefWidth="120.0" style="-fx-background-radius: 1; -fx-border-color: grey; -fx-border-radius: 4; -fx-background-radius: 4;" />
                                                                         </children>
                                                                         <HBox.margin>
                                                                             <Insets />
@@ -463,7 +463,7 @@
                                                                                   <Insets left="1.0" />
                                                                               </VBox.margin>
                                                                           </Label>
-                                                                          <ComboBox fx:id="paymentModeC" focusTraversable="false" maxWidth="130.0" minWidth="120.0" prefHeight="30.0" prefWidth="130.0" style="-fx-background-radius: 1; -fx-border-color: grey; -fx-border-radius: 4; -fx-background-radius: 4;">
+                                                                          <ComboBox fx:id="paymentModeC" focusTraversable="false" maxWidth="115.0" minHeight="24.0" minWidth="120.0" prefWidth="115.0" style="-fx-background-radius: 1; -fx-border-color: grey; -fx-border-radius: 4; -fx-background-radius: 4;">
                                                                               <VBox.margin>
                                                                                   <Insets />
                                                                               </VBox.margin>
@@ -480,7 +480,7 @@
                                                                <Insets left="1.0" />
                                                             </VBox.margin>
                                                          </Label>
-                                                         <TextField fx:id="referenceNumTf" minWidth="120.0" prefHeight="30.0" prefWidth="130.0" style="-fx-border-color: grey; -fx-border-radius: 4;" />
+                                                         <TextField fx:id="referenceNumTf" minHeight="24.0" minWidth="120.0" prefWidth="130.0" style="-fx-border-color: grey; -fx-border-radius: 4;" />
                                                       </children>
                                                    </VBox>
                                                    <VBox>
@@ -492,7 +492,7 @@
                                                          </Label>
                                                          <HBox>
                                                             <children>
-                                                               <Label fx:id="doctorNameL" alignment="CENTER" minHeight="30.0" minWidth="200.0" onMouseClicked="#selectDoctor" prefHeight="30.0" prefWidth="280.0" style="-fx-border-color: grey; -fx-border-radius: 4; -fx-cursor: hand;" text="SELECT DOCTOR" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+                                                               <Label fx:id="doctorNameL" alignment="CENTER" minHeight="24.0" minWidth="200.0" onMouseClicked="#selectDoctor" prefWidth="280.0" style="-fx-border-color: grey; -fx-border-radius: 4; -fx-cursor: hand;" text="SELECT DOCTOR" textAlignment="CENTER" HBox.hgrow="ALWAYS">
                                                                   <font>
                                                                      <Font size="13.0" />
                                                                   </font>
@@ -514,7 +514,20 @@
                                                                <Insets left="1.0" />
                                                             </VBox.margin>
                                                          </Label>
-                                                         <TextField fx:id="remarksTf" minWidth="200.0" prefHeight="30.0" style="-fx-border-color: grey; -fx-border-radius: 4;" />
+                                                         <TextField fx:id="remarksTf" minHeight="24.0" minWidth="200.0" prefHeight="24.0" style="-fx-border-color: grey; -fx-border-radius: 4;" />
+                                                      </children>
+                                                   </VBox>
+                                                   <VBox alignment="CENTER_LEFT" layoutX="615.0" layoutY="10.0" maxWidth="105.0" minWidth="105.0" spacing="1.0">
+                                                      <children>
+                                                         <Label text="Discount (%) :">
+                                                            <font>
+                                                               <Font name="Arial Bold" size="13.0" />
+                                                            </font>
+                                                            <VBox.margin>
+                                                               <Insets left="1.0" />
+                                                            </VBox.margin>
+                                                         </Label>
+                                                         <TextField fx:id="addDiscTF" minHeight="24.0" minWidth="100.0" prefHeight="24.0" style="-fx-border-color: grey; -fx-border-radius: 4;" text="0" />
                                                       </children>
                                                    </VBox>
                                                 </children>
@@ -526,7 +539,7 @@
                                                         <children>
                                                             <HBox alignment="CENTER" prefHeight="26.0" prefWidth="254.0" spacing="20.0">
                                                                 <children>
-                                                                    <Button alignment="CENTER" focusTraversable="false" graphicTextGap="10.0" minWidth="120.0" onAction="#closeBn" prefHeight="30.0" style="-fx-cursor: hand; -fx-background-color: RED; -fx-text-fill: WHITE; -fx-background-radius: 30;" text="CANCEL" textAlignment="CENTER">
+                                                                    <Button alignment="CENTER" focusTraversable="false" graphicTextGap="10.0" minWidth="116.0" onAction="#closeBn" prefHeight="24.0" prefWidth="116.0" style="-fx-cursor: hand; -fx-background-color: RED; -fx-text-fill: WHITE; -fx-background-radius: 30;" text="CANCEL" textAlignment="CENTER">
                                                                         <graphic>
                                                                             <ImageView fitHeight="16.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
                                                                                 <image>
@@ -538,11 +551,11 @@
                                                                             <Insets left="20.0" right="20.0" />
                                                                         </padding>
                                                                         <font>
-                                                                            <Font name="Arial Bold" size="12.0" />
+                                                                            <Font name="Arial Bold" size="11.0" />
                                                                         </font>
                                                                     </Button>
 
-                                                                                <Button alignment="CENTER" focusTraversable="false" graphicTextGap="6.0" minWidth="80.0" onAction="#clearAllBn" prefHeight="30.0" style="-fx-cursor: hand; -fx-background-color: grey; -fx-text-fill: WHITE; -fx-background-radius: 30;" text="CLEAR" textAlignment="CENTER">
+                                                                                <Button alignment="CENTER" focusTraversable="false" graphicTextGap="6.0" minWidth="80.0" onAction="#clearAllBn" prefHeight="24.0" style="-fx-cursor: hand; -fx-background-color: grey; -fx-text-fill: WHITE; -fx-background-radius: 30;" text="CLEAR" textAlignment="CENTER">
                                                                         <graphic>
                                                                             <ImageView fitHeight="17.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
                                                                                 <image>
@@ -554,7 +567,7 @@
                                                                             <Insets bottom="4.0" left="10.0" right="10.0" top="4.0" />
                                                                         </padding>
                                                                         <font>
-                                                                            <Font name="Arial Bold" size="12.0" />
+                                                                            <Font name="Arial Bold" size="11.0" />
                                                                         </font>
                                                                     </Button>
                                                                 </children>
@@ -562,7 +575,7 @@
                                                             <Separator orientation="VERTICAL" />
                                                             <HBox alignment="CENTER">
                                                                 <children>
-                                                                    <Button fx:id="checkOutButton" alignment="CENTER" graphicTextGap="10.0" minWidth="150.0" onAction="#checkOutBn" prefHeight="30.0" style="-fx-cursor: hand; -fx-background-color: BLUE; -fx-text-fill: WHITE; -fx-background-radius: 30;" text="SAVE" textAlignment="CENTER">
+                                                                    <Button fx:id="checkOutButton" alignment="CENTER" graphicTextGap="10.0" minWidth="100.0" onAction="#checkOutBn" prefHeight="24.0" prefWidth="100.0" style="-fx-cursor: hand; -fx-background-color: BLUE; -fx-text-fill: WHITE; -fx-background-radius: 30;" text="SAVE" textAlignment="CENTER">
                                                                         <graphic>
                                                                             <ImageView fitHeight="16.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
                                                                                 <image>
@@ -616,14 +629,14 @@
                      <children>
                         <Button graphicTextGap="3.0" mnemonicParsing="false" onAction="#addPatient" prefHeight="31.0" prefWidth="100.0" style="-fx-cursor: hand; -fx-background-color: white; -fx-background-radius: 3; -fx-border-color: grey; -fx-border-radius: 3;" text="ADD PATIENT">
                            <graphic>
-                              <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fitHeight="14.0" fitWidth="14.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="@../img/icon/add_ic_black.png" />
                                  </image>
                               </ImageView>
                            </graphic>
                            <font>
-                              <Font name="System Bold" size="10.0" />
+                              <Font name="System Bold" size="9.0" />
                            </font>
                         </Button>
                         <TextField fx:id="searchNameTf" minHeight="30.0" prefHeight="30.0" prefWidth="225.0" promptText="Enter patient name" style="-fx-border-radius: 3; -fx-border-color: grey;" />

@@ -15,10 +15,15 @@ public class ReturnProductModel {
     private boolean isReturn;
     private int stockId;
     private double mrpPerTab,discountPercentage;
-    private String returnableQuantity;
+    private String returnableQuantity,displayMrp;
+    private double discountPerPCSPercentage;
+    private String displayUnit;
+    private double returnDiscountAmount,amount,returnNetAmount;
 
     public ReturnProductModel(int saleItemID, String itemName, double netAmount, double mrp, String quantity, String saleDate, double discountAmount, String returnQuantity,
-                              boolean isReturn, int stockId, double mrpPerTab, double discountPercentage, String returnableQuantity) {
+                              boolean isReturn, int stockId, double mrpPerTab, double discountPercentage,
+                              String returnableQuantity,String displayMrp,double discountPerPCSPercentage,
+                              String displayUnit,double returnDiscountAmount, double amount,double returnNetAmount) {
         this.saleItemID = saleItemID;
         this.itemName = itemName;
         this.netAmount = netAmount;
@@ -32,6 +37,60 @@ public class ReturnProductModel {
         this.mrpPerTab = mrpPerTab;
         this.discountPercentage = discountPercentage;
         this.returnableQuantity = returnableQuantity;
+        this.displayMrp = displayMrp;
+        this.discountPerPCSPercentage = discountPerPCSPercentage;
+        this.displayUnit = displayUnit;
+        this.returnDiscountAmount = returnDiscountAmount;
+        this.amount = amount;
+        this.returnNetAmount = returnNetAmount;
+    }
+
+    public double getReturnNetAmount() {
+        return returnNetAmount;
+    }
+
+    public void setReturnNetAmount(double returnNetAmount) {
+        this.returnNetAmount = returnNetAmount;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+
+    public double getReturnDiscountAmount() {
+        return returnDiscountAmount;
+    }
+
+    public void setReturnDiscountAmount(double returnDiscountAmount) {
+        this.returnDiscountAmount = returnDiscountAmount;
+    }
+
+    public String getDisplayUnit() {
+        return displayUnit;
+    }
+
+    public void setDisplayUnit(String displayUnit) {
+        this.displayUnit = displayUnit;
+    }
+
+    public double getDiscountPerPCSPercentage() {
+        return discountPerPCSPercentage;
+    }
+
+    public void setDiscountPerPCSPercentage(double discountPerPCSPercentage) {
+        this.discountPerPCSPercentage = discountPerPCSPercentage;
+    }
+
+    public String getDisplayMrp() {
+        return displayMrp;
+    }
+
+    public void setDisplayMrp(String displayMrp) {
+        this.displayMrp = displayMrp;
     }
 
     public String getReturnableQuantity() {

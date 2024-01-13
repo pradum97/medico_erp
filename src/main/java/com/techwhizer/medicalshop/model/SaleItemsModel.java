@@ -4,19 +4,20 @@ public class SaleItemsModel {
 
     private int sale_item_Id, productId;
     private String productName;
-    private double mrp ,taxAmount, netAmount;
+    private double mrp ,taxAmount, netAmount,discount;
     private String quantity;
     private int hsn, tax ,  igst , cgst , sgst;
     private String sellingDate ;
 
     public SaleItemsModel(int sale_item_Id, int productId, String productName, double mrp,
-                          double taxAmount, double netAmount, String quantity, int hsn, int tax, int igst, int cgst, int sgst, String sellingDate) {
+                          double taxAmount, double netAmount, double discount,String quantity, int hsn, int tax, int igst, int cgst, int sgst, String sellingDate) {
         this.sale_item_Id = sale_item_Id;
         this.productId = productId;
         this.productName = productName;
         this.mrp = mrp;
         this.taxAmount = taxAmount;
         this.netAmount = netAmount;
+        this.discount = discount;
         this.quantity = quantity;
         this.hsn = hsn;
         this.tax = tax;
@@ -24,6 +25,14 @@ public class SaleItemsModel {
         this.cgst = cgst;
         this.sgst = sgst;
         this.sellingDate = sellingDate;
+    }
+
+    public double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(double discount) {
+        this.discount = discount;
     }
 
     public int getSale_item_Id() {

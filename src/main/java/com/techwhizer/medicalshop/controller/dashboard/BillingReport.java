@@ -137,7 +137,7 @@ public class BillingReport implements Initializable {
             connection = dbConnection.getConnection();
 
             String query = """
-                    select tsm.sale_main_id ,tc.patient_id,tsm.seller_id,tsm.additional_discount,
+                    select tsm.sale_main_id ,tc.patient_id,tsm.seller_id,tsm.additional_discount_amount as additional_discount,
                            tsm.tot_tax_amount,tsm.net_amount,tsm.payment_mode,tsm.invoice_number,
                            tsm.bill_type, (TO_CHAR(tsm.sale_date , 'YYYY-MM-DD HH12:MI:SS AM')) as saleDate,
                            regexp_replace(trim( concat(COALESCE(ts.name, ''), ' ',
@@ -210,9 +210,9 @@ public class BillingReport implements Initializable {
         columnName.setCellFactory(tc -> {
             TableCell<SaleMainModel, String> cell = new TableCell<>();
             Text text = new Text();
-            text.setStyle("-fx-font-size: 14");
+            text.setStyle("-fx-font-size: 12");
             cell.setGraphic(text);
-            text.setStyle("-fx-text-alignment: CENTER ; -fx-padding: 10");
+            text.setStyle("-fx-padding: 5");
             cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
             text.wrappingWidthProperty().bind(columnName.widthProperty());
             text.textProperty().bind(cell.itemProperty());
@@ -327,8 +327,6 @@ public class BillingReport implements Initializable {
                     });
 
                     HBox container = new HBox(bnChecItem);
-                    container.setStyle("-fx-alignment:center");
-                    HBox.setMargin(bnChecItem, new Insets(0, 20, 0, 20));
                     setGraphic(container);
 
                     setText(null);
