@@ -153,6 +153,8 @@ public class ExcelExporter {
             headerRow.createCell(4).setCellValue("QUANTITY");
             headerRow.createCell(5).setCellValue("DOSE");
             headerRow.createCell(6).setCellValue("COMPOSITION");
+            headerRow.createCell(7).setCellValue("DEALER NAME");
+            headerRow.createCell(8).setCellValue("DEALER ADDRESS");
 
             for (int rowIdx = 0; rowIdx < items.size(); rowIdx++) {
 
@@ -166,6 +168,8 @@ public class ExcelExporter {
                 row.createCell(4).setCellValue(item.getFullQty());
                 row.createCell(5).setCellValue(item.getDose());
                 row.createCell(6).setCellValue(item.getComposition());
+                row.createCell(7).setCellValue(item.getDealerName());
+                row.createCell(8).setCellValue(item.getDealerAddress());
             }
 
             try (FileOutputStream fileOut = new FileOutputStream(filePath)) {

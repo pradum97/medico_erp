@@ -47,3 +47,37 @@ BEGIN
 
 END ;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_available_quantity(itemId int,format varchar(50))
+    RETURNS VARCHAR(300)
+    LANGUAGE plpgsql AS
+$func$
+
+BEGIN
+
+    return
+
+    (case when format = 'PCS' or format = 'TAB' THEN
+              cast((select distinct sum(quantity) from tbl_stock ts where item_id = itemId limit 1) as varchar(1000))
+         ELSE
+
+            cast(( select distinct
+
+                       tab_to_strip(cast(
+
+                                            (select sum(quantity) from tbl_stock ts where item_id = itemId) as int),
+                                    cast(tim.strip_tab as int),ts.quantity_unit)
+
+
+                   from stock_v ts
+
+                            left join public.tbl_items_master tim on ts.item_id = tim.item_id
+
+                   where ts.item_id = itemId limit 1) as varchar(1000))
+        END
+    );
+
+
+
+END ;
+$func$;

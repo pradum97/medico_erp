@@ -84,10 +84,29 @@ select ts.stock_id,
        EXTRACT(EPOCH FROM ( convert_expiry_date(expiry_date)::timestamp - to_char(now(),'yyyy-MM-dd')::timestamp)) / 86400 as expiry_days_left,
        tim.composition,
        tim.dose,
-       convert_expiry_date(expiry_date) as full_expiry_date
+       convert_expiry_date(expiry_date) as full_expiry_date,
+       td.dealer_name,td.address as dealer_address,td.dealer_id,tim.item_id
 from tbl_stock ts
          left join tbl_items_master tim on tim.item_id = ts.item_id
          left join tbl_purchase_items tpi on ts.purchase_items_id = tpi.purchase_items_id
+    left join public.tbl_purchase_main tpm on tpm.purchase_main_id = tpi.purchase_main_id
+left join tbl_dealer td on td.dealer_id = tpm.dealer_id;
+
+CREATE OR REPLACE VIEW available_quantity_v as
+SELECT tim.item_id, items_name, unit, strip_tab, packing, company_id, mfr_id,
+       discount_id, mr_id, gst_id, type, narcotic, item_type, status, created_by, created_date,
+       is_active, composition, dose, tag,(concat((tpt.igst + tpt.cgst + tpt.sgst), ' %')) as totalGst,
+    coalesce(get_available_quantity(tim.item_id,'STRIP'),'0')
+                                                        as avl_qty_strip
+        ,
+       cast( coalesce(get_available_quantity(tim.item_id,'TAB'),'0') as numeric)
+           as avl_qty_pcs,tpt.tax_id, tpt.sgst, tpt.cgst, tpt.igst,
+       tpt.gstname, tpt.hsn_sac, tpt.description
+
+from tbl_items_master as tim
+         left join tbl_product_tax tpt on tpt.tax_id = tim.gst_id;
+
+
 
 
 

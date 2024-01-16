@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="400.0" prefWidth="491.0" style="-fx-border-color: grey;" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.chooser.ItemChooser">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="400.0" prefWidth="651.0" style="-fx-border-color: grey;" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.chooser.ItemChooser">
    <top>
       <VBox alignment="CENTER" prefWidth="366.0" BorderPane.alignment="CENTER">
          <children>
@@ -61,6 +61,7 @@
               <columns>
                 <TableColumn fx:id="colSrNo" maxWidth="70.0" minWidth="65.0" prefWidth="-1.0" text="SR #" />
                 <TableColumn fx:id="colProductName" minWidth="300.0" prefWidth="-1.0" text="PRODUCT NAME" />
+                  <TableColumn fx:id="colAvlQty" maxWidth="160.0" minWidth="150.0" prefWidth="-1.0" text="TOT AVL QTY" />
                   <TableColumn fx:id="colAction" maxWidth="90.0" minWidth="90.0" prefWidth="-1.0" text="ACTION" />
               </columns>
                <columnResizePolicy>

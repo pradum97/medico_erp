@@ -3,6 +3,7 @@ package com.techwhizer.medicalshop.controller.dashboard;
 import com.techwhizer.medicalshop.CustomDialog;
 import com.techwhizer.medicalshop.Main;
 import com.techwhizer.medicalshop.method.Method;
+import com.techwhizer.medicalshop.model.DealerModel;
 import com.techwhizer.medicalshop.model.StockModel;
 import com.techwhizer.medicalshop.util.DBConnection;
 import com.techwhizer.medicalshop.util.ExcelExporter;
@@ -27,28 +28,28 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class StockReport implements Initializable {
 
-    public Label typeL;
-    public Label itemType;
-    public Label narcoticL;
     public Label createdDate;
     public Label statusL;
     public Button refresh_bn;
     public ComboBox<String> filterCom;
     public Button excelExportBn;
+    public ComboBox<DealerModel> comDealerList;
     int rowsPerPage = 60;
-    int lowQuantity = 10, expiryLeftDays = 60;
+   public static int lowQuantity = 15, expiryLeftDays = 60;
 
     public TextField searchTf;
     public TableView<StockModel> tableView;
     public TableColumn<StockModel, Integer> colSrNo;
     public TableColumn<StockModel, String> colProductName;
+    public TableColumn<StockModel, String> colDealerName;
     public TableColumn<StockModel, String> colPack;
-    //    public TableColumn<StockModel, String> colAction;
+    public TableColumn<StockModel, String> colDealerAddress;
     public TableColumn<StockModel, String> colBatch;
     public TableColumn<StockModel, String> colExpiryDate;
     public TableColumn<StockModel, String> colPurchaseRate;
@@ -63,6 +64,9 @@ public class StockReport implements Initializable {
     private ObservableList<String> filterList =
             FXCollections.observableArrayList("All", "Out Of Stock", "Expired Medicine",
                     "Low Quantity", "Expiring Soon");
+
+    private ObservableList<DealerModel> dealerList =
+            FXCollections.observableArrayList();
     private FilteredList<StockModel> filteredData;
 
     @Override
@@ -77,10 +81,9 @@ public class StockReport implements Initializable {
 
         Map<String, Object> data = new HashMap<>();
         data.put("filter_type", "All");
+        data.put("type", "start");
+        data.put("dealer_id", 0);
         callThread(data);
-
-
-
     }
 
     private void callThread(Map<String, Object> data) {
@@ -92,15 +95,23 @@ public class StockReport implements Initializable {
         searchTf.setText("");
         Map<String, Object> data = new HashMap<>();
         data.put("filter_type", "All");
+        data.put("type", "start");
+        data.put("dealer_id", 0);
         callThread(data);
     }
 
     public void filterBn(ActionEvent actionEvent) {
 
         String filterType = filterCom.getSelectionModel().getSelectedItem();
+        int dealerId =comDealerList.getSelectionModel().isEmpty()?0: comDealerList.getSelectionModel().getSelectedItem().getDealerId();
         Map<String, Object> data = new HashMap<>();
         data.put("filter_type", filterType);
+        data.put("type", "filter");
+        data.put("dealer_id", dealerId);
         callThread(data);
+
+        colDealerAddress.setVisible(dealerId < 1);
+        colDealerName.setVisible(dealerId < 1);
     }
 
     public <T> void excelExportBn(ActionEvent actionEvent) {
@@ -152,8 +163,13 @@ public class StockReport implements Initializable {
 
         @Override
         public Boolean doInBackground(String... params) {
-            getStock(data);
 
+            if ( null != data.get("type") && Objects.equals((String)
+                    data.get("type"), "start")){
+                getDealer();
+            }
+
+            getStock(data);
             return false;
         }
 
@@ -161,7 +177,7 @@ public class StockReport implements Initializable {
         public void onPostExecute(Boolean success) {
             refresh_bn.setDisable(false);
             tableView.setPlaceholder(new Label("Not Available"));
-            if (itemList.size() > 0) {
+            if (!itemList.isEmpty()) {
                 pagination.setVisible(true);
                 search_Item();
             }
@@ -181,6 +197,9 @@ public class StockReport implements Initializable {
 
             filterType = (String) data.get("filter_type");
         }
+
+        int dealerId = (int) data.get("dealer_id");
+
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -205,24 +224,29 @@ public class StockReport implements Initializable {
                           where TO_DATE(concat(EXTRACT(DAY FROM (date_trunc('MONTH', concat(split_part(expiry_date, '/', 2), '-',
                                                                                           split_part(expiry_date, '/', 1), '-', '01')::date) +
                                                                INTERVAL '1 MONTH' - INTERVAL '1 day')),'/',expiry_date),'dd/MM/yyyy') <= now() 
-                        """ + order_by;
+                        """ ;
             } else if (Objects.equals(filterType, "Low Quantity")) {
                 whereCondition = """
                           where cast(split_part(full_quantity,'-',1) as int) < ?
-                        """ + order_by;
+                        """;
             } else if (Objects.equals(filterType, "Expiring Soon")) {
                 whereCondition = """
                           where expiry_days_left < ?
-                        """ + order_by;
+                        """;
             } else {
 
                 whereCondition = """
                           where quantity = case when ? = 'Out Of Stock' then 0 else quantity end
                                            
-                        """ + order_by;
+                        """ ;
 
             }
-            ps = connection.prepareStatement(qry + " " + whereCondition);
+
+            String finalQry = qry + " " + whereCondition+" and dealer_id = case when "+dealerId+" > 0 then "+dealerId+" else dealer_id  end"+ order_by;
+
+            System.out.println(finalQry);
+
+            ps = connection.prepareStatement(finalQry);
 
             if (Objects.equals(filterType, "Out Of Stock") || Objects.equals(filterType, "All")) {
                 ps.setString(1, filterType);
@@ -249,11 +273,13 @@ public class StockReport implements Initializable {
                 String composition = rs.getString("composition");
                 String dose = rs.getString("dose");
                 String fullExpiryDate = rs.getString("full_expiry_date");
+                String dealerName = rs.getString("dealer_name");
+                String dealerAddress = rs.getString("dealer_address");
                 long expiry_days_left = rs.getLong("expiry_days_left");
 
                 StockModel im = new StockModel(stockId,productName,packing,quantity,
                         quantityUnit, batch, expiry, purRate, mrp, saleRate, qty,
-                        composition, dose, fullExpiryDate, expiry_days_left);
+                        composition, dose, fullExpiryDate, expiry_days_left,dealerName,dealerAddress);
                 itemList.add(im);
 
             }
@@ -315,7 +341,8 @@ public class StockReport implements Initializable {
         colPurchaseRate.setCellValueFactory(new PropertyValueFactory<>("purchaseRate"));
         colMrp.setCellValueFactory(new PropertyValueFactory<>("mrp"));
         colSale.setCellValueFactory(new PropertyValueFactory<>("saleRate"));
-
+        colDealerName.setCellValueFactory(new PropertyValueFactory<>("dealerName"));
+        colDealerAddress.setCellValueFactory(new PropertyValueFactory<>("dealerAddress"));
 
         setOptionalCell();
         int fromIndex = index * limit;
@@ -414,6 +441,47 @@ public class StockReport implements Initializable {
         label.setTooltip(new Tooltip(tooltipText));
         label.setStyle(style);
         return label;
+    }
+
+    private void getDealer() {
+
+            dealerList.clear();
+
+
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+
+            connection = new DBConnection().getConnection();
+
+            String query = """
+                    select 0 as dealer_id, 'All' as dealer_name
+                    union
+                    SELECT dealer_id, dealer_name FROM tbl_dealer order by dealer_name asc
+                    """;
+            ps = connection.prepareStatement(query);
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                int dealerId = rs.getInt("dealer_id");
+                String dealerName = rs.getString("dealer_name");
+
+                dealerList.add(new DealerModel(dealerId, dealerName));
+            }
+
+            comDealerList.setItems(dealerList);
+
+           Platform.runLater(() -> comDealerList.getSelectionModel().selectFirst());
+
+
+        } catch (SQLException ignored) {
+
+        } finally {
+            DBConnection.closeConnection(connection, ps, rs);
+        }
     }
 
 }
