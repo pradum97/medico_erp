@@ -11,10 +11,14 @@ public class StockModel {
     private double purchaseRate;
     private double mrp;
     private double saleRate;
-    private String fullQty;
-
+    private String fullQty,composition,dose;
+    private String fullExpiryDate;
+    private long expiry_days_left;
+    private String dealerName,dealerAddress;
     public StockModel(int stockId, String itemName, String packing, int quantity,
-                      String quantityUnit, String batch, String expiry, double purchaseRate, double mrp, double saleRate,String fullQty) {
+                      String quantityUnit, String batch, String expiry, double purchaseRate,
+                      double mrp, double saleRate,String fullQty,String composition,String dose,
+                      String fullExpiryDate,long expiry_days_left,String dealerName,String dealerAddress) {
         this.stockId = stockId;
         this.itemName = itemName;
         this.packing = packing;
@@ -26,6 +30,60 @@ public class StockModel {
         this.mrp = mrp;
         this.saleRate = saleRate;
         this.fullQty = fullQty;
+        this.composition = composition;
+        this.dose = dose;
+        this.fullExpiryDate = fullExpiryDate;
+        this.expiry_days_left = expiry_days_left;
+        this.dealerName = dealerName;
+        this.dealerAddress = dealerAddress;
+    }
+
+    public String getDealerAddress() {
+        return dealerAddress;
+    }
+
+    public void setDealerAddress(String dealerAddress) {
+        this.dealerAddress = dealerAddress;
+    }
+
+    public String getDealerName() {
+        return dealerName;
+    }
+
+    public void setDealerName(String dealerName) {
+        this.dealerName = dealerName;
+    }
+
+    public String getFullExpiryDate() {
+        return fullExpiryDate;
+    }
+
+    public void setFullExpiryDate(String fullExpiryDate) {
+        this.fullExpiryDate = fullExpiryDate;
+    }
+
+    public long getExpiry_days_left() {
+        return expiry_days_left;
+    }
+
+    public void setExpiry_days_left(long expiry_days_left) {
+        this.expiry_days_left = expiry_days_left;
+    }
+
+    public String getDose() {
+        return dose;
+    }
+
+    public void setDose(String dose) {
+        this.dose = dose;
+    }
+
+    public String getComposition() {
+        return composition;
+    }
+
+    public void setComposition(String composition) {
+        this.composition = composition;
     }
 
     public String getFullQty() {

@@ -10,13 +10,20 @@ import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.method.StaticData;
 import com.techwhizer.medicalshop.model.DoctorModel;
 import com.techwhizer.medicalshop.model.PatientModel;
+import com.techwhizer.medicalshop.model.PriceTypeModel;
 import com.techwhizer.medicalshop.model.SaleEntryModel;
+import com.techwhizer.medicalshop.model.chooserModel.BatchChooserModel;
+import com.techwhizer.medicalshop.model.chooserModel.ItemChooserModel;
 import com.techwhizer.medicalshop.util.DBConnection;
 import com.victorlaerte.asynctask.AsyncTask;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -24,6 +31,8 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -33,8 +42,7 @@ import javafx.util.Callback;
 
 import java.net.URL;
 import java.sql.*;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class Billing implements Initializable {
     public Label patientNameL;
@@ -52,7 +60,6 @@ public class Billing implements Initializable {
     public TableColumn<SaleEntryModel, String> colAmount;
 
     public TableColumn<SaleEntryModel, String> colAction;
-    public Button saleButton;
     public Label totAmountL;
     public Label totDisAmountL;
     public Label totGstAmountL;
@@ -67,6 +74,28 @@ public class Billing implements Initializable {
     public Button checkOutButton;
     public HBox progressBar;
     public Label doctorNameL;
+    public Label patientAgeL;
+    public Label patientAddressL;
+    public Label itemNameL;
+    public TextField stripTf;
+    public TextField pcsTf;
+    public Label saleRateLabel;
+    public TextField saleRateTf;
+    public Button addItemToList;
+    public Label mrpL;
+    public Label avlQuantity;
+    public Label tabPerStripL;
+    public TextField referenceNumTf;
+    public TextField remarksTf;
+    public TextField searchNameTf;
+    public TableView<PatientModel> tableViewPatient;
+    public TableColumn<PatientModel, Integer> colPatientSr;
+    public TableColumn<PatientModel, String> colAdmNum;
+    public TableColumn<PatientModel, String> colPatientName;
+    public Pagination pagination;
+    public Label genderL;
+    public Label guardianNameL;
+    public Label addDisAmountL;
     private CustomDialog customDialog;
     private Method method;
     private DBConnection dbConnection;
@@ -75,6 +104,15 @@ public class Billing implements Initializable {
     private double totGstAmount = 0, netTotalAmount = 0, totalDiscount = 0, totalAmtAsPerMrp = 0;
     private PatientModel patientModel;
     private DoctorModel doctorModel;
+    private ObservableList<PatientModel> patientList = FXCollections.observableArrayList();
+    private FilteredList<PatientModel> filteredData;
+    static private int rowsPerPage = 20;
+    private  BatchChooserModel bcm ;
+
+
+    enum Type{
+        GET_PATIENT,SAVE,GET_CART_DATA
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -83,8 +121,15 @@ public class Billing implements Initializable {
         staticData = new StaticData();
         dbConnection = new DBConnection();
         method.hideElement(progressBar);
+        tableViewPatient.setFixedCellSize(26);
         setData();
-        refresh();
+        callThread(Type.GET_PATIENT);
+        callThread(Type.GET_CART_DATA);
+    }
+
+    private void setInvoiceAmount(double amount){
+
+        Platform.runLater(()-> invoiceValueTf.setText(String.valueOf(Math.round(amount))));
     }
 
     private void setData() {
@@ -100,7 +145,7 @@ public class Billing implements Initializable {
 
         colSrNo.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(tableView.getItems().indexOf(cellData.getValue()) + 1));
         colProductName.setCellValueFactory(new PropertyValueFactory<>("productName"));
-        colPack.setCellValueFactory(new PropertyValueFactory<>("pack"));
+       // colPack.setCellValueFactory(new PropertyValueFactory<>("pack"));
         colStrip.setCellValueFactory(new PropertyValueFactory<>("strip"));
         colPcs.setCellValueFactory(new PropertyValueFactory<>("pcs"));
         colMrp.setCellValueFactory(new PropertyValueFactory<>("saleRate"));
@@ -116,12 +161,12 @@ public class Billing implements Initializable {
             totGstAmountL.setText(method.decimalFormatter(totGstAmount));
             totDisAmountL.setText(method.decimalFormatter(totalDiscount));
 
-            invoiceValueTf.setText(method.removeZeroAfterDecimal(Math.round((netTotalAmount))));
+            setInvoiceAmount(netTotalAmount);
+
         });
     }
 
     private void setOptionalCell() {
-
 
         Callback<TableColumn<SaleEntryModel, String>, TableCell<SaleEntryModel, String>>
                 cellFactory = (TableColumn<SaleEntryModel, String> param) -> new TableCell<>() {
@@ -134,24 +179,24 @@ public class Billing implements Initializable {
 
                 } else {
 
-                    Button selectBn = new Button();
+                    Button deleteBn = new Button();
                     ImageView iv = new ImageView(new ImageLoader().load("img/icon/delete_ic_white.png"));
-                    iv.setFitHeight(17);
-                    iv.setFitWidth(17);
+                    iv.setFitHeight(12);
+                    iv.setFitWidth(12);
 
-                    selectBn.setGraphic(iv);
-                    selectBn.setStyle("-fx-cursor: hand ; -fx-background-color: #c1061c ; -fx-background-radius: 3 ");
+                    deleteBn.setGraphic(iv);
+                    deleteBn.setStyle("-fx-cursor: hand ; -fx-background-color: #c1061c ; -fx-background-radius: 3;-fx-padding: 2 4 2 4 ");
 
-                    selectBn.setOnAction((event) -> {
+                    deleteBn.setOnAction((event) -> {
                         method.selectTable(getIndex(), tableView);
                         SaleEntryModel sem = tableView.getSelectionModel().getSelectedItem();
                         removeItem(sem.getCartId());
 
                     });
 
-                    HBox managebtn = new HBox(selectBn);
+                    HBox managebtn = new HBox(deleteBn);
                     managebtn.setStyle("-fx-alignment:center");
-                    HBox.setMargin(selectBn, new Insets(0, 0, 0, 0));
+                    HBox.setMargin(deleteBn, new Insets(0, 0, 0, 0));
 
                     setGraphic(managebtn);
 
@@ -258,29 +303,41 @@ public class Billing implements Initializable {
             setTableDate();
             Platform.runLater(()->{
                 addDiscTF.textProperty().addListener((observableValue, s, val1) -> {
-                    double mainValue = Math.round((netTotalAmount));
-
+                    double mainValue = netTotalAmount;
                     String val = addDiscTF.getText();
+
+                    double invoiceValue = 0,discountAmount = 0;
                     if (!val.isEmpty()){
+
                         try {
-                            double addDis = Double.parseDouble(val);
-                            if (addDis>mainValue){
+                            double addDisPercentage = Double.parseDouble(val);
+                            if(addDisPercentage > 100){
+                                method.show_popup("You cannot discount more than 100 percent",addDiscTF);
+                                addDiscTF.setText(String.valueOf(0));
+                                return;
+                            }
+                            discountAmount = mainValue*Double.parseDouble(val)/100;
+
+                            if (discountAmount>mainValue){
                                 method.show_popup("Please enter amount less then invoice value",addDiscTF);
-                                addDiscTF.setText("");
+                                addDiscTF.setText(String.valueOf(0));
+                                discountAmount = 0;
                                 return;
                             }else {
-                                double invVal = Math.round(mainValue-addDis);
-                                Platform.runLater(()->invoiceValueTf.setText(String.valueOf(invVal)));
+                                invoiceValue = mainValue-discountAmount;
                             }
                         } catch (NumberFormatException e) {
-                            invoiceValueTf.setText(String.valueOf(mainValue));
+                            invoiceValue = mainValue;
                             method.show_popup("Please enter amount less then invoice value",addDiscTF);
-                            addDiscTF.setText("");
+                            addDiscTF.setText(String.valueOf(0));
+                            discountAmount = 0;
                         }
                     }else {
-                        invoiceValueTf.setText(String.valueOf(mainValue));
+                        invoiceValue = mainValue;
+                        discountAmount = 0;
                     }
-
+                    addDisAmountL.setText(String.valueOf(method.decimalFormatter(discountAmount)));
+                    setInvoiceAmount(invoiceValue);
                 });
             });
 
@@ -292,18 +349,6 @@ public class Billing implements Initializable {
         }
     }
 
-    public void addItem(MouseEvent mouseEvent) {
-        customDialog.showFxmlDialog2("chooser/saleQuantityChooser.fxml", "SELECT ITEM");
-        refresh();
-    }
-
-    public void selectPatient(MouseEvent mouseEvent) {
-        customDialog.showFxmlDialog2("chooser/patientChooser.fxml", "SELECT PATIENT");
-        if (Main.primaryStage.getUserData() instanceof PatientModel pm) {
-            this.patientModel = pm;
-            patientNameL.setText(pm.getFullName());
-        }
-    }
 
     public void selectDoctor(MouseEvent mouseEvent) {
         customDialog.showFxmlDialog2("chooser/doctorChooser.fxml", "SELECT DOCTOR");
@@ -360,7 +405,7 @@ public class Billing implements Initializable {
                     if (null != itemList) {
                         itemList.clear();
                     }
-                    refresh();
+                    callThread(Type.GET_CART_DATA);
                 }
 
             } catch (SQLException e) {
@@ -368,7 +413,7 @@ public class Billing implements Initializable {
                 e.printStackTrace();
             } finally {
                 DBConnection.closeConnection(con, ps, null);
-                refresh();
+                callThread(Type.GET_CART_DATA);
             }
         });
     }
@@ -392,38 +437,358 @@ public class Billing implements Initializable {
             e.printStackTrace();
         } finally {
             DBConnection.closeConnection(con, ps, null);
-            refresh();
+            callThread(Type.GET_CART_DATA);
         }
     }
 
-    private void refresh() {
-        MyAsyncTask myAsyncTask = new MyAsyncTask();
-        myAsyncTask.setDaemon(false);
-        myAsyncTask.execute();
+   private void callThread(Type type){
+       MyAsyncTask myAsyncTask = new MyAsyncTask(type);
+       myAsyncTask.setDaemon(false);
+       myAsyncTask.execute();
     }
 
+    public void addPatient(ActionEvent actionEvent) {
+
+        customDialog.showFxmlDialog2("patient/addPatient.fxml", "Add New Patient");
+
+        if (Main.primaryStage.getUserData() instanceof Boolean) {
+
+            boolean isSuccess = (Boolean) Main.primaryStage.getUserData();
+
+            if(isSuccess){
+                callThread(Type.GET_PATIENT);
+            }
+        }
+    }
+
+    public void addItemToListClick(ActionEvent actionEvent) {
+        submit(null);
+    }
+
+    public void chooseItem(MouseEvent mouseEvent) {
+        Main.primaryStage.setUserData(null);
+        customDialog.showFxmlDialog2("chooser/itemChooser.fxml", "SELECT ITEM");
+
+        if (Main.primaryStage.getUserData() instanceof ItemChooserModel icm) {
+
+            if (method.isItemAvailableInStock(icm.getItemId())) {
+
+                if (method.isMultipleItemInStock(icm.getItemId())){
+
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("item_id", icm.getItemId());
+                    map.put("item_name", icm.getItemName());
+                    Main.primaryStage.setUserData(map);
+                    customDialog.showFxmlDialog2("chooser/batchChooser.fxml", "SELECT BATCH");
+
+                    if (Main.primaryStage.getUserData() instanceof BatchChooserModel bcm) {
+                        this.bcm = bcm;
+                    }
+
+                } else {
+
+                    Connection connection = null;
+                    PreparedStatement ps = null;
+                    ResultSet rs = null;
+
+                    try {
+                        connection = new DBConnection().getConnection();
+
+                        String qry = """
+                                 select  stock_id,tpi.purchase_items_id ,tim.items_name,tim.strip_tab ,tpi.batch , tpi.expiry_date , ts.quantity , ts.quantity_unit  from tbl_stock ts
+                                                    left join tbl_purchase_items tpi on tpi.purchase_items_id = ts.purchase_items_id
+                                                    left join tbl_items_master tim on tim.item_id = ts.item_id
+                                                    where tpi.item_id =?  and ts.quantity>0 order by expiry_date asc
+                                """;
+                        ps = connection.prepareStatement(qry);
+                        ps.setInt(1,icm.getItemId());
+                        rs = ps.executeQuery();
+
+                        if (rs.next()){
+
+                            int stockId = rs.getInt("stock_id");
+                            String itemName = rs.getString("items_name");
+                            String batch = rs.getString("batch");
+                            String expiryDate = rs.getString("expiry_date");
+                            int quantity = rs.getInt("quantity");
+                            int strip_tab = rs.getInt("strip_tab");
+                            int purchase_items_id = rs.getInt("purchase_items_id");
+                            String quantityUnit = rs.getString("quantity_unit");
+                            String qty = method.tabToStrip(quantity, strip_tab, quantityUnit);
+
+                            bcm = new BatchChooserModel(stockId, itemName, batch,
+                                    expiryDate, quantity, quantityUnit, qty,strip_tab,purchase_items_id);
+                        }
+
+
+
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }finally {
+                        DBConnection.closeConnection(connection,ps,rs);
+                    }
+
+                }
+
+                if (null == bcm){
+                    return;
+                }
+
+                avlQuantity.setText(bcm.getFullQty());
+                tabPerStripL.setText(String.valueOf(bcm.getStripTab()));
+                itemNameL.setText(bcm.getItemName());
+                PriceTypeModel ptm = method.getStockPrice(bcm.getPurchaseItemId());
+
+                mrpL.setText(String.valueOf(method.removeZeroAfterDecimal(ptm.getMrp())));
+
+                if (ptm.getSaleRate() < 1) {
+                    saleRateTf.setText(method.removeZeroAfterDecimal(ptm.getMrp()));
+                }else {
+                    saleRateTf.setText(method.removeZeroAfterDecimal(ptm.getSaleRate()));
+                }
+
+                if (method.isItemAvlInCart(bcm.getStockId())) {
+                    Connection connection = null;
+                    PreparedStatement ps = null;
+                    ResultSet rs = null;
+
+                    try {
+                        connection = new DBConnection().getConnection();
+                        String qry = "select * from tbl_cart where stock_id = ?";
+                        ps = connection.prepareStatement(qry);
+                        ps.setInt(1, bcm.getStockId());
+                        rs = ps.executeQuery();
+                        if (rs.next()) {
+                            double mrp = rs.getDouble("mrp");
+                            int strip = rs.getInt("strip");
+                            int pcs = rs.getInt("pcs");
+
+                            mrpL.setText(method.removeZeroAfterDecimal(mrp));
+                            stripTf.setText(method.removeZeroAfterDecimal(strip));
+                            pcsTf.setText(method.removeZeroAfterDecimal(pcs));
+                            customDialog.showAlertBox("","Item Already Added");
+                        }
+
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    } finally {
+                        DBConnection.closeConnection(connection, ps, rs);
+                    }
+                } else {
+                }
+
+            } else {
+                customDialog.showAlertBox("", "Item stock not available. Please add purchase item");
+            }
+        }
+    }
+
+    public void enterKeyPress(KeyEvent keyEvent) {
+        if (keyEvent.getCode() == KeyCode.ENTER) {
+            submit(null);
+        }
+    }
+
+    public void submit(ActionEvent event) {
+        String saleRate = saleRateTf.getText();
+        String strip = stripTf.getText();
+        String pcs = pcsTf.getText();
+        boolean isStripAVl = false, isPcsAvl = false;
+        int stripI = 0, pcsI = 0;
+        double saleRateD = 0;
+
+        if (null == bcm) {
+            method.show_popup("Please select item", itemNameL);
+            return;
+        } else if (strip.isEmpty() && pcs.isEmpty()) {
+            method.show_popup("Please enter strip or pcs", pcsTf);
+            return;
+        } else if (!strip.isEmpty()) {
+            try {
+                stripI = Integer.parseInt(strip);
+            } catch (NumberFormatException e) {
+                method.show_popup("Special characters are not allowed here", stripTf);
+                return;
+            }
+            if (pcs.isEmpty()) {
+                if (stripI < 1) {
+                    method.show_popup("Please enter valid strip", stripTf);
+                    return;
+                }
+            }
+        }
+        if (!pcs.isEmpty()) {
+            try {
+                pcsI = Integer.parseInt(pcs);
+            } catch (NumberFormatException e) {
+                method.show_popup("Special characters are not allowed here", pcsTf);
+                return;
+            }
+            if (strip.isEmpty()) {
+                if (pcsI < 1) {
+                    method.show_popup("Please enter valid pcs or tab", pcsTf);
+                    return;
+                }
+            }
+        }
+
+        if (stripI < 1 && pcsI < 1) {
+            method.show_popup("Please enter strip or pcs", pcsTf);
+            return;
+        } else if (saleRate.isEmpty()) {
+            method.show_popup("Please sale rate", saleRateTf);
+            return;
+        } else if (!saleRate.isEmpty()) {
+            try {
+                saleRateD = Double.parseDouble(saleRate);
+            } catch (NumberFormatException e) {
+                method.show_popup("Please enter valid sale rate", saleRateTf);
+                return;
+            }
+
+            if (saleRateD < 1) {
+                method.show_popup("Please enter valid sale rate", saleRateTf);
+                return;
+            }
+        }
+
+        if (!strip.isEmpty() && stripI > 0) {
+            String stockUnit = method.getStockUnitStockWise(bcm.getStockId());
+            if (!Objects.equals(stockUnit, "TAB")) {
+                customDialog.showAlertBox("", "Strip not available in stock. Only available in pcs");
+                return;
+            }
+            isStripAVl = true;
+        }
+        if (!pcs.isEmpty() && pcsI > 0) {
+            isPcsAvl = true;
+        }
+        int totalTab = 0;
+        int stockQty = method.getQuantity(bcm.getStockId());
+        if (isStripAVl && isPcsAvl) {
+            totalTab = (stripI * bcm.getStripTab()) + pcsI;
+            if (totalTab > stockQty) {
+                customDialog.showAlertBox("", "Quantity not available");
+                return;
+            }
+
+        } else if (isStripAVl) {
+            totalTab = (stripI *  bcm.getStripTab());
+            if (totalTab > stockQty) {
+                customDialog.showAlertBox("", "Strip not available");
+                return;
+            }
+
+        } else {
+            totalTab = pcsI;
+            if (totalTab > stockQty) {
+                customDialog.showAlertBox("", "PCS not available");
+                return;
+            }
+        }
+
+        if (totalTab < 1) {
+            customDialog.showAlertBox("", "Please enter strip or pcs");
+            return;
+        }
+
+        String qry = "";
+        if (method.isItemAvlInCart(bcm.getStockId())) {
+            qry = "UPDATE tbl_cart SET stock_id=?, MRP=?,  STRIP=?, PCS  = ? WHERE stock_id = " + bcm.getStockId();
+        } else {
+            qry = "INSERT INTO TBL_CART(stock_id, MRP,  STRIP, PCS) VALUES (?,?,?,?)";
+        }
+        Connection connection = null;
+        PreparedStatement ps = null;
+
+        try {
+            connection = dbConnection.getConnection();
+            ps = connection.prepareStatement(qry);
+            ps.setInt(1, bcm.getStockId());
+            ps.setDouble(2, saleRateD);
+            ps.setInt(3, stripI);
+            ps.setInt(4, pcsI);
+
+            int res = ps.executeUpdate();
+
+            if (res > 0) {
+                resetChooseItemField();
+                callThread(Type.GET_CART_DATA);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            DBConnection.closeConnection(connection, ps, null);
+        }
+
+
+    }
+
+
     private class MyAsyncTask extends AsyncTask<String, Integer, Boolean> {
+        Type type;
+
+        public MyAsyncTask(Type type) {
+            this.type = type;
+        }
+
         @Override
         public void onPreExecute() {
-            if (null != tableView) {
-                tableView.setItems(null);
+
+            switch (type){
+
+                case GET_CART_DATA -> {
+                    if (null != tableView) {
+                        tableView.setItems(null);
+                    }
+                    if (null != itemList) {
+                        itemList.clear();
+                    }
+                    assert tableView != null;
+                    tableView.setPlaceholder(method.getProgressBarRed(40, 40));
+                }
+
+                case GET_PATIENT -> {
+                    tableViewPatient.setPlaceholder(method.getProgressBarRed(40, 40));
+                }
             }
-            if (null != itemList) {
-                itemList.clear();
-            }
-            assert tableView != null;
-            tableView.setPlaceholder(method.getProgressBarRed(40, 40));
+
+
         }
 
         @Override
         public Boolean doInBackground(String... params) {
-            getCartData();
+
+            switch (type){
+
+            case GET_CART_DATA -> {
+                getCartData();
+            }
+
+            case GET_PATIENT -> {
+                getPatient();
+            }
+        }
+
             return true;
         }
 
         @Override
         public void onPostExecute(Boolean success) {
-            tableView.setPlaceholder(new Label("Not Available."));
+
+            switch (type){
+
+                case GET_CART_DATA -> {
+                    tableView.setPlaceholder(new Label("Not Available."));
+                }
+
+                case GET_PATIENT -> {
+                    tableViewPatient.setPlaceholder(new Label("Patient Not Available."));
+                }
+            }
+
+
         }
 
         @Override
@@ -432,9 +797,203 @@ public class Billing implements Initializable {
         }
     }
 
-    public void checkOutBn(ActionEvent event) {
+    private void resetChooseItemField(){
 
-        System.out.println("size : "+tableView.getItems().size());
+        avlQuantity.setText("");
+        tabPerStripL.setText("");
+        itemNameL.setText("SELECT ITEM");
+        saleRateTf.setText("");
+        mrpL.setText("");
+        stripTf.setText("");
+        pcsTf.setText("");
+
+    }
+
+    private void getPatient() {
+
+        if (null != patientList) {
+            patientList.clear();
+        }
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            connection = new DBConnection().getConnection();
+
+            String qry = """
+                            select * from patient_v
+                    order by patient_id  desc
+                     """;
+
+            ps = connection.prepareStatement(qry);
+            rs = ps.executeQuery();
+
+
+            while (rs.next()) {
+
+                int patient_id = rs.getInt("PATIENT_ID");
+                int salutation_id = rs.getInt("salutation_id");
+                int created_by = rs.getInt("created_by");
+                int last_update_by = rs.getInt("last_update_by");
+
+                String salutation_name = rs.getString("salutation_name");
+                String first_name = rs.getString("first_name");
+                String middle_name = rs.getString("middle_name");
+                String last_name = rs.getString("last_name");
+
+                String fullName = rs.getString("fullName");
+
+                String gender = rs.getString("gender");
+                String age = rs.getString("age");
+                String address = rs.getString("address");
+                String dob = rs.getString("dob");
+                String phone = rs.getString("phone");
+
+                String idType = rs.getString("id_type");
+                String idNum = rs.getString("id_number");
+                String guardianName = rs.getString("guardian_name");
+
+                String weight = rs.getString("weight");
+                String bp = rs.getString("bp");
+                String pulse = rs.getString("pulse");
+                String sugar = rs.getString("sugar");
+                String spo2 = rs.getString("SPO2");
+                String temp = rs.getString("temp");
+                String cvs = rs.getString("cvs");
+                String cns = rs.getString("cns");
+                String chest = rs.getString("chest");
+                String creationDate = rs.getString("creation_date");
+                String lastUpdate = rs.getString("last_update");
+                String admission_number = rs.getString("admission_number");
+                String uhidNum = rs.getString("uhid_no");
+
+                PatientModel pm = new PatientModel(patient_id, salutation_id, created_by, last_update_by, salutation_name, first_name,
+                        middle_name, last_name, fullName, gender, age, address, dob, phone, idType, idNum, guardianName, weight, bp, pulse,
+                        sugar, spo2, temp, cvs, cns, chest, creationDate, lastUpdate, admission_number,uhidNum);
+                patientList.add(pm);
+            }
+            if (null != patientList) {
+                if (!patientList.isEmpty()) {
+                    pagination.setVisible(true);
+                    search_Item();
+                }
+            }
+
+            Platform.runLater(() -> {
+
+                if (!patientList.isEmpty()) {
+                    tableViewPatient.setPlaceholder(new Label(""));
+                } else {
+                    tableViewPatient.setPlaceholder(new Label("Patient not available"));
+                }
+            });
+        } catch (SQLException e) {
+            Platform.runLater(() -> {
+
+                tableViewPatient.setPlaceholder(new Label("An error occurred while fetching the item"));
+            });
+
+        } finally {
+            DBConnection.closeConnection(connection, ps, rs);
+        }
+
+    }
+
+    private void search_Item() {
+
+        filteredData = new FilteredList<>(patientList, p -> true);
+
+        searchNameTf.textProperty().addListener((observable, oldValue, newValue) -> {
+
+            filteredData.setPredicate(patient -> {
+
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+
+                String lowerCaseFilter = newValue.toLowerCase();
+
+                if (String.valueOf(patient.getPhone()).toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                } else return patient.getFullName().toLowerCase().contains(lowerCaseFilter);
+            });
+
+            changeTableViewPatient(pagination.getCurrentPageIndex(), rowsPerPage);
+        });
+
+        pagination.setCurrentPageIndex(0);
+        changeTableViewPatient(0, rowsPerPage);
+        Platform.runLater(() -> {
+            pagination.currentPageIndexProperty().addListener(
+                    (observable1, oldValue1, newValue1) -> {
+                        changeTableViewPatient(newValue1.intValue(), rowsPerPage);
+                    });
+        });
+
+    }
+
+    private void changeTableViewPatient(int index, int limit) {
+
+        int totalPage = (int) (Math.ceil(filteredData.size() * 1.0 / rowsPerPage));
+        Platform.runLater(() -> pagination.setPageCount(totalPage));
+        colPatientSr.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(
+                tableViewPatient.getItems().indexOf(cellData.getValue()) + 1));
+        colPatientName.setCellValueFactory(new PropertyValueFactory<>("fullName"));
+        setOptionalCellPatient();
+
+        int fromIndex = index * limit;
+        int toIndex = Math.min(fromIndex + limit, patientList.size());
+
+        int minIndex = Math.min(toIndex, filteredData.size());
+        SortedList<PatientModel> sortedData = new SortedList<>(
+                FXCollections.observableArrayList(filteredData.subList(Math.min(fromIndex, minIndex), minIndex)));
+        sortedData.comparatorProperty().bind(tableViewPatient.comparatorProperty());
+
+        tableViewPatient.setItems(sortedData);
+    }
+
+    private void setOptionalCellPatient() {
+
+        Callback<TableColumn<PatientModel, String>, TableCell<PatientModel, String>>
+                cellEdit = (TableColumn<PatientModel, String> param) -> new TableCell<>() {
+            @Override
+            public void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                    setText(null);
+
+                } else {
+
+                    Hyperlink admNumHl = new Hyperlink(tableViewPatient.getItems().get(getIndex()).getAdmissionNumber());
+
+                    admNumHl.setStyle("-fx-background-color: transparent; -fx-text-fill: blue;" +
+                            "-fx-border-color: transparent;-fx-font-size: 12;-fx-alignment: center-left");
+
+                    admNumHl.setMinWidth(130);
+
+                    admNumHl.setOnAction(actionEvent -> {
+                        tableViewPatient.getSelectionModel().select(getIndex());
+                        patientModel = tableViewPatient.getSelectionModel().getSelectedItem();
+                        patientNameL.setText(patientModel.getFullName());
+                        genderL.setText(patientModel.getGender());
+                        patientAgeL.setText(patientModel.getAge());
+                        patientAddressL.setText(patientModel.getAddress());
+                        guardianNameL.setText(patientModel.getGuardianName());
+                                           });
+                    HBox managebtn = new HBox(admNumHl);
+                    managebtn.setStyle("-fx-alignment: center-left");
+                    setGraphic(managebtn);
+                    setText(null);
+                }
+            }
+
+        };
+
+        colAdmNum.setCellFactory(cellEdit);
+    }
+
+    public void checkOutBn(ActionEvent event) {
 
         if (itemList.size() < 1) {
             customDialog.showAlertBox("Not available", "Item not available.please add at least one item");
@@ -525,27 +1084,59 @@ public class Billing implements Initializable {
 
             connection = dbConnection.getConnection();
             connection.setAutoCommit(false);
-            double addiDisc = 0;
+            double addiDiscAmt = 0,addDiscountPercentage = 0,totalDiscountAmount = 0,discountPerItem = 0.0;
 
             if (!addDiscTF.getText().isEmpty()){
                 try {
-                    addiDisc = Double.parseDouble(addDiscTF.getText());
+                    addDiscountPercentage =addDiscTF.getText().isEmpty()?0:
+                            Double.parseDouble(addDiscTF.getText());
+
+                    discountPerItem = addDiscountPercentage/(items.isEmpty()?0:items.size());
+
+                    System.out.println("discountPerItem-"+discountPerItem);
+
                 } catch (NumberFormatException ignored) {
                     customDialog.showAlertBox("", "Please enter valid additional discount");
                     return;
                 }
             }
 
+            if (!totDisAmountL.getText().isEmpty()){
+                try {
+                double totDisAmount =Double.parseDouble(totDisAmountL.getText());
+
+                if (totDisAmount > 0){
+                    totalDiscountAmount = totDisAmount;
+                }
+                } catch (NumberFormatException ignored) {
+
+                }
+            }
+
+            if (!addDisAmountL.getText().isEmpty()){
+                try {
+                    double totAddDisAmount =Double.parseDouble(addDisAmountL.getText());
+
+                    if (totAddDisAmount > 0){
+                        addiDiscAmt = totAddDisAmount;
+                    }
+                } catch (NumberFormatException ignored) {
+
+                }
+            }
+
 
             String invoiceNumber = new GenerateBillNumber().getSaleBillNum();
 
-            String saleMainQuery = "INSERT INTO TBL_SALE_MAIN(PATIENT_ID, SELLER_ID, ADDITIONAL_DISCOUNT," +
-                    " PAYMENT_MODE, TOT_TAX_AMOUNT, NET_AMOUNT, INVOICE_NUMBER, BILL_TYPE,doctor_id) VALUES (?,?,?,?,?,?,?,?,?)\n";
+            String saleMainQuery = "INSERT INTO TBL_SALE_MAIN(PATIENT_ID, SELLER_ID, additional_discount_amount," +
+                    " PAYMENT_MODE, TOT_TAX_AMOUNT, NET_AMOUNT, INVOICE_NUMBER, BILL_TYPE,doctor_id," +
+                    "payment_reference_num,remarks,created_by,additional_discount_percentage,total_discount_amount) " +
+                    "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)\n";
 
             ps = connection.prepareStatement(saleMainQuery, new String[]{"sale_main_id"});
             ps.setInt(1, patientId);
             ps.setInt(2, Login.currentlyLogin_Id);
-            ps.setDouble(3, addiDisc);
+            ps.setDouble(3, addiDiscAmt);
             ps.setString(4, paytmModeS);
             ps.setDouble(5, totalTaxAmtD);
             ps.setDouble(6, invoiceValue);
@@ -557,6 +1148,12 @@ public class Billing implements Initializable {
             }else {
                 ps.setInt(9, doctorModel.getDoctorId());
             }
+
+            ps.setString(10, referenceNumTf.getText());
+            ps.setString(11, remarksTf.getText());
+            ps.setInt(12, Login.currentlyLogin_Id);
+            ps.setDouble(13,addDiscountPercentage);
+            ps.setDouble(14,totalDiscountAmount);
 
             int resMain = ps.executeUpdate();
 
@@ -582,7 +1179,7 @@ public class Billing implements Initializable {
                         ps.setDouble(4, model.getSaleRate());
                         ps.setInt(5, model.getStrip());
                         ps.setInt(6, model.getPcs());
-                        ps.setDouble(7, model.getDiscount());
+                        ps.setDouble(7, (model.getDiscount()+discountPerItem));
                         ps.setLong(8, model.getHsn());
                         ps.setInt(9, model.getiGst());
                         ps.setInt(10, model.getsGst());

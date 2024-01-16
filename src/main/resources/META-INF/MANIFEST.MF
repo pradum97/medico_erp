@@ -1,13 +1,13 @@
 Manifest-Version: 1.0
 Main-Class: com.techwhizer.medicalshop.Launch
-Class-Path: javax.mail-1.6.2.jar commons-logging-1.2.jar postgresql-42.4
- .3.jar javafx-graphics-19-win.jar javafx-base-19-win.jar javafx-fxml-19
- -win.jar javafx-graphics-19.jar commons-codec-1.11.jar activation-1.1.j
- ar javafx-base-19.jar javafx-controls-19-win.jar checker-qual-3.5.0.jar
-  jfx-asynctask-1.0.1.jar controlsfx-11.1.2.jar javafx-controls-19.jar j
- avafx-fxml-19.jar httpmime-4.5.13.jar httpclient-4.5.13.jar ecj-4.6.1.j
- ar core-3.3.1.jar javase-3.3.1.jar itext-2.1.7.js4.jar custom-hindi-fon
- ts.jar STLiti-Custom-Font.jar commons-digester-2.1.jar jasperreports-6.
- 19.0.jar commons-logging-1.1.1.jar commons-beanutils-1.9.4.jar commons-
- collections4-4.4.jar jasperreports-fonts-6.20.0.jar httpcore-4.4.13.jar
+Class-Path: javafx-graphics-19.jar javafx-fxml-19.jar httpclient-4.5.13.
+ jar javax.mail-1.6.2.jar jfx-asynctask-1.0.1.jar httpcore-4.4.13.jar co
+ mmons-logging-1.2.jar postgresql-42.4.3.jar javafx-controls-19.jar ecj-
+ 4.6.1.jar core-3.3.1.jar javase-3.3.1.jar itext-2.1.7.js4.jar custom-hi
+ ndi-fonts.jar STLiti-Custom-Font.jar commons-digester-2.1.jar jasperrep
+ orts-6.19.0.jar commons-logging-1.1.1.jar commons-beanutils-1.9.4.jar c
+ ommons-collections4-4.4.jar jasperreports-fonts-6.20.0.jar commons-code
+ c-1.11.jar checker-qual-3.5.0.jar httpmime-4.5.13.jar javafx-base-19.ja
+ r javafx-controls-19-win.jar javafx-graphics-19-win.jar javafx-base-19-
+ win.jar javafx-fxml-19-win.jar controlsfx-11.1.2.jar activation-1.1.jar
 

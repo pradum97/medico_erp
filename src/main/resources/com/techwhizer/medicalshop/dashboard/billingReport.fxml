@@ -29,16 +29,16 @@
 
                           <TableColumn fx:id="col_sno" editable="false" minWidth="60.0" sortable="false" text="Sr.No" />
                           <TableColumn fx:id="colPatientName" editable="false" minWidth="150.0" sortable="false" text="PATIENT NAME" />
-                          <TableColumn fx:id="colPhone" editable="false" minWidth="150.0" sortable="false" text="PHONE" />
+                          <TableColumn fx:id="colPhone" editable="false" maxWidth="110.0" minWidth="110.0" prefWidth="-1.0" sortable="false" text="PHONE" />
                           <TableColumn fx:id="colAddress" editable="false" minWidth="150.0" sortable="false" text="ADDRESS" />
-                          <TableColumn fx:id="colInvoiceNumber" editable="false" minWidth="130.0" sortable="false" text="INVOICE NUM" />
+                          <TableColumn fx:id="colInvoiceNumber" editable="false" maxWidth="107.0" minWidth="107.0" prefWidth="-1.0" sortable="false" text="INVOICE #" />
                           <TableColumn fx:id="colDate" editable="false" minWidth="150.0" sortable="false" text="DATE" />
-                          <TableColumn fx:id="colCheck" editable="false" minWidth="110.0" sortable="false" text=" ITEMS" />
+                          <TableColumn fx:id="colCheck" editable="false" maxWidth="72.0" minWidth="72.0" sortable="false" text=" ITEMS" />
                           <TableColumn fx:id="colNetAmount" editable="false" minWidth="130.0" sortable="false" text="NET AMOUNT" />
-                          <TableColumn fx:id="colTotTax" editable="false" minWidth="80.0" sortable="false" text=" TOT TAX ₹" />
-                          <TableColumn fx:id="colAddiDisc" editable="false" minWidth="90.0" sortable="false" text="ADDI DISC" />
+                          <TableColumn fx:id="colTotTax" editable="false" minWidth="80.0" sortable="false" text="TAX ₹" />
+                          <TableColumn fx:id="colAddiDisc" editable="false" minWidth="90.0" sortable="false" text="DISC ₹" />
                           <TableColumn fx:id="colBillType" editable="false" minWidth="100.0" prefWidth="90.0" sortable="false" text="BILL TYPE" />
-                          <TableColumn fx:id="colPaymentMode" editable="false" minWidth="130.0" sortable="false" text="PAYMENT MODE" />
+                          <TableColumn fx:id="colPaymentMode" editable="false" minWidth="130.0" sortable="false" text="PAY. MODE" />
                           <TableColumn fx:id="colSellerName" editable="false" minWidth="150.0" sortable="false" text="SELLER NAME" />
 
 

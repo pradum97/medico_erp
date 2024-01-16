@@ -1,12 +1,15 @@
 package com.techwhizer.medicalshop.controller.dashboard;
 
 import com.techwhizer.medicalshop.Main;
+import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.model.ReturnItemModel;
 import com.techwhizer.medicalshop.util.DBConnection;
+import com.victorlaerte.asynctask.AsyncTask;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -24,13 +27,49 @@ public class ReturnItemsHistory implements Initializable {
     public TableColumn<ReturnItemModel, String> colProductName;
     public TableColumn<ReturnItemModel, String> colQty;
 
+    public TableColumn<ReturnItemModel, String> colAmount;
+    public TableColumn<ReturnItemModel, String> colDiscountAmt;
+    public TableColumn<ReturnItemModel, String> colNetAmount;
+
+
     private ObservableList<ReturnItemModel> itemsList = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         tableview.setFixedCellSize(28.0);
         int returnMainId = (Integer) Main.primaryStage.getUserData();
-        getItems(returnMainId);
+      new MyAsyncTask(returnMainId).execute();
+    }
+
+    private class MyAsyncTask extends AsyncTask<String, Integer, Boolean> {
+        private int returnMainId;
+
+        public MyAsyncTask(int returnMainId) {
+            this.returnMainId = returnMainId;
+        }
+        @Override
+        public void onPreExecute() {
+
+            tableview.setPlaceholder(new Method().getProgressBarRed(40,40));
+
+        }
+
+        @Override
+        public Boolean doInBackground(String... params) {
+           getItems(returnMainId);
+            return false;
+
+        }
+
+        @Override
+        public void onPostExecute(Boolean success) {
+            tableview.setPlaceholder(new Label(""));
+        }
+
+        @Override
+        public void progressCallback(Integer... params) {
+
+        }
     }
 
     private void getItems(int returnMainId) {
@@ -47,7 +86,7 @@ public class ReturnItemsHistory implements Initializable {
             connection = new DBConnection().getConnection();
 
             String query = """
-                    select tsi.item_name ,tri.sale_item_id, concat(tri.quantity,'-',tri.quantity_unit) as quantity from tbl_return_items tri
+                    select tsi.item_name ,tri.sale_item_id, concat(tri.quantity,'-',tri.quantity_unit) as quantity,amount,discount_amount,tri.net_amount from tbl_return_items tri
                     left join tbl_sale_items tsi on tri.sale_item_id = tsi.sale_item_id where return_main_id = ?
                     """;
             ps = connection.prepareStatement(query);
@@ -59,7 +98,12 @@ public class ReturnItemsHistory implements Initializable {
                 int sale_item_id = rs.getInt("sale_item_id");
                 String itemName = rs.getString("item_name");
                 String quantity = rs.getString("quantity");
-                ReturnItemModel rmi = new ReturnItemModel(sale_item_id, itemName, quantity);
+                double amount = rs.getDouble("amount");
+                double disAmount = rs.getDouble("discount_amount");
+                double netAmount = rs.getDouble("net_amount");
+
+
+                ReturnItemModel rmi = new ReturnItemModel(sale_item_id, itemName, quantity,Math.round(amount),Math.round(disAmount),Math.round(netAmount));
                 itemsList.add(rmi);
             }
 
@@ -69,6 +113,10 @@ public class ReturnItemsHistory implements Initializable {
                     tableview.getItems().indexOf(cellData.getValue()) + 1));
             colProductName.setCellValueFactory(new PropertyValueFactory<>("productName"));
             colQty.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+
+            colAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
+            colDiscountAmt.setCellValueFactory(new PropertyValueFactory<>("discountAmount"));
+            colNetAmount.setCellValueFactory(new PropertyValueFactory<>("netAmount"));
 
         } catch (SQLException e) {
             throw new RuntimeException(e);

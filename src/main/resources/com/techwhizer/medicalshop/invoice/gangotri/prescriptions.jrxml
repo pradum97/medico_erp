@@ -125,7 +125,10 @@
 	</parameter>
 	<parameter name="medicineList" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource" isForPrompting="false"/>
 	<parameter name="watermark" class="java.io.InputStream" isForPrompting="false"/>
-	<parameter name="uhidNum" class="java.lang.String"/>
+	<parameter name="uhidNum" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="fee_valid_days" class="java.lang.Integer" isForPrompting="false"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -1066,15 +1069,15 @@ $F{composition}]]></textFieldExpression>
 					<pen lineWidth="0.0"/>
 				</graphicElement>
 			</rectangle>
-			<staticText>
-				<reportElement x="454" y="-15" width="131" height="14" uuid="a1c832cf-2c4a-4e9c-877e-d332b62d60ab">
+			<textField>
+				<reportElement x="454" y="-15" width="131" height="14" uuid="1bda57c7-2461-4095-a91c-b6e2d1d189c5">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="11"/>
 				</textElement>
-				<text><![CDATA[Fee Valid for 15 Days...]]></text>
-			</staticText>
+				<textFieldExpression><![CDATA["Fee Valid for "+$P{fee_valid_days}+" Days..."]]></textFieldExpression>
+			</textField>
 			<staticText>
 				<reportElement x="5" y="-1" width="240" height="13" forecolor="#FFFFFF" uuid="ead4e0d0-0da5-4779-935a-7b718089248e">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>

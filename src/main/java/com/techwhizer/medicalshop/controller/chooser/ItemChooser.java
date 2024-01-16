@@ -5,6 +5,7 @@ import com.techwhizer.medicalshop.ImageLoader;
 import com.techwhizer.medicalshop.Main;
 import com.techwhizer.medicalshop.controller.Constant;
 import com.techwhizer.medicalshop.controller.auth.Login;
+import com.techwhizer.medicalshop.controller.dashboard.StockReport;
 import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.model.GstModel;
 import com.techwhizer.medicalshop.model.chooserModel.ItemChooserModel;
@@ -37,10 +38,11 @@ import java.util.ResourceBundle;
 
 public class ItemChooser implements Initializable {
     public ProgressIndicator progressBar;
-    private int rowsPerPage = 20;
+    private int rowsPerPage = 100;
     public TextField searchTf;
     public TableColumn<ItemChooserModel, Integer> colSrNo;
     public TableColumn<ItemChooserModel, String> colProductName;
+    public TableColumn<ItemChooserModel, String> colAvlQty;
     public TableColumn<ItemChooserModel, String> colAction;
     public TableView<ItemChooserModel> tableView;
     public Pagination pagination;
@@ -107,10 +109,7 @@ public class ItemChooser implements Initializable {
             connection = dbConnection.getConnection();
 
             String qry = """
-                    SELECT * ,tim.type,tim.status
-                         ,(concat((tpt.igst+tpt.cgst+tpt.sgst),' %')) as totalGst
-                    from tbl_items_master as tim
-                             left join tbl_product_tax tpt on tpt.tax_id = tim.gst_id
+                    select * from available_quantity_v where avl_qty_pcs > 0
                     """;
             ps = connection.prepareStatement(qry);
             rs = ps.executeQuery();
@@ -135,6 +134,7 @@ public class ItemChooser implements Initializable {
                 String composition = rs.getString("composition");
                 String tag = rs.getString("tag");
                 String medicineDose = rs.getString("dose");
+                String avlQty = rs.getString("avl_qty_strip");
                 count++;
 
                 GstModel gm = new GstModel(gstId, hsn, sGst, cGst, iGst, gstName, null);
@@ -142,10 +142,10 @@ public class ItemChooser implements Initializable {
                 if (status == 1){
                     if (Constant.ITEM_TYPE_PROHIBIT.equalsIgnoreCase(type)) {
                         if (Login.currentRoleName.equalsIgnoreCase("admin")) {
-                            itemList.add(new ItemChooserModel(itemId, itemName, packing, gm, unit, tabPerStrip,composition,tag,medicineDose));
+                            itemList.add(new ItemChooserModel(itemId, itemName, packing, gm, unit, tabPerStrip,composition,tag,medicineDose,avlQty));
                         }
                     } else {
-                        itemList.add(new ItemChooserModel(itemId, itemName, packing, gm, unit, tabPerStrip,composition,tag,medicineDose));
+                        itemList.add(new ItemChooserModel(itemId, itemName, packing, gm, unit, tabPerStrip,composition,tag,medicineDose,avlQty));
                     }
                 }else {
                     msg = "All items are disabled.";
@@ -229,6 +229,44 @@ public class ItemChooser implements Initializable {
     private void setOptionalCell() {
 
         Callback<TableColumn<ItemChooserModel, String>, TableCell<ItemChooserModel, String>>
+                cellQty = (TableColumn<ItemChooserModel, String> param) -> new TableCell<>() {
+            @Override
+            public void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                    setText(null);
+
+                } else {
+
+                    String qtyStr = tableView.getItems().get(getIndex()).getAvailableQuantity();
+                    int qty = qtyStr == null ? 0 : Integer.parseInt(qtyStr.split("-")[0]);
+
+                    Label qtyLabel = new Label(qtyStr);
+
+                    if (qty > 0 && qty < StockReport.lowQuantity) {
+                        qtyLabel.setStyle("-fx-text-fill: white;-fx-font-weight: bold;-fx-background-color: #ff9933;" +
+                                "-fx-padding: 0px 3px 0px 3px;-fx-background-radius: 3px");
+                    } else if (qty == 0) {
+                        qtyLabel.setStyle("-fx-text-fill: white;-fx-font-weight: bold;-fx-background-color: red;" +
+                                "-fx-padding: 0px 3px 0px 3px;-fx-background-radius: 3px");
+                    } else {
+                        qtyLabel.setStyle("-fx-text-fill: black;-fx-font-weight:bold;-fx-background-color: inherit");
+                    }
+
+                    HBox managebtn = new HBox(qtyLabel);
+                    managebtn.setStyle("-fx-alignment:CENTER-LEFT");
+                    HBox.setMargin(qtyLabel, new Insets(0, 0, 0, 5));
+
+                    setGraphic(managebtn);
+                    setText(null);
+
+                }
+            }
+
+        };
+
+        Callback<TableColumn<ItemChooserModel, String>, TableCell<ItemChooserModel, String>>
                 cellFactory = (TableColumn<ItemChooserModel, String> param) -> new TableCell<>() {
             @Override
             public void updateItem(String item, boolean empty) {
@@ -273,7 +311,7 @@ public class ItemChooser implements Initializable {
             }
 
         };
-
+colAvlQty.setCellFactory(cellQty);
         colAction.setCellFactory(cellFactory);
     }
 

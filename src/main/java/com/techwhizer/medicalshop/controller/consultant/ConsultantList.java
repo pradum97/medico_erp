@@ -31,7 +31,6 @@ import java.util.ResourceBundle;
 
 public class ConsultantList implements Initializable {
 
-
     public ComboBox<String> comStatus;
     public TextField searchTf;
     public Pagination pagination;
@@ -140,6 +139,7 @@ public class ConsultantList implements Initializable {
             switch (type){
 
                 case "GET_CONSULT"->{
+                    tableview.setPlaceholder( new Label("Not Available"));
 
 
                 }

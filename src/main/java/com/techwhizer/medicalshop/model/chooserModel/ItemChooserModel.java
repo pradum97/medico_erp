@@ -11,11 +11,11 @@ public class ItemChooserModel {
     private GstModel discountModel;
     private String unit;
     private int tabPerStrip;
-    private String composition,productTag,medicineDose;
+    private String composition,productTag,medicineDose,availableQuantity;
 
     public ItemChooserModel(int itemId, String itemName, String packing,
                              GstModel discountModel,String unit,int tabPerStrip,
-                            String composition, String productTag,String medicineDose) {
+                            String composition, String productTag,String medicineDose,String availableQuantity) {
         this.itemId = itemId;
         this.itemName = itemName;
         this.discountModel = discountModel;
@@ -25,6 +25,15 @@ public class ItemChooserModel {
         this.composition = composition;
         this.productTag = productTag;
         this.medicineDose = medicineDose;
+        this.availableQuantity = availableQuantity;
+    }
+
+    public String getAvailableQuantity() {
+        return availableQuantity;
+    }
+
+    public void setAvailableQuantity(String availableQuantity) {
+        this.availableQuantity = availableQuantity;
     }
 
     public String getMedicineDose() {

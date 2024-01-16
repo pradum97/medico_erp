@@ -6,7 +6,7 @@
         DB_NAME = medical_shop
 */
 
-drop table if exists tbl_cart cascade;
+/*drop table if exists tbl_cart cascade;
 drop table if exists tbl_company cascade;
 drop table if exists tbl_dealer cascade;
 drop table if exists tbl_discount cascade;
@@ -30,6 +30,12 @@ drop table if exists TBL_RETURN_MAIN cascade;
 drop table if exists tbl_frequency cascade;
 drop table if exists TBL_MEDICINE_TIME cascade;
 
+drop table if exists TBL_SALUTATION cascade;
+drop table if exists patient_consultation cascade;
+drop table if exists PRESCRIBE_MEDICINE_MASTER cascade;
+drop table if exists PRESCRIBE_MEDICINE_ITEMS cascade;
+drop table if exists payment_information cascade;
+*/
 CREATE TABLE tbl_users
 (
     USER_ID        SERIAL PRIMARY KEY       NOT NULL,
@@ -255,7 +261,9 @@ CREATE TABLE TBL_SALE_MAIN
     PATIENT_ID          INTEGER                             NOT NULL,
     DOCTOR_ID           INT,
     SELLER_ID           INTEGER                             NOT NULL,
-    ADDITIONAL_DISCOUNT NUMERIC,
+    ADDITIONAL_DISCOUNT_AMOUNT     NUMERIC,
+    ADDITIONAL_DISCOUNT_PERCENTAGE NUMERIC,
+    TOTAL_DISCOUNT_AMOUNT          NUMERIC,
     PAYMENT_MODE        VARCHAR                             NOT NULL,
     TOT_TAX_AMOUNT      NUMERIC,
     NET_AMOUNT          NUMERIC                             NOT NULL,
@@ -343,7 +351,10 @@ CREATE TABLE TBL_RETURN_ITEMS
     SALE_ITEM_ID   INT NOT NULL,
     QUANTITY       BIGINT,
     QUANTITY_UNIT  VARCHAR(20),
-    RETURN_MAIN_ID INT NOT NULL
+    RETURN_MAIN_ID INT NOT NULL,
+    DISCOUNT_AMOUNT numeric,
+    AMOUNT numeric,
+    NET_AMOUNT numeric
 );
 
 CREATE TABLE tbl_frequency
@@ -363,15 +374,6 @@ CREATE TABLE TBL_MEDICINE_TIME
     CREATED_BY       INT
 );
 
-
-
-----------New Added------------
-
---Notes:
--- drop tbl_patients
--- drop table PATIENT_MEDICAL_HISTORY_MAIN-- name change
--- drop table PATIENT_MEDICAL_HISTORY_ITEM-- name change
------------------------------------------
 CREATE TABLE TBL_SALUTATION
 (
     SALUTATION_ID SERIAL PRIMARY KEY,
@@ -390,7 +392,6 @@ CREATE TABLE TBL_PATIENT
     MIDDLE_NAME      VARCHAR(100),
     LAST_NAME        VARCHAR(100),
     GENDER           VARCHAR(10),
-    AGE              VARCHAR(5),
     ADDRESS          VARCHAR(200),
     DOB              VARCHAR(50),
     PHONE            VARCHAR(30),
@@ -485,6 +486,42 @@ CREATE TABLE payment_information
     CREATION_DATE   TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE consultation_setup(
+    consultation_setup_ID SERIAL PRIMARY KEY ,
+    consultation_fee numeric not null ,
+    fee_valid_days int not null,
+    CREATED_BY INT NOT NULL ,
+    CREATION_DATE TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+insert into consultation_setup(consultation_fee, fee_valid_days, CREATED_BY)
+VALUES(400,25,1);
+
+ALTER TABLE TBL_SALE_MAIN
+    ADD COLUMN PAYMENT_REFERENCE_NUM VARCHAR(300),
+    ADD COLUMN REMARKS VARCHAR(500),
+    ADD COLUMN CREATED_BY INT;
+-------------------09-Jan-2024---------------------
+
+--drop patient_age_column
+--alter view and create patient view
+-- create function
+
+ALTER TABLE tbl_sale_main
+    RENAME COLUMN additional_discount TO ADDITIONAL_DISCOUNT_AMOUNT;
+
+ALTER TABLE tbl_sale_main
+    ADD COLUMN ADDITIONAL_DISCOUNT_PERCENTAGE NUMERIC;
+
+ALTER TABLE tbl_sale_main
+    ADD COLUMN TOTAL_DISCOUNT_AMOUNT NUMERIC;
+
+ALTER TABLE TBL_RETURN_ITEMS ADD DISCOUNT_AMOUNT numeric;
+ALTER TABLE TBL_RETURN_ITEMS ADD AMOUNT numeric;
+ALTER TABLE TBL_RETURN_ITEMS ADD NET_AMOUNT numeric;
+
+
+-- remove duplicate dealer [JYOTI MEDICAL AGENCY]
 
 
 

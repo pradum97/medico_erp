@@ -42,7 +42,6 @@ public class AddPatient implements Initializable {
     public TextField bpTf;
     public TextField pulseTf;
     public TextField sugarTf;
-
     public TextField spo2Tf;
     public TextField tempTf;
     public TextField cvsTf;
@@ -57,22 +56,35 @@ public class AddPatient implements Initializable {
     public TextField guardianNameTf;
     public ProgressIndicator progressBar;
     public Button submitBn;
-
     private Method method;
     private CustomDialog customDialog;
-    private DBConnection dbConnection;
-  private   PatientModel pm;
+    private   PatientModel pm;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         method = new Method();
         customDialog = new CustomDialog();
-        dbConnection = new DBConnection();
-
         method.hideElement(progressBar);
-
         callTask("START",null);
+        config();
+    }
 
+    private void config() {
+
+        ageTf.textProperty().addListener((observable, oldValue, newValue) -> {
+
+           if (!newValue.isEmpty()){
+
+               try {
+                   dobDb.setValue(CommonUtil.calculateDOBFromAge(Integer.parseInt(newValue)));
+               }catch (Exception e){
+                   dobDb.getEditor().setText("");
+                   method.show_popup("Please enter valid age",ageTf);
+               }
+           }else {
+               dobDb.getEditor().setText("");
+           }
+        });
     }
 
     private void setData() {
@@ -88,12 +100,11 @@ public class AddPatient implements Initializable {
         firstNameTf.setText(pm.getFirstName());
         middleNameTf.setText(pm.getMiddleName());
         lastNameTf.setText(pm.getLastName());
-
         ageTf.setText(pm.getAge());
         addressTf.setText(pm.getAddress());
-        dobDb.getEditor().setText(pm.getDateOfBirth());
-        phoneTf.setText(pm.getPhone());
 
+      //  dobDb.getEditor().setText(pm.getDateOfBirth());
+        phoneTf.setText(pm.getPhone());
         idNumberTf.setText(pm.getIdNumber());
         guardianNameTf.setText(pm.getGuardianName());
         weightTf.setText(pm.getWeight());
@@ -113,9 +124,6 @@ public class AddPatient implements Initializable {
         }
     }
 
-    public void cancel_Bn(ActionEvent event) {
-        closeStage();
-    }
 
     public void submit_bn(ActionEvent event) {
        addNewPatient();
@@ -166,11 +174,11 @@ public class AddPatient implements Initializable {
         }else if (genderCom.getSelectionModel().isEmpty()) {
             method.show_popup("Please select gender", genderCom);
             return;
-        }else if (age.isEmpty()) {
-            method.show_popup("Please enter patient age", ageTf);
-            return;
         } else if (address.isEmpty()) {
             method.show_popup("Please enter patient address", addressTf);
+            return;
+        }else if (dobDb.getEditor().getText().isEmpty()) {
+            method.show_popup("Please enter AGE OR DOB", ageTf);
             return;
         }
 
@@ -180,7 +188,6 @@ public class AddPatient implements Initializable {
                 return;
             }
         }
-
 
         if (!idNumber.isEmpty()) {
 
@@ -236,17 +243,17 @@ public class AddPatient implements Initializable {
                 qry = """
 
                             INSERT INTO tbl_patient(
-                                 salutation_id, first_name, middle_name, last_name, gender, age, address, dob, phone, id_type, id_number,
+                                 salutation_id, first_name, middle_name, last_name, gender, address, dob, phone, id_type, id_number,
                                   guardian_name, weight, bp, pulse, sugar, spo2, temp, cvs, cns, chest, created_by, last_update, last_update_by,
                                   admission_number,UHID_NO)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,  ?, ?, ?, ?,?,?)
                             """;
             }else {
 
                 qry = """
                                                         
                             UPDATE tbl_patient
-                            SET salutation_id=?, first_name=?, middle_name=?, last_name=?, gender=?, age=?, address=?, dob=?,
+                            SET salutation_id=?, first_name=?, middle_name=?, last_name=?, gender=?, address=?, dob=?,
                                 phone=?, id_type=?, id_number=?, guardian_name=?, weight=?, bp=?, pulse=?, sugar=?, spo2=?, temp=?, cvs=?, cns=?, chest=?,\s
                                 last_update_by=?, last_update=?
                             WHERE patient_id = ?;
@@ -260,33 +267,32 @@ public class AddPatient implements Initializable {
             ps.setString(3, pium.getMiddleName());
             ps.setString(4, pium.getLastName());
             ps.setString(5, pium.getGender());
-            ps.setString(6, pium.getAge());
-            ps.setString(7, pium.getAddress());
-            ps.setString(8, pium.getDob());
-            ps.setString(9, pium.getPhone());
-            ps.setString(10, pium.getIdType());
-            ps.setString(11, pium.getIdNumber());
-            ps.setString(12, pium.getGuardianName());
-            ps.setString(13, pium.getWeight());
-            ps.setString(14, pium.getBp());
-            ps.setString(15, pium.getPulse());
-            ps.setString(16, pium.getSugar());
-            ps.setString(17, pium.getSpo2());
-            ps.setString(18, pium.getTemp());
-            ps.setString(19, pium.getCvs());
-            ps.setString(20, pium.getCns());
-            ps.setString(21, pium.getChest());
-            ps.setInt(22, Login.currentlyLogin_Id);
+            ps.setString(6, pium.getAddress());
+            ps.setString(7, pium.getDob());
+            ps.setString(8, pium.getPhone());
+            ps.setString(9, pium.getIdType());
+            ps.setString(10, pium.getIdNumber());
+            ps.setString(11, pium.getGuardianName());
+            ps.setString(12, pium.getWeight());
+            ps.setString(13, pium.getBp());
+            ps.setString(14, pium.getPulse());
+            ps.setString(15, pium.getSugar());
+            ps.setString(16, pium.getSpo2());
+            ps.setString(17, pium.getTemp());
+            ps.setString(18, pium.getCvs());
+            ps.setString(19, pium.getCns());
+            ps.setString(20, pium.getChest());
+            ps.setInt(21, Login.currentlyLogin_Id);
 
             Calendar cal = Calendar.getInstance();
             Timestamp timestamp = new Timestamp(cal.getTimeInMillis());
-            ps.setTimestamp(23, timestamp);
+            ps.setTimestamp(22, timestamp);
             if (null == pm) {
-                ps.setInt(24, Login.currentlyLogin_Id);
-                ps.setString(25,new  GenerateBillNumber().generatorAdmissionNumber());
-                ps.setString(26,new  GenerateBillNumber().generateUHIDNum());
+                ps.setInt(23, Login.currentlyLogin_Id);
+                ps.setString(24,new  GenerateBillNumber().generatorAdmissionNumber());
+                ps.setString(25,new  GenerateBillNumber().generateUHIDNum());
             } else {
-                ps.setInt(24, pm.getPatientId());
+                ps.setInt(23, pm.getPatientId());
             }
             int res = ps.executeUpdate();
             if (res > 0) {
@@ -310,10 +316,9 @@ public class AddPatient implements Initializable {
     }
 
     public void cancelBn(ActionEvent event) {
+        closeStage();
     }
 
-    public void submitBn(ActionEvent event) {
-    }
 
     private void callTask(String type,PatientInsertUpdateModel pium) {
 

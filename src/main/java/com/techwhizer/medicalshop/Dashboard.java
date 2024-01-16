@@ -78,7 +78,7 @@ public class Dashboard implements Initializable {
         if (Objects.equals(Login.currentRoleName, RoleKey.STAFF)){
             myProductBnClick(null);
         } else if (Login.currentRoleName.equalsIgnoreCase(RoleKey.DOCTOR)) {
-            patientViewClick(null);
+            prescriptionBnClick(null);
         } else {
             homeBnClick(null);
         }
@@ -163,6 +163,9 @@ public class Dashboard implements Initializable {
         setVisible(billingBnTop, Objects.equals(Login.currentRoleName, RoleKey.ADMIN) ||
                 Objects.equals(Login.currentRoleName, RoleKey.STAFF));
 
+        setVisible(invoiceBn, Objects.equals(Login.currentRoleName, RoleKey.ADMIN) ||
+                Objects.equals(Login.currentRoleName, RoleKey.STAFF));
+        setVisible(prescriptionBn, Objects.equals(Login.currentRoleName, RoleKey.DOCTOR));
 
     }
 
@@ -214,13 +217,17 @@ public class Dashboard implements Initializable {
 
         settingMenuButton.getItems().addAll(product, prescription, profile, users, shopData, doctor, returnHistory, dealer, backup, logout);
 
-        onClickAction(gst, shopData, profile, users, dealer, backup, company, discount, manufacture, mr, doctor, returnHistory, frequency, timing, logout);
+        onClickAction(gst, shopData, profile, users, dealer, backup, company, discount,
+                manufacture, mr, doctor, returnHistory, frequency, timing, logout);
 
     }
 
     private void onClickAction(MenuItem gst, MenuItem shopData,
                                MenuItem profile, MenuItem users, MenuItem dealer ,
-                               MenuItem backup, MenuItem company, MenuItem discount, MenuItem manufacture, MenuItem mr, MenuItem doctor, MenuItem returnHistory, MenuItem frequency, MenuItem timing, MenuItem C) {
+                               MenuItem backup, MenuItem company, MenuItem discount,
+                               MenuItem manufacture, MenuItem mr, MenuItem doctor,
+                               MenuItem returnHistory, MenuItem frequency,
+                               MenuItem timing, MenuItem logout) {
 
         gst.setOnAction(event -> {
             customDialog.showFxmlDialog2("product/gst/gstConfig.fxml", "GST");
@@ -265,7 +272,7 @@ public class Dashboard implements Initializable {
 
         manufacture.setOnAction(event -> customDialog.showFxmlDialog2("product/manufactureMain.fxml","Manufactures"));
         mr.setOnAction(event -> customDialog.showFxmlFullDialog("product/mr/mrMain.fxml","Medical Representatives"));
-        mr.setOnAction(event -> logout());
+        logout.setOnAction(event -> logout());
 
 
 
@@ -344,7 +351,7 @@ public class Dashboard implements Initializable {
 
     public void saleProductBnClick(MouseEvent actionEvent) {
 
-        customDialog.showFxmlDialog2("dashboard/billing.fxml","SALE ENTRY");
+        customDialog.showFxmlFullDialog("dashboard/billing.fxml","SALE ENTRY");
     }
 
     public void saleReportBnClick(ActionEvent actionEvent) {

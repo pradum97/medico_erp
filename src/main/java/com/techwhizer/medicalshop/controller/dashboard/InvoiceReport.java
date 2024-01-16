@@ -255,10 +255,17 @@ public class InvoiceReport implements Initializable {
         try {
             connection = dbConnection.getConnection();
             String query = """
-                    select tp.name, coalesce(tp.phone, '-')as phone,  tsm.bill_type,
-                           (TO_CHAR(tsm.sale_date, 'DD-MM-YYYY HH12:MI:SS AM')) as sale_date,tsm.sale_main_id,tsm.invoice_number,
+                    select regexp_replace(trim( concat(COALESCE(ts.name, ''), ' ',
+                    COALESCE(tp.first_name, ''), ' ',
+                    COALESCE(tp.middle_name, ''), ' ',
+                    COALESCE(tp.last_name, '')) ),'  ',' ' ) as name, coalesce(tp.phone, '-')as phone,  tsm.bill_type,
+                           (TO_CHAR(tsm.sale_date, 'DD-MM-YYYY HH12:MI AM')) as sale_date,tsm.sale_main_id,tsm.invoice_number,
                            (select count(*) from tbl_sale_items tsi where tsm.sale_main_id = tsi.sale_main_id)as totalItem
-                    from tbl_sale_main tsm left join tbl_patient tp on tsm.patient_id = tp.patient_id""";
+                    from tbl_sale_main tsm 
+                    left join tbl_patient tp on tsm.patient_id = tp.patient_id
+                    left join tbl_salutation ts on ts.salutation_id = tp.salutation_id 
+
+                    """;
 
             if (isDateFilter) {
                 String q = query.concat(" where TO_CHAR(tsm.sale_date, 'YYYY-MM-DD') between ? and ? order by sale_main_id asc  ");
@@ -407,7 +414,7 @@ public class InvoiceReport implements Initializable {
                     bnDownload.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 
                     bnDownload.setStyle("-fx-background-color: #030c3d; -fx-background-radius: 3 ;  " +
-                            "-fx-padding: 2 5 2 5 ;-fx-font-family: Arial; -fx-text-fill: white;-fx-font-weight: bold; -fx-alignment: center;-fx-cursor: hand");
+                            "-fx-padding: 2 2 2 2 ;-fx-font-family: Arial; -fx-text-fill: white;-fx-font-weight: bold; -fx-alignment: center;-fx-cursor: hand");
 
                     bnPrint.setStyle("-fx-background-color: #670283; -fx-background-radius: 3 ;-fx-font-weight: bold ;-fx-font-family: Arial; " +
                             "-fx-padding: 2 5 2 5 ; -fx-text-fill: white; -fx-alignment: center;-fx-cursor: hand");
@@ -416,7 +423,7 @@ public class InvoiceReport implements Initializable {
 
                     String path = "img/icon/";
 
-                    down_iv.setFitHeight(22);
+                    down_iv.setFitHeight(12);
                     down_iv.setFitWidth(12);
 
                     print_iv.setFitHeight(12);

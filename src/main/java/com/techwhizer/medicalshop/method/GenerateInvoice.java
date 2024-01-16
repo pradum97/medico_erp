@@ -5,6 +5,7 @@ import com.techwhizer.medicalshop.FileLoader;
 import com.techwhizer.medicalshop.ImageLoader;
 import com.techwhizer.medicalshop.InvoiceModel.PaymentChargeModel;
 import com.techwhizer.medicalshop.model.*;
+import com.techwhizer.medicalshop.util.CommonUtil;
 import com.techwhizer.medicalshop.util.DBConnection;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -18,6 +19,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -55,7 +57,10 @@ public class GenerateInvoice {
 
             String query = """
 
-                    select tsi.item_name,td.dr_name , tp.name as patient_name,tp.phone as patient_phone ,
+                    select tsi.item_name,td.dr_name , regexp_replace(trim( concat(COALESCE(sal.name, ''), ' ',
+                    COALESCE(tp.first_name, ''), ' ',
+                    COALESCE(tp.middle_name, ''), ' ',
+                    COALESCE(tp.last_name, '')) ),'  ',' ' ) as patient_name,tp.phone as patient_phone ,
                            tp.address as patient_address ,
                            tml.manufacturer_name,tsi.batch,
                            case when ts.quantity_unit = 'TAB' then (coalesce(tsi.sale_rate,0)/coalesce(tsi.strip_tab,0))
@@ -70,12 +75,14 @@ public class GenerateInvoice {
                            tsd.shop_name , tsd.shop_address , tsd.shop_email,tsd.shop_gst_number , tsd.shop_phone_1 , tsd.shop_phone_2,
                            tsd.shop_food_licence,tsd.shop_drug_licence,(tsi.strip*tsi.strip_tab)+tsi.pcs as totalTab,
                            tsi.sgst, tsi.cgst,tsi.igst , tsi.hsn_sac ,
-                           tsm.additional_discount as ADDITIONAL_DISCOUNT
+                           tsm.additional_discount_amount as additional_discount_amount
                     from tbl_sale_main tsm
                              Left Join tbl_sale_items tsi on tsm.sale_main_id = tsi.sale_main_id
                              LEFT JOIN tbl_doctor td on tsm.doctor_id = td.doctor_id
                              left join tbl_stock ts on tsi.stock_id = ts.stock_id
                              LEFT JOIN tbl_patient tp on tsm.patient_id = tp.patient_id
+                            left join tbl_salutation sal on sal.salutation_id = tp.salutation_id
+
                              left join tbl_manufacturer_list tml on tsi.mfr_id = tml.mfr_id
                              CROSS JOIN tbl_shop_details tsd
                     where tsm.sale_main_id = ?
@@ -114,7 +121,7 @@ public class GenerateInvoice {
                 String fl = rs.getString("shop_food_licence");
                 String dl = rs.getString("shop_drug_licence");
                 String drName = rs.getString("dr_name");
-                double additional_discount = rs.getDouble("ADDITIONAL_DISCOUNT");
+                double additional_discount = rs.getDouble("additional_discount_amount");
 
                 if (null == shopPhone2 || shopPhone2.isEmpty()) {
                     shopPhone2 = "";
@@ -246,8 +253,12 @@ public class GenerateInvoice {
         try {
             connection = new DBConnection().getConnection();
             String query = """
-                    select tsi.item_name,td.dr_name , tp.name as patient_name,tp.phone as patient_phone ,
-                           tp.address as patient_address ,
+                    select tsi.item_name,td.dr_name , 
+                    regexp_replace(trim( concat(COALESCE(sal.name, ''), ' ',
+                    COALESCE(tp.first_name, ''), ' ',
+                    COALESCE(tp.middle_name, ''), ' ',
+                    COALESCE(tp.last_name, '')) ),'  ',' ' ) as patient_name ,
+                           tp.address as patient_address ,tp.phone as patient_phone,
                            tml.manufacturer_name,tsi.batch,
                            case when ts.quantity_unit = 'TAB' then (coalesce(tsi.sale_rate,0)/coalesce(tsi.strip_tab,0))
                                else coalesce(tsi.sale_rate,0) end as sale_rate,
@@ -260,15 +271,17 @@ public class GenerateInvoice {
                            tsm.invoice_number ,(TO_CHAR(tsm.sale_date, 'DD-MM-YYYY')) as sale_date,
                            tsd.shop_name , tsd.shop_address , tsd.shop_email,tsd.shop_gst_number , tsd.shop_phone_1 , tsd.shop_phone_2,
                            tsd.shop_food_licence,tsd.shop_drug_licence,(tsi.strip*tsi.strip_tab)+tsi.pcs as totalTab,
-                           tsm.additional_discount as ADDITIONAL_DISCOUNT
+                           tsm.additional_discount_amount as additional_discount_amount
                     from tbl_sale_main tsm
                              Left Join tbl_sale_items tsi on tsm.sale_main_id = tsi.sale_main_id
                              LEFT JOIN tbl_doctor td on tsm.doctor_id = td.doctor_id
-                        left join tbl_stock ts on tsi.stock_id = ts.stock_id
+                             left join tbl_stock ts on tsi.stock_id = ts.stock_id
                              LEFT JOIN tbl_patient tp on tsm.patient_id = tp.patient_id
+                            left join tbl_salutation sal on sal.salutation_id = tp.salutation_id
+                             
                              left join tbl_manufacturer_list tml on tsi.mfr_id = tml.mfr_id
                              CROSS JOIN tbl_shop_details tsd
-                                                            where tsm.sale_main_id = ?""";
+                             where tsm.sale_main_id = ?""";
 
             ps = connection.prepareStatement(query);
             ps.setInt(1, saleMainId);
@@ -299,7 +312,7 @@ public class GenerateInvoice {
                 String fl = rs.getString("shop_food_licence");
                 String dl = rs.getString("shop_drug_licence");
                 String drName = rs.getString("dr_name");
-                double additional_discount = rs.getDouble("ADDITIONAL_DISCOUNT");
+                double additional_discount = rs.getDouble("additional_discount_amount");
 
                 if (null == shopPhone2 || shopPhone2.isEmpty()) {
                     shopPhone2 = "";
@@ -420,6 +433,10 @@ public class GenerateInvoice {
                 param.put("invoiceNumber",invoiceNum);
                 param.put("uhidNum",uhid_no);
 
+                ConsultationSetupModel csm = CommonUtil.getConsultationSetup();
+
+                param.put("fee_valid_days",csm==null?25:csm.getFee_valid_days());
+
                 String companyLogoPath = "img/company/gangotri_company_logo.png";
 
                 param.put("company_logo1", new ImageLoader().reportLogo(companyLogoPath));
@@ -463,6 +480,7 @@ public class GenerateInvoice {
         try {
             connection = new DBConnection().getConnection();
 
+
             if (Objects.equals(slipType, "Consultant")) {
 
                 String query = """
@@ -496,11 +514,19 @@ public class GenerateInvoice {
                     String receipt_date = rs.getString("receipt_date");
                     String gender_age = rs.getString("gender_age");
                     String phone = rs.getString("phone");
-                    String fee_valid_date = rs.getString("fee_valid_date");
+                    String consult_date = rs.getString("consult_date");
                     String preparedBy = rs.getString("preparedby");
                     String receipt_type = rs.getString("receipt_type");
                     String patient_category = rs.getString("patient_category");
 
+                    System.out.println(consult_date);
+
+                    DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+                    LocalDate lDate = LocalDate.parse(consult_date,format);
+
+                    ConsultationSetupModel csm = CommonUtil.getConsultationSetup();
+
+                    String feeValidUpTo = lDate.plusDays(csm == null?25:csm.getFee_valid_days()).format(format).toString();
 
                     param.put("patientName", patient_name);
                     param.put("uhidNum", uhid_no);
@@ -511,7 +537,7 @@ public class GenerateInvoice {
                     param.put("ReceiptDateAndTime", receipt_date);
                     param.put("genderAge", gender_age);
                     param.put("MobileNum", phone);
-                    param.put("feeVaildDate", fee_valid_date);
+                    param.put("feeVaildDate", feeValidUpTo);
                     param.put("printedBy", preparedBy);
                     param.put("receiptType", receipt_type);
                     param.put("patientCategory", patient_category);

@@ -28,6 +28,7 @@ public class ViewBillingItems implements Initializable {
     public TableColumn<SaleItemsModel, String> colProductName;
     public TableColumn<SaleItemsModel, String> colMrp;
     public TableColumn<SaleItemsModel, String> colQuantity;
+    public TableColumn<SaleItemsModel, String> colDiscount;
     public TableColumn<SaleItemsModel, String> colHsnSac;
     public TableColumn<SaleItemsModel, String> colTax;
     public TableColumn<SaleItemsModel, String> colTaxAmount;
@@ -48,6 +49,9 @@ public class ViewBillingItems implements Initializable {
         propRead = propLoader.getReadProp();
         sale_main_id = (int) Main.primaryStage.getUserData();
         method = new Method();
+
+        colTax.setVisible(false);
+        colDate.setVisible(false);
         getSaleItem();
     }
 
@@ -65,7 +69,7 @@ public class ViewBillingItems implements Initializable {
                     select (TO_CHAR(sale_date, 'DD-MM-YYYY HH12:MI:SS AM')) as sale_date,ts.quantity_unit,tsi.strip_tab
                             ,((coalesce(tsi.strip,0)*coalesce(tsi.strip_tab,0))+tsi.pcs) as totalTab,
                            ts.quantity_unit,tim.item_id,tsi.sale_item_id,tsi.sale_item_id, tsi.item_name, tsi.sale_rate, tsi.discount, tsi.hsn_sac,
-                           tsi.igst, tsi.sgst, tsi.cgst, tsi.net_amount, tsi.sale_date, tsi.tax_amount
+                           tsi.igst, tsi.sgst, tsi.cgst, tsi.net_amount, tsi.sale_date, tsi.tax_amount,tsi.discount
                     from tbl_sale_items tsi
                              left join tbl_items_master tim on tim.item_id = tsi.item_id
                              left join tbl_stock ts on tsi.stock_id = ts.stock_id
@@ -82,6 +86,7 @@ public class ViewBillingItems implements Initializable {
                 double sale_rate = rs.getDouble("sale_rate");
                 double taxAmount = rs.getDouble("tax_amount");
                 double netAmount = rs.getDouble("net_amount");
+                double discount = rs.getDouble("discount");
                 int hsn = rs.getInt("hsn_sac");
                 int igst = rs.getInt("igst");
                 int sgst = rs.getInt("sgst");
@@ -95,7 +100,7 @@ public class ViewBillingItems implements Initializable {
                 String qty = method.tabToStrip(totalTab,stripTab,quantity_unit);;
 
                 reportList.add(new SaleItemsModel(saleItemId, productId, productName, sale_rate,
-                        taxAmount, netAmount, qty, hsn, tax, igst, cgst, sgst, saleDate));
+                        taxAmount, netAmount,discount, qty, hsn, tax, igst, cgst, sgst, saleDate));
 
             }
             if (null != reportList) {
@@ -131,6 +136,7 @@ public class ViewBillingItems implements Initializable {
         colTaxAmount.setCellValueFactory(new PropertyValueFactory<>("taxAmount"));
         colNetAmount.setCellValueFactory(new PropertyValueFactory<>("netAmount"));
         colDate.setCellValueFactory(new PropertyValueFactory<>("sellingDate"));
+        colDiscount.setCellValueFactory(new PropertyValueFactory<>("discount"));
 
         int fromIndex = index * limit;
         int toIndex = Math.min(fromIndex + limit, reportList.size());
@@ -150,9 +156,9 @@ public class ViewBillingItems implements Initializable {
         columnName.setCellFactory(tc -> {
             TableCell<SaleItemsModel, String> cell = new TableCell<>();
             Text text = new Text();
-            text.setStyle("-fx-font-size: 14");
+            text.setStyle("-fx-font-size: 11");
             cell.setGraphic(text);
-            text.setStyle("-fx-text-alignment: CENTER ; -fx-padding: 10");
+            text.setStyle("-fx-padding: 5");
             cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
             text.wrappingWidthProperty().bind(columnName.widthProperty());
             text.textProperty().bind(cell.itemProperty());
