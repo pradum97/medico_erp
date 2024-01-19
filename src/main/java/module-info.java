@@ -81,5 +81,8 @@ module com.techwhizer.medicalshop {
     exports com.techwhizer.medicalshop.controller.consultant;
     opens com.techwhizer.medicalshop.controller.consultant to javafx.fxml;
 
+    exports com.techwhizer.medicalshop.controller.product.purchase.model;
+    opens com.techwhizer.medicalshop.controller.product.purchase.model to javafx.fxml;
+
 
 }
