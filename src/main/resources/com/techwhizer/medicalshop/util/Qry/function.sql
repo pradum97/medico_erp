@@ -81,3 +81,20 @@ BEGIN
 
 END ;
 $func$;
+
+
+CREATE OR REPLACE FUNCTION get_remaining_dues(dues_source_id int)
+    RETURNS VARCHAR(50) AS
+$$
+DECLARE
+    result VARCHAR;
+BEGIN
+
+    result = (select td.dues_amount - (select sum(amount) as dues_amount from
+        payment_information
+                                       where document_id = td.dues_id and document_source = 'DUES') as remaining_dues
+              from tbl_dues td where td.source_id = dues_source_id);
+
+    return result;
+END ;
+$$ LANGUAGE plpgsql;

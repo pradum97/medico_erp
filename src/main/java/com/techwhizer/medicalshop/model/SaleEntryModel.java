@@ -51,7 +51,6 @@ public class SaleEntryModel {
         this.batch = batch;
         this.mfrId = mfrId;
         this.amtAsPerMrp = amtAsPerMrp;
-
     }
 
     public int getStockId() {

@@ -1,4 +1,4 @@
-CREATE OR REPLACE  VIEW print_consultant_slip_v as
+CREATE OR REPLACE VIEW print_consultant_slip_v as
 select consultation_id,
        pc.referred_by_doctor_id,
        pc.consultation_doctor_id,

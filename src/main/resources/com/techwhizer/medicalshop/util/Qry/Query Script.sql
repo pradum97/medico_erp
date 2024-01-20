@@ -257,50 +257,52 @@ CREATE TABLE TBL_CART
 
 CREATE TABLE TBL_SALE_MAIN
 (
-    SALE_MAIN_ID        SERIAL PRIMARY KEY                  NOT NULL,
-    PATIENT_ID          INTEGER                             NOT NULL,
-    DOCTOR_ID           INT,
-    SELLER_ID           INTEGER                             NOT NULL,
+    SALE_MAIN_ID                   SERIAL PRIMARY KEY                  NOT NULL,
+    PATIENT_ID                     INTEGER                             NOT NULL,
+    DOCTOR_ID                      INT,
+    SELLER_ID                      INTEGER                             NOT NULL,
     ADDITIONAL_DISCOUNT_AMOUNT     NUMERIC,
     ADDITIONAL_DISCOUNT_PERCENTAGE NUMERIC,
     TOTAL_DISCOUNT_AMOUNT          NUMERIC,
-    PAYMENT_MODE        VARCHAR                             NOT NULL,
-    TOT_TAX_AMOUNT      NUMERIC,
-    NET_AMOUNT          NUMERIC                             NOT NULL,
-    INVOICE_NUMBER      VARCHAR(100)                        NOT NULL,
-    BILL_TYPE           VARCHAR(100)                        NOT NULL,
-    sale_date           timestamp default CURRENT_TIMESTAMP NOT NULL,
+    PAYMENT_MODE                   VARCHAR                             NOT NULL,
+    TOT_TAX_AMOUNT                 NUMERIC,
+    NET_AMOUNT                     NUMERIC                             NOT NULL,
+    INVOICE_NUMBER                 VARCHAR(100)                        NOT NULL,
+    BILL_TYPE                      VARCHAR(100)                        NOT NULL,
+    sale_date                      timestamp default CURRENT_TIMESTAMP NOT NULL,
+    RECEIVED_AMOUNT                NUMERIC,
     FOREIGN KEY (SELLER_ID)
         REFERENCES tbl_users (user_id)
 );
 
 CREATE TABLE TBL_SALE_ITEMS
 (
-    SALE_ITEM_ID  BIGSERIAL PRIMARY KEY               NOT NULL,
-    SALE_MAIN_ID  INTEGER                             NOT NULL,
-    ITEM_ID       INTEGER                             NOT NULL,
-    ITEM_NAME     VARCHAR(200)                        NOT NULL,
+    SALE_ITEM_ID                   BIGSERIAL PRIMARY KEY               NOT NULL,
+    SALE_MAIN_ID                   INTEGER                             NOT NULL,
+    ITEM_ID                        INTEGER                             NOT NULL,
+    ITEM_NAME                      VARCHAR(200)                        NOT NULL,
 
-    PACK          VARCHAR(200),
-    MFR_ID        INT,
-    BATCH         VARCHAR(200),
-    EXPIRY_DATE   VARCHAR(50),
+    PACK                           VARCHAR(200),
+    MFR_ID                         INT,
+    BATCH                          VARCHAR(200),
+    EXPIRY_DATE                    VARCHAR(50),
 
-    PURCHASE_RATE NUMERIC                             NOT NULL,
-    MRP           NUMERIC   DEFAULT 0                 NOT NULL,
-    SALE_RATE     NUMERIC                             NOT NULL,
-    STRIP         INT       default 0,
-    PCS           INT       default 0,
-    DISCOUNT      numeric,
-    HSN_SAC       NUMERIC,
-    igst          NUMERIC,
-    sgst          NUMERIC,
-    cgst          NUMERIC,
-    STRIP_TAB     INT,
-    NET_AMOUNT    NUMERIC                             NOT NULL,
-    TAX_AMOUNT    NUMERIC,
-    sale_date     timestamp default CURRENT_TIMESTAMP NOT NULL,
-    stock_id      integer                             not null,
+    PURCHASE_RATE                  NUMERIC                             NOT NULL,
+    MRP                            NUMERIC   DEFAULT 0                 NOT NULL,
+    SALE_RATE                      NUMERIC                             NOT NULL,
+    STRIP                          INT       default 0,
+    PCS                            INT       default 0,
+    DISCOUNT                       numeric,
+    HSN_SAC                        NUMERIC,
+    igst                           NUMERIC,
+    sgst                           NUMERIC,
+    cgst                           NUMERIC,
+    STRIP_TAB                      INT,
+    NET_AMOUNT                     NUMERIC                             NOT NULL,
+    TAX_AMOUNT                     NUMERIC,
+    sale_date                      timestamp default CURRENT_TIMESTAMP NOT NULL,
+    stock_id                       integer                             not null,
+    ADDITIONAL_DISCOUNT_PERCENTAGE numeric,
 
     FOREIGN KEY (SALE_MAIN_ID)
         REFERENCES TBL_SALE_MAIN (SALE_MAIN_ID),
@@ -346,15 +348,15 @@ CREATE TABLE TBL_RETURN_MAIN
 
 CREATE TABLE TBL_RETURN_ITEMS
 (
-    RETURNS_ID     SERIAL PRIMARY KEY,
-    STOCK_ID       INT NOT NULL,
-    SALE_ITEM_ID   INT NOT NULL,
-    QUANTITY       BIGINT,
-    QUANTITY_UNIT  VARCHAR(20),
-    RETURN_MAIN_ID INT NOT NULL,
+    RETURNS_ID      SERIAL PRIMARY KEY,
+    STOCK_ID        INT NOT NULL,
+    SALE_ITEM_ID    INT NOT NULL,
+    QUANTITY        BIGINT,
+    QUANTITY_UNIT   VARCHAR(20),
+    RETURN_MAIN_ID  INT NOT NULL,
     DISCOUNT_AMOUNT numeric,
-    AMOUNT numeric,
-    NET_AMOUNT numeric
+    AMOUNT          numeric,
+    NET_AMOUNT      numeric
 );
 
 CREATE TABLE tbl_frequency
@@ -387,7 +389,7 @@ CREATE TABLE TBL_PATIENT
     SALUTATION_ID    INT,
     FIRST_NAME       VARCHAR(100)       NOT NULL,
     PATIENT_CATEGORY VARCHAR(200) DEFAULT 'GENERAL/CASH',
-    UHID_NO VARCHAR(200),
+    UHID_NO          VARCHAR(200),
     admission_number varchar(50),
     MIDDLE_NAME      VARCHAR(100),
     LAST_NAME        VARCHAR(100),
@@ -410,7 +412,7 @@ CREATE TABLE TBL_PATIENT
     created_by       int,
     last_update      timestamp,
     last_update_by   int,
-    CREATION_DATE    timestamp default CURRENT_TIMESTAMP
+    CREATION_DATE    timestamp    default CURRENT_TIMESTAMP
 );
 
 
@@ -424,10 +426,10 @@ CREATE TABLE patient_consultation
     patient_id             INT,
     referred_by_doctor_id  INT,
     referred_by_name       varchar(300),
-    description varchar(1000),
+    description            varchar(1000),
     consultation_doctor_id INT,
-    receipt_num varchar(100),
-    receipt_type varchar(100),
+    receipt_num            varchar(100),
+    receipt_type           varchar(100),
     remarks                varchar(500),
     consultant_status      VARCHAR(100) DEFAULT 'Pending',
     consultation_date      timestamp    DEFAULT CURRENT_TIMESTAMP,
@@ -437,35 +439,35 @@ CREATE TABLE patient_consultation
     LAST_UPDATE_DATE       timestamp    default CURRENT_TIMESTAMP
 );
 
-CREATE  TABLE PRESCRIBE_MEDICINE_MASTER(
-  PRESCRIBE_MASTER_MEDICINE_ID   SERIAL PRIMARY KEY,
-  consultation_id         int,
-  PATIENT_ID INT,
-  INVOICE_NUM VARCHAR(30),
-  CREATED_BY INT,
-  CREATION_DATE TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE PRESCRIBE_MEDICINE_MASTER
+(
+    PRESCRIBE_MASTER_MEDICINE_ID SERIAL PRIMARY KEY,
+    consultation_id              int,
+    PATIENT_ID                   INT,
+    INVOICE_NUM                  VARCHAR(30),
+    CREATED_BY                   INT,
+    CREATION_DATE                TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
 ;
 
-CREATE  TABLE PRESCRIBE_MEDICINE_ITEMS
+CREATE TABLE PRESCRIBE_MEDICINE_ITEMS
 (
-    PRESCRIBE_ITEMS_MEDICINE_ID   SERIAL PRIMARY KEY,
-    ITEM_NAME               VARCHAR(400),
-    ITEM_ID                 INT,
-    PRESCRIBE_MASTER_MEDICINE_ID INT ,
-    IS_ITEM_EXISTS_IN_STOCK bool,
-    COMPOSITION             VARCHAR(300),
-    TAG                     VARCHAR(200),
-    REMARK                  VARCHAR(1000),
-    QUANTITY                VARCHAR(100),
-    TIME                    VARCHAR(500),
-    DOSE                    VARCHAR(200),
-    FREQUENCY               VARCHAR(400),
-    DURATION                VARCHAR(100),
-    STATUS                  VARCHAR(50) DEFAULT 1,
-    CREATION_DATE           TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
+    PRESCRIBE_ITEMS_MEDICINE_ID  SERIAL PRIMARY KEY,
+    ITEM_NAME                    VARCHAR(400),
+    ITEM_ID                      INT,
+    PRESCRIBE_MASTER_MEDICINE_ID INT,
+    IS_ITEM_EXISTS_IN_STOCK      bool,
+    COMPOSITION                  VARCHAR(300),
+    TAG                          VARCHAR(200),
+    REMARK                       VARCHAR(1000),
+    QUANTITY                     VARCHAR(100),
+    TIME                         VARCHAR(500),
+    DOSE                         VARCHAR(200),
+    FREQUENCY                    VARCHAR(400),
+    DURATION                     VARCHAR(100),
+    STATUS                       VARCHAR(50) DEFAULT 1,
+    CREATION_DATE                TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
 );
-
 
 
 
@@ -486,42 +488,38 @@ CREATE TABLE payment_information
     CREATION_DATE   TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE consultation_setup(
-    consultation_setup_ID SERIAL PRIMARY KEY ,
-    consultation_fee numeric not null ,
-    fee_valid_days int not null,
-    CREATED_BY INT NOT NULL ,
-    CREATION_DATE TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE consultation_setup
+(
+    consultation_setup_ID SERIAL PRIMARY KEY,
+    consultation_fee      numeric not null,
+    fee_valid_days        int     not null,
+    CREATED_BY            INT     NOT NULL,
+    CREATION_DATE         TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 insert into consultation_setup(consultation_fee, fee_valid_days, CREATED_BY)
-VALUES(400,25,1);
+VALUES (400, 25, 1);
 
 ALTER TABLE TBL_SALE_MAIN
     ADD COLUMN PAYMENT_REFERENCE_NUM VARCHAR(300),
-    ADD COLUMN REMARKS VARCHAR(500),
-    ADD COLUMN CREATED_BY INT;
--------------------09-Jan-2024---------------------
-
---drop patient_age_column
---alter view and create patient view
--- create function
-
-ALTER TABLE tbl_sale_main
-    RENAME COLUMN additional_discount TO ADDITIONAL_DISCOUNT_AMOUNT;
-
-ALTER TABLE tbl_sale_main
-    ADD COLUMN ADDITIONAL_DISCOUNT_PERCENTAGE NUMERIC;
-
-ALTER TABLE tbl_sale_main
-    ADD COLUMN TOTAL_DISCOUNT_AMOUNT NUMERIC;
-
-ALTER TABLE TBL_RETURN_ITEMS ADD DISCOUNT_AMOUNT numeric;
-ALTER TABLE TBL_RETURN_ITEMS ADD AMOUNT numeric;
-ALTER TABLE TBL_RETURN_ITEMS ADD NET_AMOUNT numeric;
+    ADD COLUMN REMARKS               VARCHAR(500),
+    ADD COLUMN CREATED_BY            INT;
 
 
--- remove duplicate dealer [JYOTI MEDICAL AGENCY]
+CREATE  TABLE TBL_DUES(
+    DUES_ID SERIAL PRIMARY KEY ,
+    SOURCE_ID INT,
+    DUES_TYPE VARCHAR(200),
+    DUES_AMOUNT NUMERIC,
+    CREATED_BY INT,
+    CREATED_DATE timestamp DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+
+
+
 
 
 

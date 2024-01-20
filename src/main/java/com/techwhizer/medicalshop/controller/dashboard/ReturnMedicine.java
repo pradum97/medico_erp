@@ -211,19 +211,25 @@ public class ReturnMedicine implements Initializable {
             connection = new DBConnection().getConnection();
 
             String query = """
-                             select tsi.sale_item_id ,(TO_CHAR(tsm.sale_date, 'dd-MM-yyyy')) as sale_date,tsi.item_name,
-                                    concat(tsi.strip*case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end+tsi.pcs,'-',
-                                    (case when tsi.strip > 0 then 'TAB' ELSE 'PCS' END)) as quantity , tsi.discount as discountPercentage,
-                                    (tsi.sale_rate/case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end) as mrpPerTab,
-                                    tsi.sale_rate,tsi.stock_id,additional_discount_amount as additional_discount,
-                                    (tsi.discount/case when tsi.strip_tab > 0 then (tsi.strip_tab*tsi.strip) else tsi.pcs end) as discountPerTabPercentage,
-                                    case when tsi.strip > 0 then 'TAB' ELSE 'PCS' END as display_unit,
-                                    ((( tsi.strip*case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end)+tsi.pcs)*(tsi.sale_rate/case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end)-
-                                     (((( tsi.strip*case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end)+tsi.pcs)*(tsi.sale_rate/case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end))*tsi.discount/100)) as netAmount,
-                                    (((( tsi.strip*case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end)+tsi.pcs)*(tsi.sale_rate/case when 
-                                    case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end > 0 then case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end else 1 end))*tsi.discount/100) as discountAmount
-                             from tbl_sale_main tsm
-                                      left join tbl_sale_items tsi on tsm.sale_main_id = tsi.sale_main_id
+                
+                    select tsi.sale_item_id ,(TO_CHAR(tsm.sale_date, 'dd-MM-yyyy')) as sale_date,tsi.item_name,
+                       concat(tsi.strip*case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end+tsi.pcs,'-',
+                              (case when tsi.strip > 0 then 'TAB' ELSE 'PCS' END)) as quantity , tsi.discount as discountPercentage,
+                       (tsi.sale_rate/greatest(case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end,1)) as mrpPerTab,
+                       tsi.sale_rate,tsi.stock_id,additional_discount_amount as additional_discount,
+                       ((greatest((tsi.discount),0)+greatest(tsi.additional_discount_percentage,0))/
+                        greatest(case when tsi.strip_tab > 0 then (tsi.strip_tab*tsi.strip) else tsi.pcs end,1)) as discountPerTabPercentage,
+                       case when tsi.strip > 0 then 'TAB' ELSE 'PCS' END as display_unit,
+                       ((( tsi.strip*case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end)+tsi.pcs)*(tsi.sale_rate/case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end)-
+                        (((( tsi.strip*case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end)+tsi.pcs)*(tsi.sale_rate/case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end))*tsi.discount/100)) as netAmount,
+                       (((( tsi.strip*case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end)+tsi.pcs)*(tsi.sale_rate/case when
+                      case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end > 0 then case when tsi.strip_tab > 0 then tsi.strip_tab else 1
+                    end else 1 end))*
+                
+                        cast((greatest(cast(greatest(tsi.discount,0) as numeric)+ cast(greatest(tsi.additional_discount_percentage,0) as numeric),1))as numeric)
+                            /100) as discountAmount,tsi.additional_discount_percentage
+                from tbl_sale_main tsm
+                         left join tbl_sale_items tsi on tsm.sale_main_id = tsi.sale_main_id
                              where invoice_number = ?
                                         
                     """;
@@ -234,7 +240,6 @@ public class ReturnMedicine implements Initializable {
 
             while (rs.next()) {
                 count++;
-
                 int saleItemId = rs.getInt("sale_item_id");
                 int stockId = rs.getInt("stock_id");
                 String productName = rs.getString("item_name");
@@ -251,6 +256,7 @@ public class ReturnMedicine implements Initializable {
 
                 double discountAmount = rs.getDouble("discountAmount");
                 double discountPerPCSPercentage = rs.getDouble("discountPerTabPercentage");
+                double additionalDisPercentage = rs.getDouble("additional_discount_percentage");
 
                 int returnedQty = Integer.parseInt(getReturnableQuantity(saleItemId).split("-")[0]);
                 int totalQuantity = Integer.parseInt(quantity.split("-")[0]);
@@ -263,7 +269,7 @@ public class ReturnMedicine implements Initializable {
                         Double.parseDouble(method.decimalFormatter(netAmount)), mrp,
                         quantity, saleDate, Double.parseDouble(method.decimalFormatter(discountAmount)),
                         "0", false, stockId, mrpPerTab, discountPercentage, returnable, displayMrp,
-                        discountPerPCSPercentage, displayUnit, 0, 0, 0);
+                        discountPerPCSPercentage, displayUnit, 0, 0, 0,additionalDisPercentage);
                 itemList.add(returnProductModel);
             }
 
@@ -313,6 +319,8 @@ public class ReturnMedicine implements Initializable {
                             e.getTableView().getItems().get(e.getTablePosition().getRow()).setReturn(inputQuantity > 0);
                             e.getTableView().getItems().get(e.getTablePosition().getRow()).setReturnQuantity(String.valueOf(inputQuantity));
                             double rate = rmp.getMrpPerTab();
+
+
                             double disPer = inputQuantity * rmp.getDiscountPerPCSPercentage();
                             double disAmt = (((rate * inputQuantity) * disPer) / 100);
 

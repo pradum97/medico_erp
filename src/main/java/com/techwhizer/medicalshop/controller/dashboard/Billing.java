@@ -18,8 +18,6 @@ import com.techwhizer.medicalshop.util.DBConnection;
 import com.victorlaerte.asynctask.AsyncTask;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -96,6 +94,7 @@ public class Billing implements Initializable {
     public Label genderL;
     public Label guardianNameL;
     public Label addDisAmountL;
+    public TextField receivedAmountTf;
     private CustomDialog customDialog;
     private Method method;
     private DBConnection dbConnection;
@@ -336,7 +335,8 @@ public class Billing implements Initializable {
                         invoiceValue = mainValue;
                         discountAmount = 0;
                     }
-                    addDisAmountL.setText(String.valueOf(method.decimalFormatter(discountAmount)));
+                    double finalDiscountAmount = discountAmount;
+                    Platform.runLater(() -> addDisAmountL.setText(String.valueOf(method.decimalFormatter(finalDiscountAmount))));
                     setInvoiceAmount(invoiceValue);
                 });
             });
@@ -638,7 +638,7 @@ public class Billing implements Initializable {
         } else if (saleRate.isEmpty()) {
             method.show_popup("Please sale rate", saleRateTf);
             return;
-        } else if (!saleRate.isEmpty()) {
+        } else {
             try {
                 saleRateD = Double.parseDouble(saleRate);
             } catch (NumberFormatException e) {
@@ -995,7 +995,10 @@ public class Billing implements Initializable {
 
     public void checkOutBn(ActionEvent event) {
 
-        if (itemList.size() < 1) {
+        String receivedAmountStr = receivedAmountTf.getText();
+        double receivedAmountDouble = 0;
+
+        if (itemList.isEmpty()) {
             customDialog.showAlertBox("Not available", "Item not available.please add at least one item");
             return;
         } else if (null == patientModel) {
@@ -1005,7 +1008,22 @@ public class Billing implements Initializable {
             customDialog.showAlertBox("Shop Details Not Available",
                     "Please update shop details");
             return;
+        }else if(receivedAmountStr.isEmpty()){
+            method.show_popup("Please enter received Amount",receivedAmountTf);
+            return;
         }
+
+        try {
+            receivedAmountDouble = Double.parseDouble(receivedAmountStr);
+
+            System.out.println("receivedAmountDouble-"+receivedAmountDouble);
+
+        } catch (NumberFormatException e) {
+            method.show_popup("Please enter valid received Amount",receivedAmountTf);
+            return;
+        }
+
+
 
         String billType = billingTypeC.getSelectionModel().getSelectedItem();
 
@@ -1023,7 +1041,7 @@ public class Billing implements Initializable {
         ButtonType button = result.orElse(ButtonType.CANCEL);
         if (button == ButtonType.OK) {
             // Bill Type -> "REGULAR", "GST", "KITTY PARTY"
-            SaleTask saleTask = new SaleTask(billType, patientModel.getPatientId());
+            SaleTask saleTask = new SaleTask(billType, patientModel.getPatientId(),receivedAmountDouble);
             saleTask.setDaemon(false);
             saleTask.execute();
 
@@ -1037,10 +1055,12 @@ public class Billing implements Initializable {
 
         private String billType;
         private int patientId;
+        private  double receivedAmountDouble;
 
-        public SaleTask(String billType, int patientId) {
+        public SaleTask(String billType, int patientId, double receivedAmountDouble) {
             this.billType = billType;
             this.patientId = patientId;
+            this.receivedAmountDouble = receivedAmountDouble;
         }
 
 
@@ -1052,7 +1072,7 @@ public class Billing implements Initializable {
 
         @Override
         public Boolean doInBackground(String... params) {
-            addSaleItem(patientId, billType);
+            addSaleItem(patientId, billType,receivedAmountDouble);
             return true;
         }
 
@@ -1068,7 +1088,7 @@ public class Billing implements Initializable {
         }
     }
 
-    private void addSaleItem(int patientId, String billingType) {
+    private void addSaleItem(int patientId, String billingType, double receivedAmountDouble) {
 
         String paytmModeS = paymentModeC.getSelectionModel().getSelectedItem();
 
@@ -1162,13 +1182,35 @@ public class Billing implements Initializable {
 
                 if (rs.next()) {
                     int sale_main_id = rs.getInt(1);
+
+
+                    double duesAmount = invoiceValue-receivedAmountDouble;
+                    boolean isDues =duesAmount > 0;
+
+                    boolean isDuesInserted = false;
+
+                    if (isDues){
+                        ps = null;
+                        rs = null;
+
+                        String duesQry = """
+                           INSERT INTO TBL_DUES(SOURCE_ID, DUES_TYPE, DUES_AMOUNT, CREATED_BY) VALUES (?,?,?,?)                         
+                            """;
+                        ps = connection.prepareStatement(duesQry);
+                        ps.setInt(1,sale_main_id);
+                        ps.setString(2,"BILLING");
+                        ps.setDouble(3,duesAmount);
+                        ps.setInt(4,Login.currentlyLogin_Id);
+                        isDuesInserted =  ps.executeUpdate() > 0;
+                    }
+
                     ps = null;
                     rs = null;
                     int resItem = 0;
                     String query = "INSERT INTO TBL_SALE_ITEMS(SALE_MAIN_ID, ITEM_ID, ITEM_NAME, " +
                             "sale_rate, STRIP, PCS, DISCOUNT, HSN_SAC, igst, sgst, cgst, NET_AMOUNT, TAX_AMOUNT," +
-                            "strip_tab,purchase_rate,mrp, PACK ,MFR_ID,BATCH ,EXPIRY_DATE,stock_id)" +
-                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                            "strip_tab,purchase_rate,mrp, PACK ,MFR_ID,BATCH ,EXPIRY_DATE,stock_id,additional_discount_percentage)" +
+                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                     ps = connection.prepareStatement(query);
 
                     for (SaleEntryModel model : items) {
@@ -1179,7 +1221,7 @@ public class Billing implements Initializable {
                         ps.setDouble(4, model.getSaleRate());
                         ps.setInt(5, model.getStrip());
                         ps.setInt(6, model.getPcs());
-                        ps.setDouble(7, (model.getDiscount()+discountPerItem));
+                        ps.setDouble(7, (model.getDiscount()));
                         ps.setLong(8, model.getHsn());
                         ps.setInt(9, model.getiGst());
                         ps.setInt(10, model.getsGst());
@@ -1194,6 +1236,7 @@ public class Billing implements Initializable {
                         ps.setString(19,model.getBatch());
                         ps.setString(20,model.getExpiryDate());
                         ps.setInt(21,model.getStockId());
+                        ps.setDouble(22, (discountPerItem));
 
                         resItem = ps.executeUpdate();
 
@@ -1213,6 +1256,11 @@ public class Billing implements Initializable {
 
                         System.out.println("count");
                     }
+
+                    if(isDues && !isDuesInserted){
+                        resItem = 0;
+                    }
+
                     if (resItem > 0) {
                         psUpdateQty.close();
                         connection.commit();

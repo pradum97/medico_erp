@@ -183,6 +183,9 @@ public class PatientMain implements Initializable {
                }
            });
         } catch (SQLException e) {
+
+            System.out.println(e.getMessage());
+
             Platform.runLater(()->{
 
                 tableView.setPlaceholder(new Label("An error occurred while fetching the item"));

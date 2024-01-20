@@ -1,0 +1,45 @@
+
+-------------------09-Jan-2024---------------------
+
+drop view if exists print_consultant_slip_v;
+drop view if exists consultant_history_v;
+drop view if exists patient_v;
+drop view if exists stock_v;
+drop view if exists available_quantity_v;
+drop view if exists stock_v;
+
+
+--update dob from age
+--drop patient_age_column
+--create function
+--alter view and create patient view
+--CREATE DUES TABLE
+
+-- remove duplicate dealer [JYOTI MEDICAL AGENCY]
+
+
+-- age to dob
+update tbl_patient set dob = to_char(CURRENT_DATE - INTERVAL '1 year' *
+NULLIF(regexp_replace(age, '\D','','g'), '')::numeric,'DD-MM-YYYY');
+
+
+ALTER TABLE tbl_sale_main
+    RENAME COLUMN additional_discount TO ADDITIONAL_DISCOUNT_AMOUNT;
+
+ALTER TABLE tbl_sale_main
+    ADD COLUMN ADDITIONAL_DISCOUNT_PERCENTAGE NUMERIC;
+
+ALTER TABLE tbl_sale_main
+    ADD COLUMN TOTAL_DISCOUNT_AMOUNT NUMERIC;
+
+ALTER TABLE tbl_sale_main
+    ADD COLUMN RECEIVED_AMOUNT NUMERIC;
+
+ALTER TABLE tbl_sale_items ADD ADDITIONAL_DISCOUNT_PERCENTAGE numeric;
+
+
+ALTER TABLE TBL_RETURN_ITEMS ADD DISCOUNT_AMOUNT numeric;
+ALTER TABLE TBL_RETURN_ITEMS ADD AMOUNT numeric;
+ALTER TABLE TBL_RETURN_ITEMS ADD NET_AMOUNT numeric;
+
+
