@@ -196,6 +196,7 @@ public class Dashboard implements Initializable {
         MenuItem doctor = new MenuItem("DOCTOR");
         MenuItem returnHistory = new MenuItem("RETURN HISTORY");
         MenuItem purchaseHistory = new MenuItem("PURCHASE HISTORY");
+        MenuItem dues = new MenuItem("DUES");
         MenuItem backup = new MenuItem("BACKUP");
         MenuItem logout = new MenuItem("LOGOUT");
 
@@ -217,10 +218,10 @@ public class Dashboard implements Initializable {
         users.setVisible(Objects.equals(Login.currentRoleName, RoleKey.ADMIN));
 
         settingMenuButton.getItems().addAll(product, prescription, profile, users, shopData, doctor,
-                returnHistory,purchaseHistory, dealer, backup, logout);
+                returnHistory,purchaseHistory, dues,dealer, backup, logout);
 
         onClickAction(gst, shopData, profile, users, dealer, backup, company, discount,
-                manufacture, mr, doctor, returnHistory,purchaseHistory, frequency, timing, logout);
+                manufacture, mr, doctor, returnHistory,purchaseHistory,dues, frequency, timing, logout);
 
     }
 
@@ -228,7 +229,7 @@ public class Dashboard implements Initializable {
                                MenuItem profile, MenuItem users, MenuItem dealer ,
                                MenuItem backup, MenuItem company, MenuItem discount,
                                MenuItem manufacture, MenuItem mr, MenuItem doctor,
-                               MenuItem returnHistory,MenuItem purchaseHistory, MenuItem frequency,
+                               MenuItem returnHistory,MenuItem purchaseHistory ,MenuItem dues, MenuItem frequency,
                                MenuItem timing, MenuItem logout) {
 
         gst.setOnAction(event -> {
@@ -243,7 +244,13 @@ public class Dashboard implements Initializable {
         timing.setOnAction(event -> customDialog.showFxmlDialog2("prescription/medicineTime.fxml", ""));
 
         returnHistory.setOnAction(event -> customDialog.showFxmlFullDialog("dashboard/returnHistory.fxml", "RETURN HISTORY"));
-        purchaseHistory.setOnAction(event -> customDialog.showFxmlFullDialog("product/purchase/purchaseHistoryMain.fxml", "PURCHASE HISTORY"));
+        purchaseHistory.setOnAction(event ->
+                customDialog.showFxmlFullDialog("product/purchase/purchaseHistoryMain.fxml", "PURCHASE HISTORY"));
+
+        dues.setOnAction(event ->
+                customDialog.showFxmlFullDialog("dues/duesMain.fxml", "DUES"));
+
+
         doctor.setOnAction(event -> customDialog.showFxmlFullDialog("doctor/view_doctor.fxml", "DOCTORS"));
 
 

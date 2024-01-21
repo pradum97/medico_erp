@@ -1104,16 +1104,12 @@ public class Billing implements Initializable {
 
             connection = dbConnection.getConnection();
             connection.setAutoCommit(false);
-            double addiDiscAmt = 0,addDiscountPercentage = 0,totalDiscountAmount = 0,discountPerItem = 0.0;
+            double addiDiscAmt = 0,addDiscountPercentage = 0,totalDiscountAmount = 0;
 
             if (!addDiscTF.getText().isEmpty()){
                 try {
                     addDiscountPercentage =addDiscTF.getText().isEmpty()?0:
                             Double.parseDouble(addDiscTF.getText());
-
-                    discountPerItem = addDiscountPercentage/(items.isEmpty()?0:items.size());
-
-                    System.out.println("discountPerItem-"+discountPerItem);
 
                 } catch (NumberFormatException ignored) {
                     customDialog.showAlertBox("", "Please enter valid additional discount");
@@ -1144,6 +1140,8 @@ public class Billing implements Initializable {
 
                 }
             }
+
+            totalDiscountAmount = totalDiscountAmount+addiDiscAmt;
 
 
             String invoiceNumber = new GenerateBillNumber().getSaleBillNum();
@@ -1209,15 +1207,15 @@ public class Billing implements Initializable {
                     int resItem = 0;
                     String query = "INSERT INTO TBL_SALE_ITEMS(SALE_MAIN_ID, ITEM_ID, ITEM_NAME, " +
                             "sale_rate, STRIP, PCS, DISCOUNT, HSN_SAC, igst, sgst, cgst, NET_AMOUNT, TAX_AMOUNT," +
-                            "strip_tab,purchase_rate,mrp, PACK ,MFR_ID,BATCH ,EXPIRY_DATE,stock_id,additional_discount_percentage)" +
-                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                            "strip_tab,purchase_rate,mrp, PACK ,MFR_ID,BATCH ,EXPIRY_DATE,stock_id)" +
+                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                     ps = connection.prepareStatement(query);
 
                     for (SaleEntryModel model : items) {
 
                         ps.setInt(1, sale_main_id);
                         ps.setInt(2, model.getItemId());
-                        ps.setString(3, model.getProductName());
+                        ps.setString(3, model.getProductName()+addDiscountPercentage);
                         ps.setDouble(4, model.getSaleRate());
                         ps.setInt(5, model.getStrip());
                         ps.setInt(6, model.getPcs());
@@ -1236,7 +1234,6 @@ public class Billing implements Initializable {
                         ps.setString(19,model.getBatch());
                         ps.setString(20,model.getExpiryDate());
                         ps.setInt(21,model.getStockId());
-                        ps.setDouble(22, (discountPerItem));
 
                         resItem = ps.executeUpdate();
 

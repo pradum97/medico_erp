@@ -75,7 +75,8 @@ public class GenerateInvoice {
                            tsd.shop_name , tsd.shop_address , tsd.shop_email,tsd.shop_gst_number , tsd.shop_phone_1 , tsd.shop_phone_2,
                            tsd.shop_food_licence,tsd.shop_drug_licence,(tsi.strip*tsi.strip_tab)+tsi.pcs as totalTab,
                            tsi.sgst, tsi.cgst,tsi.igst , tsi.hsn_sac ,
-                           tsm.additional_discount_amount as additional_discount_amount
+                           tsm.additional_discount_amount as additional_discount_amount,
+                           get_remaining_dues(tsm.sale_main_id) as dues_amount,tsm.total_discount_amount
                     from tbl_sale_main tsm
                              Left Join tbl_sale_items tsi on tsm.sale_main_id = tsi.sale_main_id
                              LEFT JOIN tbl_doctor td on tsm.doctor_id = td.doctor_id
@@ -122,6 +123,10 @@ public class GenerateInvoice {
                 String dl = rs.getString("shop_drug_licence");
                 String drName = rs.getString("dr_name");
                 double additional_discount = rs.getDouble("additional_discount_amount");
+                param.put("duesAmount",rs.getDouble("dues_amount"));
+                param.put("totalSaving",rs.getDouble("total_discount_amount"));
+
+                param.put("receivedAmount",0.0);
 
                 if (null == shopPhone2 || shopPhone2.isEmpty()) {
                     shopPhone2 = "";
@@ -271,7 +276,8 @@ public class GenerateInvoice {
                            tsm.invoice_number ,(TO_CHAR(tsm.sale_date, 'DD-MM-YYYY')) as sale_date,
                            tsd.shop_name , tsd.shop_address , tsd.shop_email,tsd.shop_gst_number , tsd.shop_phone_1 , tsd.shop_phone_2,
                            tsd.shop_food_licence,tsd.shop_drug_licence,(tsi.strip*tsi.strip_tab)+tsi.pcs as totalTab,
-                           tsm.additional_discount_amount as additional_discount_amount
+                           tsm.additional_discount_amount as additional_discount_amount,
+                           get_remaining_dues(tsm.sale_main_id) as dues_amount,tsm.total_discount_amount
                     from tbl_sale_main tsm
                              Left Join tbl_sale_items tsi on tsm.sale_main_id = tsi.sale_main_id
                              LEFT JOIN tbl_doctor td on tsm.doctor_id = td.doctor_id
@@ -313,6 +319,10 @@ public class GenerateInvoice {
                 String dl = rs.getString("shop_drug_licence");
                 String drName = rs.getString("dr_name");
                 double additional_discount = rs.getDouble("additional_discount_amount");
+
+                param.put("duesAmount",rs.getDouble("dues_amount"));
+                param.put("totalSaving",rs.getDouble("total_discount_amount"));
+                param.put("receivedAmount",0.0);
 
                 if (null == shopPhone2 || shopPhone2.isEmpty()) {
                     shopPhone2 = "";

@@ -107,6 +107,24 @@ from tbl_items_master as tim
          left join tbl_product_tax tpt on tpt.tax_id = tim.gst_id;
 
 
+CREATE OR REPLACE VIEW dues_v as
+select distinct  td.source_id,td.dues_id, concat ( COALESCE(ts.name,''),' ',COALESCE(first_name,''),' ',
+                                                   COALESCE(middle_name,''),' ',COALESCE(last_name,'')) as full_name,
+                 tp.phone,tp.address,to_char(td.created_date,'DD/MM/YYYY') as dues_date,
+                 td.dues_type,td.dues_amount as total_dues,
+                 get_remaining_dues(td.source_id) as remaining_dues,
+                 (select concat(greatest(amount,0),'₹ / ',to_char(payment_date,'DD-MM-YYYY')) from
+                     payment_information where document_id = td.dues_id and document_source='DUES' order by 1 desc limit 1) as last_payment_amt_date,
+
+                 greatest((select sum(amount) from payment_information where document_id =
+                 td.dues_id and document_source='DUES'),0) as total_received_amount
+
+from tbl_dues td
+         left join tbl_sale_main tsm on tsm.sale_main_id = td.source_id
+         left join tbl_patient tp on tp.patient_id = tsm.patient_id
+         left join tbl_salutation ts on ts.salutation_id = tp.salutation_id;
+
+
 
 
 

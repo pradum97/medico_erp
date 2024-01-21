@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="invoice" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="575" leftMargin="10" rightMargin="10" topMargin="10" bottomMargin="10" isFloatColumnFooter="true" uuid="fc24451b-4ab4-4dfb-820f-a2c80d6950b1">
 	<property name="ireport.zoom" value="1.610510000000009"/>
 	<property name="ireport.x" value="0"/>
@@ -64,6 +64,15 @@
 	<parameter name="add_discount" class="java.lang.Double" isForPrompting="false"/>
 	<parameter name="title_logo" class="java.io.InputStream" isForPrompting="false"/>
 	<parameter name="tax" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource" isForPrompting="false"/>
+	<parameter name="duesAmount" class="java.lang.Double" isForPrompting="false">
+		<defaultValueExpression><![CDATA["0"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="totalSaving" class="java.lang.Double" isForPrompting="false">
+		<defaultValueExpression><![CDATA["0"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="receivedAmount" class="java.lang.Double" isForPrompting="false">
+		<defaultValueExpression><![CDATA["0"]]></defaultValueExpression>
+	</parameter>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -405,12 +414,12 @@
 								<box>
 									<pen lineWidth="0.0"/>
 									<topPen lineWidth="0.0"/>
-									<leftPen lineWidth="0.0"/>
+									<leftPen lineWidth="0.75"/>
 									<bottomPen lineWidth="0.0"/>
 									<rightPen lineWidth="0.0"/>
 								</box>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font fontName="Arial" size="11" isBold="true"/>
+									<font fontName="Arial" size="9" isBold="true"/>
 								</textElement>
 								<text><![CDATA[#]]></text>
 							</staticText>
@@ -463,11 +472,11 @@
 									<bottomPen lineWidth="0.0"/>
 									<rightPen lineWidth="0.0"/>
 								</box>
-								<textElement textAlignment="Center" verticalAlignment="Bottom">
-									<font fontName="Cutom_hindi_font" size="10" isBold="true"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Cutom_hindi_font" size="9" isBold="true"/>
 									<paragraph leftIndent="10"/>
 								</textElement>
-								<text><![CDATA[PRODUCT NAME]]></text>
+								<text><![CDATA[ITEM NAME]]></text>
 							</staticText>
 						</jr:columnHeader>
 						<jr:columnFooter height="1" rowSpan="1">
@@ -567,8 +576,8 @@
 									<bottomPen lineWidth="0.0"/>
 									<rightPen lineWidth="0.0"/>
 								</box>
-								<textElement textAlignment="Center" verticalAlignment="Bottom">
-									<font fontName="Cutom_hindi_font" size="11" isBold="true"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Cutom_hindi_font" size="9" isBold="true"/>
 								</textElement>
 								<text><![CDATA[QTY]]></text>
 							</staticText>
@@ -618,8 +627,8 @@
 									<bottomPen lineWidth="0.0"/>
 									<rightPen lineWidth="0.0"/>
 								</box>
-								<textElement textAlignment="Center" verticalAlignment="Bottom">
-									<font fontName="Cutom_hindi_font" size="10" isBold="true"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Cutom_hindi_font" size="9" isBold="true"/>
 									<paragraph leftIndent="10"/>
 								</textElement>
 								<text><![CDATA[MFR.]]></text>
@@ -662,8 +671,8 @@
 							</box>
 							<staticText>
 								<reportElement x="0" y="0" width="62" height="20" uuid="17eb3288-6bf1-45e0-8640-f217d9e0ab02"/>
-								<textElement textAlignment="Center" verticalAlignment="Bottom">
-									<font fontName="Cutom_hindi_font"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Cutom_hindi_font" size="9" isBold="true"/>
 								</textElement>
 								<text><![CDATA[BATCH]]></text>
 							</staticText>
@@ -716,8 +725,8 @@
 									<bottomPen lineWidth="0.0"/>
 									<rightPen lineWidth="0.0"/>
 								</box>
-								<textElement textAlignment="Center" verticalAlignment="Bottom">
-									<font fontName="Cutom_hindi_font" size="11" isBold="true"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Cutom_hindi_font" size="9" isBold="true"/>
 								</textElement>
 								<text><![CDATA[EXP.]]></text>
 							</staticText>
@@ -759,8 +768,8 @@
 							</box>
 							<staticText>
 								<reportElement x="0" y="0" width="54" height="20" uuid="90f46697-cdbf-4a17-9743-c0d570c38cca"/>
-								<textElement textAlignment="Center" verticalAlignment="Bottom">
-									<font fontName="Cutom_hindi_font"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Cutom_hindi_font" size="9" isBold="true"/>
 								</textElement>
 								<text><![CDATA[MRP]]></text>
 							</staticText>
@@ -813,8 +822,8 @@
 									<bottomPen lineWidth="0.0"/>
 									<rightPen lineWidth="0.0"/>
 								</box>
-								<textElement textAlignment="Center" verticalAlignment="Bottom">
-									<font fontName="Cutom_hindi_font" size="11" isBold="true"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Cutom_hindi_font" size="9" isBold="true"/>
 								</textElement>
 								<text><![CDATA[DIS ₹]]></text>
 							</staticText>
@@ -861,7 +870,7 @@
 									<bottomPen lineWidth="0.0"/>
 									<rightPen lineWidth="0.0"/>
 								</box>
-								<textElement textAlignment="Center" verticalAlignment="Bottom">
+								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="Cutom_hindi_font" size="9" isBold="true"/>
 								</textElement>
 								<text><![CDATA[AMOUNT]]></text>
@@ -883,9 +892,12 @@
 								<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<textField>
-								<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="52" height="16" isPrintWhenDetailOverflows="true" uuid="cc1d7844-d888-49a2-93a2-47ba92474a8c"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle">
+								<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="52" height="16" isPrintWhenDetailOverflows="true" uuid="cc1d7844-d888-49a2-93a2-47ba92474a8c">
+									<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+								</reportElement>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
 									<font fontName="SansSerif" size="7"/>
+									<paragraph rightIndent="3"/>
 								</textElement>
 								<textFieldExpression><![CDATA[new BigDecimal($V{Amount}).setScale(1, BigDecimal.ROUND_HALF_DOWN).toString()]]></textFieldExpression>
 							</textField>
@@ -906,83 +918,78 @@
 		</band>
 	</detail>
 	<summary>
-		<band height="78">
-			<rectangle radius="1">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="400" y="-1" width="1" height="79" isRemoveLineWhenBlank="true" forecolor="#545050" backcolor="#FFFFFF" uuid="52028e21-ea17-4242-b62b-b35fc85efce9">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-				</reportElement>
-				<graphicElement>
-					<pen lineWidth="0.5" lineStyle="Solid" lineColor="#333333"/>
-				</graphicElement>
-			</rectangle>
+		<band height="133">
 			<staticText>
-				<reportElement x="410" y="3" width="83" height="20" forecolor="#050000" uuid="d84c1472-a0c9-41ab-b0d0-846448b4202b">
+				<reportElement x="410" y="1" width="83" height="13" forecolor="#050000" uuid="d84c1472-a0c9-41ab-b0d0-846448b4202b">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Arial" size="10" isBold="false"/>
+					<font fontName="Arial" size="8" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Total Amount :]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="410" y="22" width="83" height="20" forecolor="#050000" uuid="6520bf09-9ffb-47bd-9c91-fb766575dcbb">
+				<reportElement x="410" y="15" width="83" height="13" forecolor="#050000" uuid="6520bf09-9ffb-47bd-9c91-fb766575dcbb">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Arial" size="10" isBold="false"/>
+					<font fontName="Arial" size="8" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Saving :]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="496" y="3" width="80" height="20" uuid="0824a56a-8bd3-482d-aa83-30ab90e3667f"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
-					<font fontName="Arial"/>
+				<reportElement x="493" y="1" width="80" height="13" uuid="0824a56a-8bd3-482d-aa83-30ab90e3667f">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="8" isBold="true"/>
+					<paragraph leftIndent="3" rightIndent="3"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new BigDecimal($V{Sub_Total_M} ).setScale(2, BigDecimal.ROUND_HALF_DOWN).toString()]]></textFieldExpression>
 			</textField>
 			<line>
-				<reportElement x="400" y="42" width="174" height="1" uuid="bbbcfaf1-5238-4018-9781-2a8ed61b5037"/>
+				<reportElement x="400" y="30" width="174" height="1" uuid="bbbcfaf1-5238-4018-9781-2a8ed61b5037"/>
 			</line>
 			<line>
-				<reportElement x="0" y="77" width="575" height="1" uuid="503c94d6-448a-457f-bf24-8bf200a01247"/>
+				<reportElement x="0" y="76" width="575" height="1" uuid="503c94d6-448a-457f-bf24-8bf200a01247"/>
 			</line>
 			<staticText>
-				<reportElement x="493" y="65" width="80" height="9" uuid="7b1f4438-5924-4f3c-90f6-31426eb0aa9c"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="6"/>
-				</textElement>
-				<text><![CDATA[All values are in INR]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="414" y="43" width="79" height="21" forecolor="#000000" uuid="dabc339b-c6eb-4abf-8807-403e3dc684d7">
+				<reportElement x="414" y="32" width="79" height="13" forecolor="#000000" uuid="dabc339b-c6eb-4abf-8807-403e3dc684d7">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Arial" size="9" isBold="true"/>
+					<font fontName="Arial" size="8" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Amount Payable :]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="493" y="23" width="81" height="19" uuid="2880d11a-413a-4920-b543-8aac8054988a"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial"/>
+				<reportElement x="493" y="15" width="81" height="13" uuid="2880d11a-413a-4920-b543-8aac8054988a">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+					<paragraph leftIndent="3" rightIndent="3"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new BigDecimal($V{Total_Disount_Amount}+new Double($P{add_discount})).setScale(2, BigDecimal.ROUND_HALF_DOWN).toString()]]></textFieldExpression>
+				<textFieldExpression><![CDATA[new BigDecimal($P{totalSaving}).setScale(2, BigDecimal.ROUND_HALF_DOWN).toString()]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="493" y="44" width="80" height="20" uuid="f07e5150-2f43-48f7-bba6-55d1c535882e">
-					<property name="com.jaspersoft.studio.unit.leftIndent" value="pixel"/>
+				<reportElement x="493" y="32" width="80" height="13" uuid="f07e5150-2f43-48f7-bba6-55d1c535882e">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" isBold="true"/>
-					<paragraph leftIndent="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+					<paragraph leftIndent="3" rightIndent="3"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new BigDecimal($V{TOTAL_PAYABLE}-$P{add_discount}).setScale(0, BigDecimal.ROUND_HALF_DOWN
+				<textFieldExpression><![CDATA[new BigDecimal($V{TOTAL_PAYABLE}-$P{totalSaving}).setScale(0, BigDecimal.ROUND_HALF_DOWN
 ).toString()+".00"]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="1" y="0" width="218" height="78" uuid="56774594-d82f-484e-8880-c5697c9e2c43">
+				<reportElement x="1" y="0" width="218" height="76" uuid="56774594-d82f-484e-8880-c5697c9e2c43">
 					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle" markup="html">
@@ -994,22 +1001,72 @@ Medicines without Batch No. & Exp. will not to taken back.
 Please consult Dr. before using the medicines.]]></text>
 			</staticText>
 			<line>
-				<reportElement x="219" y="-2" width="1" height="80" uuid="e7492bd2-0b12-4e8a-bb48-578828ea39ac">
+				<reportElement x="219" y="-2" width="1" height="78" uuid="e7492bd2-0b12-4e8a-bb48-578828ea39ac">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 			</line>
 			<staticText>
-				<reportElement x="220" y="44" width="180" height="32" uuid="0c74c794-7b07-4546-a512-34802885f059"/>
+				<reportElement x="220" y="50" width="180" height="26" uuid="0c74c794-7b07-4546-a512-34802885f059"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="13" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Authorised Signatory]]></text>
 			</staticText>
 			<line>
-				<reportElement x="220" y="42" width="180" height="1" uuid="bb5e9eab-2197-481b-bd60-5421524bcd7d">
+				<reportElement x="220" y="47" width="180" height="1" uuid="bb5e9eab-2197-481b-bd60-5421524bcd7d">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 			</line>
+			<line>
+				<reportElement x="400" y="47" width="175" height="1" uuid="331c98e4-5b42-4bc3-bfd0-b6b7ad89a329"/>
+			</line>
+			<line>
+				<reportElement x="399" y="-1" width="1" height="77" uuid="25e0a2c6-1915-43c6-ac81-cbbed12c8362">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+			</line>
+			<staticText>
+				<reportElement x="415" y="48" width="79" height="13" forecolor="#000000" uuid="ee6540b2-ad2f-489a-af9b-5157bd211587">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Paid Amount :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="494" y="48" width="80" height="13" uuid="d074073f-3b26-4e3d-b9ad-f3be89d9da98">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+					<paragraph leftIndent="3" rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new BigDecimal($P{receivedAmount}).setScale(0, BigDecimal.ROUND_HALF_DOWN
+).toString()+".00"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="415" y="62" width="79" height="13" forecolor="#000000" uuid="0587176d-9d4d-4d0f-a4fb-8032e42e07b4">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Dues Amount :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="494" y="62" width="80" height="13" uuid="0a30c2fc-ccf3-4bf9-828e-7b443fca3dc0">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+					<paragraph leftIndent="3" rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new BigDecimal($P{duesAmount}).setScale(0, BigDecimal.ROUND_HALF_DOWN
+).toString()+".00"]]></textFieldExpression>
+			</textField>
 		</band>
 	</summary>
 </jasperReport>

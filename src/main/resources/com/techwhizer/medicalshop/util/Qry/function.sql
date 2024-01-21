@@ -90,9 +90,9 @@ DECLARE
     result VARCHAR;
 BEGIN
 
-    result = (select td.dues_amount - (select sum(amount) as dues_amount from
+    result = (select td.dues_amount - greatest((select sum(coalesce(amount,0)) as dues_amount from
         payment_information
-                                       where document_id = td.dues_id and document_source = 'DUES') as remaining_dues
+              where document_id = td.dues_id and document_source = 'DUES'),0) as remaining_dues
               from tbl_dues td where td.source_id = dues_source_id);
 
     return result;

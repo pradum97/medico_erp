@@ -302,7 +302,7 @@ CREATE TABLE TBL_SALE_ITEMS
     TAX_AMOUNT                     NUMERIC,
     sale_date                      timestamp default CURRENT_TIMESTAMP NOT NULL,
     stock_id                       integer                             not null,
-    ADDITIONAL_DISCOUNT_PERCENTAGE numeric,
+    ADDITIONAL_DISCOUNT_PERCENTAGE numeric DEFAULT 0,
 
     FOREIGN KEY (SALE_MAIN_ID)
         REFERENCES TBL_SALE_MAIN (SALE_MAIN_ID),
