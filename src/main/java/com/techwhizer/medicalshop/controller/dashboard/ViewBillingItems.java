@@ -100,8 +100,7 @@ public class ViewBillingItems implements Initializable {
                 String qty = method.tabToStrip(totalTab,stripTab,quantity_unit);;
 
                 reportList.add(new SaleItemsModel(saleItemId, productId, productName, sale_rate,
-                        taxAmount, netAmount,discount, qty, hsn, tax, igst, cgst, sgst, saleDate));
-
+                        Math.round(taxAmount), netAmount,discount, qty, hsn, tax, igst, cgst, sgst, saleDate));
             }
             if (null != reportList) {
                 if (reportList.size() > 0) {

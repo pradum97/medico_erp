@@ -171,7 +171,7 @@ public class DuesMain implements Initializable {
                 case when ? = 'Dues' then cast(remaining_dues as decimal) > 0.0 else
                     cast(remaining_dues as decimal) < 1 end
                 and to_date(dues_date,'DD/MM/YYYY') BETWEEN to_date(?,'DD/MM/YYYY') AND
-                    to_date(?,'DD/MM/YYYY')
+                    to_date(?,'DD/MM/YYYY') order by dues_id desc
                 """;
         ps = connection.prepareStatement(qry);
 

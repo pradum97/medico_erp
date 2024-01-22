@@ -247,4 +247,6 @@ public class SaleEntryModel {
     public void setAmount(double amount) {
         this.amount = amount;
     }
+
+
 }

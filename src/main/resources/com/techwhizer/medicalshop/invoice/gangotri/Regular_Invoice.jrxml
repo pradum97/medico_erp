@@ -976,7 +976,7 @@
 					<font fontName="Arial" size="8" isBold="true"/>
 					<paragraph leftIndent="3" rightIndent="3"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new BigDecimal($V{TOTAL_PAYABLE}-$P{totalSaving}).setScale(0, BigDecimal.ROUND_HALF_DOWN
+				<textFieldExpression><![CDATA[new BigDecimal($V{TOTAL_PAYABLE}).setScale(0, BigDecimal.ROUND_HALF_DOWN
 ).toString()+".00"]]></textFieldExpression>
 			</textField>
 			<staticText>

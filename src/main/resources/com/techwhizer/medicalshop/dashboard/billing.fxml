@@ -361,26 +361,6 @@
                                                               </Label>
                                                           </children>
                                                       </HBox>
-                                       <HBox alignment="CENTER_LEFT" layoutX="290.0" layoutY="15.0">
-                                          <children>
-                                             <Label alignment="CENTER_RIGHT" minWidth="60.0" prefHeight="15.0" style="-fx-text-fill: BLACK;" text="Add. Disc Amt :">
-                                                <font>
-                                                   <Font name="Arial Bold" size="12.0" />
-                                                </font>
-                                                <HBox.margin>
-                                                   <Insets left="7.0" />
-                                                </HBox.margin>
-                                             </Label>
-                                             <Label fx:id="addDisAmountL" layoutX="10.0" layoutY="10.0" minWidth="70.0" style="-fx-text-fill: BLACK;" textFill="#04852f">
-                                                <HBox.margin>
-                                                   <Insets left="10.0" />
-                                                </HBox.margin>
-                                                <font>
-                                                   <Font name="Arial" size="13.0" />
-                                                </font>
-                                             </Label>
-                                          </children>
-                                       </HBox>
                                                       <HBox alignment="CENTER_LEFT">
                                                           <children>
                                                               <Label fx:id="taxTitleL" alignment="CENTER_RIGHT" minWidth="62.0" prefHeight="15.0" style="-fx-text-fill: BLACK;" text="Gst Amt :">
@@ -514,7 +494,7 @@
                                                                <Insets left="1.0" />
                                                             </VBox.margin>
                                                          </Label>
-                                                         <TextField fx:id="remarksTf" minHeight="24.0" minWidth="200.0" prefHeight="24.0" style="-fx-border-color: grey; -fx-border-radius: 4;" />
+                                                         <TextField fx:id="remarksTf" minHeight="24.0" minWidth="188.0" prefHeight="24.0" style="-fx-border-color: grey; -fx-border-radius: 4;" />
                                                       </children>
                                                    </VBox>
                                                    <VBox alignment="CENTER_LEFT" layoutX="615.0" layoutY="10.0" maxWidth="105.0" minWidth="105.0" spacing="1.0">
@@ -527,7 +507,16 @@
                                                                <Insets left="1.0" />
                                                             </VBox.margin>
                                                          </Label>
-                                                         <TextField fx:id="addDiscTF" minHeight="24.0" minWidth="100.0" prefHeight="24.0" style="-fx-border-color: grey; -fx-border-radius: 4;" text="0" />
+                                                         <HBox>
+                                                            <children>
+                                                               <TextField fx:id="addDiscTF" maxWidth="92.0" minHeight="24.0" minWidth="75.0" onKeyPressed="#keyPress" prefHeight="24.0" style="-fx-border-color: grey; -fx-border-radius: 4;" text="0" />
+                                                               <ImageView fx:id="applyDiscountBn" fitHeight="26.0" fitWidth="24.0" onMouseClicked="#applyDiscountBnClick" pickOnBounds="true" preserveRatio="true" style="-fx-cursor: hand;">
+                                                                  <image>
+                                                                     <Image url="@../img/icon/check_icon.png" />
+                                                                  </image>
+                                                               </ImageView>
+                                                            </children>
+                                                         </HBox>
                                                       </children>
                                                    </VBox>
                                                 </children>

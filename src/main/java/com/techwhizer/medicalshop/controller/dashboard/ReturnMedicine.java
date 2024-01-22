@@ -251,7 +251,7 @@ public class ReturnMedicine implements Initializable {
                 double netAmount = rs.getDouble("netAmount");
                 double mrp = rs.getDouble("sale_rate");
 
-                double discountPercentage = rs.getDouble("discountPercentage");
+                double discountPercentage = rs.getDouble("discount_percentage");
                 double mrpPerTab = rs.getDouble("mrpPerTab");
 
                 double discountAmount = rs.getDouble("discountAmount");

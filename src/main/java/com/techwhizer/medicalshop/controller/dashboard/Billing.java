@@ -65,7 +65,6 @@ public class Billing implements Initializable {
     public VBox paymentModeContainer;
     public ComboBox<String> paymentModeC;
     public ComboBox<String> billingTypeC;
-    public VBox gstContainer;
     public Label taxTitleL;
     public TextField addDiscTF;
     public VBox amountContainer;
@@ -93,8 +92,8 @@ public class Billing implements Initializable {
     public Pagination pagination;
     public Label genderL;
     public Label guardianNameL;
-    public Label addDisAmountL;
     public TextField receivedAmountTf;
+    public ImageView applyDiscountBn;
     private CustomDialog customDialog;
     private Method method;
     private DBConnection dbConnection;
@@ -107,6 +106,9 @@ public class Billing implements Initializable {
     private FilteredList<PatientModel> filteredData;
     static private int rowsPerPage = 20;
     private  BatchChooserModel bcm ;
+    private double additionalDiscountAmount = 0.0, addDiscountPercentage = 0.0;
+
+
 
 
     enum Type{
@@ -124,6 +126,82 @@ public class Billing implements Initializable {
         setData();
         callThread(Type.GET_PATIENT);
         callThread(Type.GET_CART_DATA);
+
+        discountConfig();
+    }
+
+    public void applyDiscountBnClick(MouseEvent mouseEvent) {
+
+        String addDisc = addDiscTF.getText();
+
+        if (!addDisc.isEmpty()){
+            itemList.clear();
+            itemList.removeAll();
+            tableView.setItems(null);
+            applyDiscountBn.setVisible(false);
+            callThread(Type.GET_CART_DATA);
+        }
+    }
+
+    public void keyPress(KeyEvent keyEvent) {
+
+        if (keyEvent.getCode() == KeyCode.ENTER) {
+
+        }
+
+    }
+
+
+    private void discountConfig() {
+
+        addDiscTF.textProperty().addListener((observableValue, s, val1) -> {
+            double mainValue = netTotalAmount;
+            String val = addDiscTF.getText();
+
+            double invoiceValue = 0, discountAmount = 0;
+            if (!val.isEmpty()) {
+
+                try {
+                    double addDisPercentage = Double.parseDouble(val);
+                    if (addDisPercentage > 100) {
+                        method.show_popup("You cannot discount more than 100 percent", addDiscTF);
+                        addDiscTF.setText(String.valueOf(0));
+                        return;
+                    }
+
+                    if (addDiscountPercentage != addDisPercentage){
+                        applyDiscountBn.setVisible(true);
+                    }else {
+                        applyDiscountBn.setVisible(false);
+                    }
+
+                    addDiscountPercentage = addDisPercentage;
+                    discountAmount = mainValue * addDisPercentage / 100;
+
+                    if (discountAmount > mainValue) {
+                        method.show_popup("Please enter amount less then invoice value", addDiscTF);
+                        addDiscTF.setText(String.valueOf(0));
+                        discountAmount = 0;
+                        return;
+                    } else {
+                        invoiceValue = mainValue - discountAmount;
+                    }
+                } catch (NumberFormatException e) {
+                    invoiceValue = mainValue;
+                    method.show_popup("Please enter amount less then invoice value", addDiscTF);
+                    addDiscTF.setText(String.valueOf(0));
+                    discountAmount = 0;
+                }
+            } else {
+                invoiceValue = mainValue;
+                discountAmount = 0;
+            }
+
+            additionalDiscountAmount = discountAmount;
+            setInvoiceAmount(invoiceValue);
+
+        });
+
     }
 
     private void setInvoiceAmount(double amount){
@@ -139,7 +217,6 @@ public class Billing implements Initializable {
     }
 
     private void setTableDate() {
-        tableView.refresh();
         tableView.setItems(itemList);
 
         colSrNo.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(tableView.getItems().indexOf(cellData.getValue()) + 1));
@@ -210,10 +287,8 @@ public class Billing implements Initializable {
     }
 
     private void getCartData() {
-
-        if (null != itemList) {
-            itemList.clear();
-        }
+        itemList.clear();
+        itemList = FXCollections.observableArrayList();
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -226,40 +301,56 @@ public class Billing implements Initializable {
         try {
             connection = dbConnection.getConnection();
             String qry = """
-                   select tim.items_name,tim.item_id , tc.stock_id , tc,cart_id,t.batch,tim.mfr_id ,tpt.hsn_sac as hsn,tpt.igst,tpt.sgst,tpt.cgst, tim.packing , tc.mrp  as sale_rate , tc.strip,tc.pcs,
-                          (select expiry_date from tbl_purchase_items tpi where ts.purchase_items_id = tpi.purchase_items_id),t.purchase_rate,t.mrp,
-                          coalesce(td.discount,0) as discount,td.discount_id,tpt.tax_id,
-                          coalesce((coalesce(tpt.sgst,0)+coalesce(tpt.cgst,0)+coalesce(tpt.igst,0)),0)as total_gst,
-                          ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0)) totaltab,
-                   
-                          ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0))*
-                          case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else coalesce(tc.mrp,0) end as amountAsPerMrp,
-                          ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0))*
-                          case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else coalesce(tc.mrp,0)
-                              end-(( ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0))*
-                               case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else
-                                coalesce(tc.mrp,0) end )*coalesce(td.discount,0)/100) as netAmount,
-                   
-                          ( ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0))*
-                            case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else
-                                coalesce(tc.mrp,0) end )*coalesce(td.discount,0)/100 as discountAmount,
-                   
-                          ( coalesce( ( ( ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0))*case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else coalesce(tc.mrp,0) end )-
-                                        ( ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0))*case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else coalesce(tc.mrp,0) end )*coalesce(td.discount,0)/100),0)*100)/
-                          (100+(coalesce((coalesce(tpt.sgst,0)+coalesce(tpt.cgst,0)+coalesce(tpt.igst,0)),0))) as taxableAmount,
-                   
-                          ( coalesce( ( ( ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0))*case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else coalesce(tc.mrp,0) end )-
-                                        ( ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0))*case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else coalesce(tc.mrp,0) end )*coalesce(td.discount,0)/100),0)*100)/
-                          (100+(coalesce((coalesce(tpt.sgst,0)+coalesce(tpt.cgst,0)+coalesce(tpt.igst,0)),0)))*coalesce((coalesce(tpt.sgst,0)+coalesce(tpt.cgst,0)
-                                                                                                                             +coalesce(tpt.igst,0)),0)/100 as gstAmount
-                   from tbl_cart tc
-                            left join tbl_stock ts on tc.stock_id = ts.stock_id
-                            left join tbl_items_master tim on tim.item_id = ts.item_id
-                            left join tbl_discount td on tim.discount_id = td.discount_id
-                            left join tbl_product_tax tpt on tpt.tax_id = tim.gst_id
-                            left outer join tbl_purchase_items t on ts.purchase_items_id = t.purchase_items_id
-                   """;
+                                       select tim.items_name,tim.item_id , tc.stock_id , tc,cart_id,t.batch,tim.mfr_id ,tpt.hsn_sac as hsn,tpt.igst,tpt.sgst,tpt.cgst, tim.packing , tc.mrp  as sale_rate , tc.strip,tc.pcs,
+                                              (select expiry_date from tbl_purchase_items tpi where ts.purchase_items_id = tpi.purchase_items_id),t.purchase_rate,t.mrp,
+                                         
+                                              case when (coalesce(td.discount,0)+?) > 100 then 100 else (coalesce(td.discount,0)+?) end as discount
+                                             
+                                              ,td.discount_id,tpt.tax_id,
+                                              coalesce((coalesce(tpt.sgst,0)+coalesce(tpt.cgst,0)+coalesce(tpt.igst,0)),0)as total_gst,
+                                              ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0)) totaltab,
+                                       
+                                              ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0))*
+                                              case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else coalesce(tc.mrp,0) end as amountAsPerMrp,
+                                              ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0))*
+                                              case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else coalesce(tc.mrp,0)
+                                                  end-(( ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0))*
+                                                         case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else
+                                                             coalesce(tc.mrp,0) end )*
+                                                       (case when (coalesce(td.discount,0)+?) > 100 then 100 else (coalesce(td.discount,0)+?) end)/100) as netAmount,
+                                       
+                                              ( ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0))*
+                                                case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else
+                                                    coalesce(tc.mrp,0) end )*(case when (coalesce(td.discount,0)+?) > 100 then 100 else (coalesce(td.discount,0)+?) end)/100 as discountAmount,
+                                       
+                                              ( coalesce( ( ( ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0))*case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else coalesce(tc.mrp,0) end )-
+                                                            ( ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0))*case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else coalesce(tc.mrp,0) end )*
+                                                            (case when (coalesce(td.discount,0)+?) > 100 then 100 else (coalesce(td.discount,0)+?) end)/100),0)*100)/
+                                              (100+(coalesce((coalesce(tpt.sgst,0)+coalesce(tpt.cgst,0)+coalesce(tpt.igst,0)),0))) as taxableAmount,
+                                       
+                                              ( coalesce( ( ( ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0))*case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else coalesce(tc.mrp,0) end )-
+                                                            ( ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0))*case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else coalesce(tc.mrp,0) end )*
+                                                            (case when (coalesce(td.discount,0)+?) > 100 then 100 else (coalesce(td.discount,0)+?) end)/100),0)*100)/
+                                              (100+(coalesce((coalesce(tpt.sgst,0)+coalesce(tpt.cgst,0)+coalesce(tpt.igst,0)),0)))*coalesce((coalesce(tpt.sgst,0)+coalesce(tpt.cgst,0)
+                                                  +coalesce(tpt.igst,0)),0)/100 as gstAmount
+                                       from tbl_cart tc
+                                                left join tbl_stock ts on tc.stock_id = ts.stock_id
+                                                left join tbl_items_master tim on tim.item_id = ts.item_id
+                                                left join tbl_discount td on tim.discount_id = td.discount_id
+                                                left join tbl_product_tax tpt on tpt.tax_id = tim.gst_id
+                                                left outer join tbl_purchase_items t on ts.purchase_items_id = t.purchase_items_id
+                                                           
+                    """;
             ps = connection.prepareStatement(qry);
+
+
+            for (int i = 0; i < 10; i++) {
+                ps.setDouble(i+1,addDiscountPercentage);
+            }
+
+
+            System.out.println(ps);
+
             rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -290,9 +381,18 @@ public class Billing implements Initializable {
 
                 int cartId = rs.getInt("cart_id");
                 int stockId = rs.getInt("stock_id");
+                SaleEntryModel sem = new SaleEntryModel(itemId, cartId, stockId, productName, saleRate, pack, strip, pcs, expiryDate, discountId,
+                        discount, gstId, totalGst, netAmount, hsn, iGst, cGst, sGst, gstAmount,
+                        purchaseRate, mrp, batch, mfrId, amountAsPerMrp);
 
-                itemList.add(new SaleEntryModel(itemId,cartId , stockId, productName, saleRate, pack, strip, pcs, expiryDate, discountId,
-                        discount, gstId, totalGst, netAmount, hsn, iGst, cGst, sGst, gstAmount, purchaseRate, mrp,batch,mfrId,amountAsPerMrp));
+
+                if (!itemList.contains(sem)){
+                    itemList.add(sem);
+                }else {
+                    System.out.println("duplicate");
+                }
+
+
                 totGstAmount += gstAmount;
                 totalDiscount += discountAmt;
                 netTotalAmount += netAmount;
@@ -300,46 +400,6 @@ public class Billing implements Initializable {
             }
 
             setTableDate();
-            Platform.runLater(()->{
-                addDiscTF.textProperty().addListener((observableValue, s, val1) -> {
-                    double mainValue = netTotalAmount;
-                    String val = addDiscTF.getText();
-
-                    double invoiceValue = 0,discountAmount = 0;
-                    if (!val.isEmpty()){
-
-                        try {
-                            double addDisPercentage = Double.parseDouble(val);
-                            if(addDisPercentage > 100){
-                                method.show_popup("You cannot discount more than 100 percent",addDiscTF);
-                                addDiscTF.setText(String.valueOf(0));
-                                return;
-                            }
-                            discountAmount = mainValue*Double.parseDouble(val)/100;
-
-                            if (discountAmount>mainValue){
-                                method.show_popup("Please enter amount less then invoice value",addDiscTF);
-                                addDiscTF.setText(String.valueOf(0));
-                                discountAmount = 0;
-                                return;
-                            }else {
-                                invoiceValue = mainValue-discountAmount;
-                            }
-                        } catch (NumberFormatException e) {
-                            invoiceValue = mainValue;
-                            method.show_popup("Please enter amount less then invoice value",addDiscTF);
-                            addDiscTF.setText(String.valueOf(0));
-                            discountAmount = 0;
-                        }
-                    }else {
-                        invoiceValue = mainValue;
-                        discountAmount = 0;
-                    }
-                    double finalDiscountAmount = discountAmount;
-                    Platform.runLater(() -> addDisAmountL.setText(String.valueOf(method.decimalFormatter(finalDiscountAmount))));
-                    setInvoiceAmount(invoiceValue);
-                });
-            });
 
         } catch (SQLException e) {
             tableView.setPlaceholder(new Label("Something went wrong"));
@@ -405,6 +465,9 @@ public class Billing implements Initializable {
                     if (null != itemList) {
                         itemList.clear();
                     }
+                    addDiscTF.setText("0");
+                    remarksTf.setText("");
+                    referenceNumTf.setText("");
                     callThread(Type.GET_CART_DATA);
                 }
 
@@ -1104,7 +1167,7 @@ public class Billing implements Initializable {
 
             connection = dbConnection.getConnection();
             connection.setAutoCommit(false);
-            double addiDiscAmt = 0,addDiscountPercentage = 0,totalDiscountAmount = 0;
+            double addDiscountPercentage = 0, totalDiscountAmount = 0;
 
             if (!addDiscTF.getText().isEmpty()){
                 try {
@@ -1120,41 +1183,24 @@ public class Billing implements Initializable {
             if (!totDisAmountL.getText().isEmpty()){
                 try {
                 double totDisAmount =Double.parseDouble(totDisAmountL.getText());
-
                 if (totDisAmount > 0){
                     totalDiscountAmount = totDisAmount;
                 }
                 } catch (NumberFormatException ignored) {
-
                 }
             }
-
-            if (!addDisAmountL.getText().isEmpty()){
-                try {
-                    double totAddDisAmount =Double.parseDouble(addDisAmountL.getText());
-
-                    if (totAddDisAmount > 0){
-                        addiDiscAmt = totAddDisAmount;
-                    }
-                } catch (NumberFormatException ignored) {
-
-                }
-            }
-
-            totalDiscountAmount = totalDiscountAmount+addiDiscAmt;
-
 
             String invoiceNumber = new GenerateBillNumber().getSaleBillNum();
 
             String saleMainQuery = "INSERT INTO TBL_SALE_MAIN(PATIENT_ID, SELLER_ID, additional_discount_amount," +
                     " PAYMENT_MODE, TOT_TAX_AMOUNT, NET_AMOUNT, INVOICE_NUMBER, BILL_TYPE,doctor_id," +
-                    "payment_reference_num,remarks,created_by,additional_discount_percentage,total_discount_amount) " +
-                    "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)\n";
+                    "payment_reference_num,remarks,created_by,additional_discount_percentage,total_discount_amount,received_amount) " +
+                    "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)\n";
 
             ps = connection.prepareStatement(saleMainQuery, new String[]{"sale_main_id"});
             ps.setInt(1, patientId);
             ps.setInt(2, Login.currentlyLogin_Id);
-            ps.setDouble(3, addiDiscAmt);
+            ps.setDouble(3, additionalDiscountAmount);
             ps.setString(4, paytmModeS);
             ps.setDouble(5, totalTaxAmtD);
             ps.setDouble(6, invoiceValue);
@@ -1172,6 +1218,7 @@ public class Billing implements Initializable {
             ps.setInt(12, Login.currentlyLogin_Id);
             ps.setDouble(13,addDiscountPercentage);
             ps.setDouble(14,totalDiscountAmount);
+            ps.setDouble(15,receivedAmountDouble);
 
             int resMain = ps.executeUpdate();
 
@@ -1207,15 +1254,15 @@ public class Billing implements Initializable {
                     int resItem = 0;
                     String query = "INSERT INTO TBL_SALE_ITEMS(SALE_MAIN_ID, ITEM_ID, ITEM_NAME, " +
                             "sale_rate, STRIP, PCS, DISCOUNT, HSN_SAC, igst, sgst, cgst, NET_AMOUNT, TAX_AMOUNT," +
-                            "strip_tab,purchase_rate,mrp, PACK ,MFR_ID,BATCH ,EXPIRY_DATE,stock_id)" +
-                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                            "strip_tab,purchase_rate,mrp, PACK ,MFR_ID,BATCH ,EXPIRY_DATE,stock_id,additional_discount_percentage)" +
+                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                     ps = connection.prepareStatement(query);
 
                     for (SaleEntryModel model : items) {
 
                         ps.setInt(1, sale_main_id);
                         ps.setInt(2, model.getItemId());
-                        ps.setString(3, model.getProductName()+addDiscountPercentage);
+                        ps.setString(3, model.getProductName());
                         ps.setDouble(4, model.getSaleRate());
                         ps.setInt(5, model.getStrip());
                         ps.setInt(6, model.getPcs());
@@ -1234,6 +1281,7 @@ public class Billing implements Initializable {
                         ps.setString(19,model.getBatch());
                         ps.setString(20,model.getExpiryDate());
                         ps.setInt(21,model.getStockId());
+                        ps.setDouble(22, addDiscountPercentage);
 
                         resItem = ps.executeUpdate();
 
