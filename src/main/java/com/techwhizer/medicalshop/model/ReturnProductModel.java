@@ -16,14 +16,13 @@ public class ReturnProductModel {
     private int stockId;
     private double mrpPerTab,discountPercentage;
     private String returnableQuantity,displayMrp;
-    private double discountPerPCSPercentage;
     private String displayUnit;
-    private double returnDiscountAmount,amount,returnNetAmount,additionalDiscountPercentage;
+    private double returnDiscountAmount,amount,returnNetAmount;
 
     public ReturnProductModel(int saleItemID, String itemName, double netAmount, double mrp, String quantity, String saleDate, double discountAmount, String returnQuantity,
                               boolean isReturn, int stockId, double mrpPerTab, double discountPercentage,
-                              String returnableQuantity,String displayMrp,double discountPerPCSPercentage,
-                              String displayUnit,double returnDiscountAmount, double amount,double returnNetAmount,double additionalDiscountPercentage) {
+                              String returnableQuantity,String displayMrp,String displayUnit,double returnDiscountAmount,
+                              double amount,double returnNetAmount) {
         this.saleItemID = saleItemID;
         this.itemName = itemName;
         this.netAmount = netAmount;
@@ -38,21 +37,12 @@ public class ReturnProductModel {
         this.discountPercentage = discountPercentage;
         this.returnableQuantity = returnableQuantity;
         this.displayMrp = displayMrp;
-        this.discountPerPCSPercentage = discountPerPCSPercentage;
         this.displayUnit = displayUnit;
         this.returnDiscountAmount = returnDiscountAmount;
         this.amount = amount;
         this.returnNetAmount = returnNetAmount;
-        this.additionalDiscountPercentage = additionalDiscountPercentage;
     }
 
-    public double getAdditionalDiscountPercentage() {
-        return additionalDiscountPercentage;
-    }
-
-    public void setAdditionalDiscountPercentage(double additionalDiscountPercentage) {
-        this.additionalDiscountPercentage = additionalDiscountPercentage;
-    }
 
     public double getReturnNetAmount() {
         return returnNetAmount;
@@ -84,14 +74,6 @@ public class ReturnProductModel {
 
     public void setDisplayUnit(String displayUnit) {
         this.displayUnit = displayUnit;
-    }
-
-    public double getDiscountPerPCSPercentage() {
-        return discountPerPCSPercentage;
-    }
-
-    public void setDiscountPerPCSPercentage(double discountPerPCSPercentage) {
-        this.discountPerPCSPercentage = discountPerPCSPercentage;
     }
 
     public String getDisplayMrp() {

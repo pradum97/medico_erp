@@ -10,10 +10,11 @@ public class GstInvoiceModel {
     private double sgst;
     private double cgst;
     private double igst;
+    private String printType;
 
     public GstInvoiceModel(String productName, String mfr, String pack, String batch,
                            String expiry, double mrp, double discountAmount, int quantity, String saleDate, long hsn,
-                           double sgst, double cgst, double igst) {
+                           double sgst, double cgst, double igst,String printType) {
         this.productName = productName;
         this.mfr = mfr;
         this.pack = pack;
@@ -27,6 +28,15 @@ public class GstInvoiceModel {
         this.sgst = sgst;
         this.cgst = cgst;
         this.igst = igst;
+        this.printType=printType;
+    }
+
+    public String getPrintType() {
+        return printType;
+    }
+
+    public void setPrintType(String printType) {
+        this.printType = printType;
     }
 
     public long getHsn() {

@@ -20,9 +20,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+
+enum PrintType {
+    GST, REGULAR
+}
 
 public class GenerateInvoice {
 
@@ -30,7 +33,7 @@ public class GenerateInvoice {
     private float pdfZoomRatio = 0.65f;
     private static final String INVOICE_ROOT_PATH = "invoice/gangotri/";
 
-    public void gstInvoice(int saleMainId, boolean isDownLoad, String downloadPath, Label button) {
+    public void billingInvoice(int saleMainId, boolean isDownLoad, String downloadPath, Label labelButton) {
 
         ImageView down_iv = new ImageView();
         ImageView print_iv = new ImageView();
@@ -56,7 +59,6 @@ public class GenerateInvoice {
             connection = new DBConnection().getConnection();
 
             String query = """
-
                     select tsi.item_name,td.dr_name , regexp_replace(trim( concat(COALESCE(sal.name, ''), ' ',
                     COALESCE(tp.first_name, ''), ' ',
                     COALESCE(tp.middle_name, ''), ' ',
@@ -64,7 +66,7 @@ public class GenerateInvoice {
                            tp.address as patient_address ,
                            tml.manufacturer_name,tsi.batch,
                            case when ts.quantity_unit = 'TAB' then (coalesce(tsi.sale_rate,0)/coalesce(tsi.strip_tab,0))
-                                else coalesce(tsi.sale_rate,0) end as sale_rate,
+                                else coalesce(tsi.sale_rate,0) end as sale_rate,tp.uhid_no,
 
                            ( ((coalesce(tsi.strip,0)*coalesce(tsi.strip_tab,0))+coalesce(tsi.pcs,0))*
                              case when ts.quantity_unit = 'TAB' then (coalesce(tsi.sale_rate,0)/coalesce(tsi.strip_tab,0))
@@ -72,11 +74,12 @@ public class GenerateInvoice {
 
                            tsi.expiry_date,tsi.pack,tsi.discount,
                            tsm.invoice_number ,(TO_CHAR(tsm.sale_date, 'DD-MM-YYYY')) as sale_date,
-                           tsd.shop_name , tsd.shop_address , tsd.shop_email,tsd.shop_gst_number , tsd.shop_phone_1 , tsd.shop_phone_2,
-                           tsd.shop_food_licence,tsd.shop_drug_licence,(tsi.strip*tsi.strip_tab)+tsi.pcs as totalTab,
+                          (tsi.strip*tsi.strip_tab)+tsi.pcs as totalTab,
                            tsi.sgst, tsi.cgst,tsi.igst , tsi.hsn_sac ,
                            tsm.additional_discount_amount as additional_discount_amount,
-                           get_remaining_dues(tsm.sale_main_id) as dues_amount,tsm.total_discount_amount
+                           get_remaining_dues(tsm.sale_main_id) as dues_amount,tsm.total_discount_amount,
+                           get_received_amount(tsm.sale_main_id) as received_amount,
+                           tsm.bill_type
                     from tbl_sale_main tsm
                              Left Join tbl_sale_items tsi on tsm.sale_main_id = tsi.sale_main_id
                              LEFT JOIN tbl_doctor td on tsm.doctor_id = td.doctor_id
@@ -85,7 +88,6 @@ public class GenerateInvoice {
                             left join tbl_salutation sal on sal.salutation_id = tp.salutation_id
 
                              left join tbl_manufacturer_list tml on tsi.mfr_id = tml.mfr_id
-                             CROSS JOIN tbl_shop_details tsd
                     where tsm.sale_main_id = ?
 
                                         """;
@@ -94,6 +96,8 @@ public class GenerateInvoice {
             ps.setInt(1, saleMainId);
 
             rs = ps.executeQuery();
+
+            String billType = "REGULAR";
 
             while (rs.next()) {
 
@@ -112,86 +116,77 @@ public class GenerateInvoice {
 
                 String invoiceNum = rs.getString("invoice_number");
                 String saleDate = rs.getString("sale_date");
+                billType = rs.getString("bill_type");
 
-                String shopName = rs.getString("shop_name");
-                String shopAddress = rs.getString("shop_address");
-                String shopEmail = rs.getString("shop_email");
-                String shopPhone1 = rs.getString("shop_phone_1");
-                String shopPhone2 = rs.getString("shop_phone_2");
-                String shopGstNum = rs.getString("shop_gst_number");
-                String fl = rs.getString("shop_food_licence");
-                String dl = rs.getString("shop_drug_licence");
+
                 String drName = rs.getString("dr_name");
                 double additional_discount = rs.getDouble("additional_discount_amount");
                 param.put("duesAmount",rs.getDouble("dues_amount"));
                 param.put("totalSaving",rs.getDouble("total_discount_amount"));
 
-                param.put("receivedAmount",0.0);
+                param.put("receivedAmount", rs.getDouble("received_amount"));
+                param.put("uhid", rs.getString("uhid_no"));
 
-                if (null == shopPhone2 || shopPhone2.isEmpty()) {
-                    shopPhone2 = "";
-                } else {
-                    shopPhone2 = "," + shopPhone2;
-                }
 
                 long hsn = rs.getLong("hsn_sac");
                 double sgst = rs.getDouble("sgst");
                 double cgst = rs.getDouble("cgst");
                 double igst = rs.getDouble("igst");
                 Method m = new Method();
-                shop_customer_details(param, rs, patientName, m.rec(patientPhone), m.rec(patientAddress), invoiceNum, saleDate, shopName, m.rec(shopAddress), shopEmail, shopPhone1, shopPhone2, m.rec(shopGstNum), additional_discount, m.rec(drName), m.rec(fl), m.rec(dl));
-                modelList.add(new GstInvoiceModel(productName, m.rec(mfrName), m.rec(pack), m.rec(batch), m.rec(exp), saleRate, discountAmount, totalTab, saleDate, hsn, sgst, cgst, igst));
+                shop_customer_details(param, rs, patientName.toUpperCase(), m.rec(patientPhone), m.rec(patientAddress.toUpperCase()), invoiceNum, saleDate, additional_discount, m.rec(drName));
+                modelList.add(new GstInvoiceModel(productName, m.rec(mfrName), m.rec(pack), m.rec(batch), m.rec(exp),
+                        saleRate, discountAmount, totalTab, saleDate, hsn, sgst, cgst, igst, billType));
             }
 
-            if (null == modelList) {
-                new CustomDialog().showAlertBox("Failed", "Something went wrong!");
-            } else {
-                Map<Long, TaxDetails> map = new HashMap<>();
+            Map<Long, TaxDetails> map = new HashMap<>();
 
-                for (GstInvoiceModel cm : modelList) {
-                    long key = cm.getHsn();
+            for (GstInvoiceModel cm : modelList) {
+                long key = cm.getHsn();
 
-                    double netAmount = ((cm.getMrp() * cm.getQuantity()));
-                    double taxableAmount = (netAmount * 100) / (100 + (cm.getSgst() + cm.getCgst() + cm.getIgst()));
+                double netAmount = ((cm.getMrp() * cm.getQuantity()));
+                double taxableAmount = (netAmount * 100) / (100 + (cm.getSgst() + cm.getCgst() + cm.getIgst()));
 
-                    if (map.containsKey(key)) {
-                        // update value
-                        TaxDetails td = new TaxDetails(cm.getSgst(), cm.getCgst(), cm.getIgst(), map.get(key).getTaxableAmount() + taxableAmount, cm.getHsn());
-
-                        map.put(key, td);
-
-                    } else {
-                        TaxDetails td = new TaxDetails(cm.getSgst(), cm.getCgst(), cm.getIgst(), taxableAmount, cm.getHsn());
-                        map.put(key, td);
-                    }
-                }
-                List<TaxDetails> taxList = new ArrayList<>(map.values());
-
-                JRBeanCollectionDataSource productBean = new JRBeanCollectionDataSource(modelList);
-                JRBeanCollectionDataSource taxBean = new JRBeanCollectionDataSource(taxList);
-
-                param.put("productDetails", productBean);
-                param.put("tax", taxBean);
-
-                JasperReport subJasperReport = JasperCompileManager.compileReport(fileLoader.load(INVOICE_ROOT_PATH + "Gst_Invoice_Tax.jrxml"));
-                param.put("SUBREPORT_DIR", subJasperReport);
-
-                JasperReport jasperReport = JasperCompileManager.compileReport(fileLoader.load(INVOICE_ROOT_PATH + "Gst_Invoice.jrxml"));
-                JasperPrint print = JasperFillManager.fillReport(jasperReport, param, new JREmptyDataSource());
-
-                if (isDownLoad && null != downloadPath) {
-                    JasperExportManager.exportReportToPdfFile(print, downloadPath);
-                    Platform.runLater(() -> button.setGraphic(down_iv));
-                    new CustomDialog().showAlertBox("Successful", "Invoice Successfully Download");
+                if (map.containsKey(key)) {
+                    TaxDetails td = new TaxDetails(cm.getSgst(), cm.getCgst(), cm.getIgst(),
+                            map.get(key).getTaxableAmount() + taxableAmount, cm.getHsn());
+                    map.put(key, td);
 
                 } else {
-                    Platform.runLater(() -> {
-                        button.setGraphic(print_iv);
-                    });
-                    JasperViewer viewer = new JasperViewer(print, false);
-                    viewer.setZoomRatio(pdfZoomRatio);
-                    viewer.setVisible(true);
+                    TaxDetails td = new TaxDetails(cm.getSgst(), cm.getCgst(), cm.getIgst(), taxableAmount, cm.getHsn());
+                    map.put(key, td);
                 }
+            }
+            List<TaxDetails> taxList = new ArrayList<>(map.values());
+
+            DefaultJasperReportsContext context = DefaultJasperReportsContext.getInstance();
+            JRPropertiesUtil.getInstance(context).setProperty("net.sf.jasperreports.xpath.executer.factory",
+                    "net.sf.jasperreports.engine.util.xml.JaxenXPathExecuterFactory");
+
+
+            JRBeanCollectionDataSource productBean = new JRBeanCollectionDataSource(modelList);
+            JRBeanCollectionDataSource taxBean = new JRBeanCollectionDataSource(taxList);
+            JasperReport subJasperReport = JasperCompileManager.compileReport(fileLoader.load(INVOICE_ROOT_PATH + "GstInvoiceSubReport.jrxml"));
+
+            param.put("productDetails", productBean);
+            param.put("tax", Objects.equals(billType, PrintType.GST.name()) ? taxBean : null);
+            param.putAll(setHospitalReportHeader());
+            param.put("SUBREPORT_DIR", subJasperReport);
+
+            JasperReport jasperReport = JasperCompileManager.compileReport(fileLoader.load(INVOICE_ROOT_PATH + "BillingInvoice.jrxml"));
+            JasperPrint print = JasperFillManager.fillReport(jasperReport, param, new JREmptyDataSource());
+
+            if (isDownLoad && null != downloadPath) {
+                JasperExportManager.exportReportToPdfFile(print, downloadPath);
+                Platform.runLater(() -> labelButton.setGraphic(down_iv));
+                new CustomDialog().showAlertBox("Successful", "Invoice Successfully Download");
+
+            } else {
+                Platform.runLater(() -> {
+                    labelButton.setGraphic(print_iv);
+                });
+                JasperViewer viewer = new JasperViewer(print, false);
+                viewer.setZoomRatio(pdfZoomRatio);
+                viewer.setVisible(true);
             }
 
 
@@ -206,19 +201,12 @@ public class GenerateInvoice {
 
     private void shop_customer_details(Map<String, Object> param, ResultSet rs, String customerName,
                                        String customerPhone, String customerAddress, String invoiceNum,
-                                       String saleDate, String shopName, String shopAddress, String shopEmail,
-                                       String shopPhone1, String shopPhone2, String shopGstNum,
-                                       double additional_discount, String doctorName, String foodLicence,
-                                       String drugLicence) throws SQLException {
+                                       String saleDate,
+                                       double additional_discount, String doctorName) throws SQLException {
         if (rs.isLast()) {
 
             // SHOP DETAILS
-            param.put("SHOP_NAME", shopName.toUpperCase());
-            param.put("SHOP_PHONE_1", shopPhone1);
-            param.put("SHOP_PHONE_2", shopPhone2);
-            param.put("SHOP_EMAIL", shopEmail);
-            param.put("SHOP_GST_NUMBER", shopGstNum);
-            param.put("SHOP_ADDRESS", shopAddress);
+
             param.put("INVOICE_NUMBER", invoiceNum);
             param.put("INVOICE_DATE", saleDate);
 
@@ -228,101 +216,37 @@ public class GenerateInvoice {
             param.put("CUSTOMER_ADDRESS", customerAddress.toUpperCase());
             param.put("add_discount", additional_discount);
             param.put("doctorName", doctorName);
-            param.put("foodLicence", foodLicence);
-            param.put("drugLicence", drugLicence);
-            param.put("title_logo", new ImageLoader().reportLogo("img/company/gangotri_company_logo.png"));
-
         }
     }
 
-    public void regularInvoice(int saleMainId, boolean isDownLoad, String downloadPath, Label button) {
-        ImageView down_iv = new ImageView();
-        ImageView print_iv = new ImageView();
 
-        String rootPath = "img/icon/";
-        down_iv.setFitHeight(18);
-        down_iv.setFitWidth(18);
-        print_iv.setFitHeight(18);
-        print_iv.setFitWidth(18);
-        ImageLoader loader = new ImageLoader();
-        down_iv.setImage(loader.load(rootPath.concat("download_ic.png")));
-        print_iv.setImage(loader.load(rootPath.concat("print_ic.png")));
+    private static Map<String, Object> setHospitalReportHeader() {
 
-        List<RegularInvoiceModel> modelList = new ArrayList<>();
+        Method method = new Method();
         Map<String, Object> param = new HashMap<>();
 
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
-        fileLoader = new FileLoader();
+
         try {
+
             connection = new DBConnection().getConnection();
-            String query = """
-                    select tsi.item_name,td.dr_name , 
-                    regexp_replace(trim( concat(COALESCE(sal.name, ''), ' ',
-                    COALESCE(tp.first_name, ''), ' ',
-                    COALESCE(tp.middle_name, ''), ' ',
-                    COALESCE(tp.last_name, '')) ),'  ',' ' ) as patient_name ,
-                           tp.address as patient_address ,tp.phone as patient_phone,
-                           tml.manufacturer_name,tsi.batch,
-                           case when ts.quantity_unit = 'TAB' then (coalesce(tsi.sale_rate,0)/coalesce(tsi.strip_tab,0))
-                               else coalesce(tsi.sale_rate,0) end as sale_rate,
-                                        
-                           ( ((coalesce(tsi.strip,0)*coalesce(tsi.strip_tab,0))+coalesce(tsi.pcs,0))*
-                             case when ts.quantity_unit = 'TAB' then (coalesce(tsi.sale_rate,0)/coalesce(tsi.strip_tab,0))
-                                  else coalesce(tsi.sale_rate,0) end )*coalesce(tsi.discount,0)/100 as discountAmount,
-                                        
-                           tsi.expiry_date,tsi.pack,tsi.discount,
-                           tsm.invoice_number ,(TO_CHAR(tsm.sale_date, 'DD-MM-YYYY')) as sale_date,
-                           tsd.shop_name , tsd.shop_address , tsd.shop_email,tsd.shop_gst_number , tsd.shop_phone_1 , tsd.shop_phone_2,
-                           tsd.shop_food_licence,tsd.shop_drug_licence,(tsi.strip*tsi.strip_tab)+tsi.pcs as totalTab,
-                           tsm.additional_discount_amount as additional_discount_amount,
-                           get_remaining_dues(tsm.sale_main_id) as dues_amount,tsm.total_discount_amount
-                    from tbl_sale_main tsm
-                             Left Join tbl_sale_items tsi on tsm.sale_main_id = tsi.sale_main_id
-                             LEFT JOIN tbl_doctor td on tsm.doctor_id = td.doctor_id
-                             left join tbl_stock ts on tsi.stock_id = ts.stock_id
-                             LEFT JOIN tbl_patient tp on tsm.patient_id = tp.patient_id
-                            left join tbl_salutation sal on sal.salutation_id = tp.salutation_id
-                             
-                             left join tbl_manufacturer_list tml on tsi.mfr_id = tml.mfr_id
-                             CROSS JOIN tbl_shop_details tsd
-                             where tsm.sale_main_id = ?""";
 
-            ps = connection.prepareStatement(query);
-            ps.setInt(1, saleMainId);
+            String qry = "select * from tbl_shop_details order by 1 desc limit 1";
+            ps = connection.prepareStatement(qry);
+
             rs = ps.executeQuery();
-            while (rs.next()) {
-                String productName = rs.getString("item_name");
-                String mfrName = rs.getString("manufacturer_name");
-                String batch = rs.getString("batch");
-                String pack = rs.getString("pack");
-                String exp = rs.getString("expiry_date");
-                int totalTab = rs.getInt("totalTab");
-                double saleRate = rs.getDouble("sale_rate");
-                double discountAmount = rs.getDouble("discountAmount");
 
-                String patientName = rs.getString("patient_name");
-                String patientPhone = rs.getString("patient_phone");
-                String patientAddress = rs.getString("patient_address");
-
-                String invoiceNum = rs.getString("invoice_number");
-                String saleDate = rs.getString("sale_date");
-
+            if (rs.next()) {
                 String shopName = rs.getString("shop_name");
                 String shopAddress = rs.getString("shop_address");
                 String shopEmail = rs.getString("shop_email");
                 String shopPhone1 = rs.getString("shop_phone_1");
                 String shopPhone2 = rs.getString("shop_phone_2");
                 String shopGstNum = rs.getString("shop_gst_number");
-                String fl = rs.getString("shop_food_licence");
-                String dl = rs.getString("shop_drug_licence");
-                String drName = rs.getString("dr_name");
-                double additional_discount = rs.getDouble("additional_discount_amount");
-
-                param.put("duesAmount",rs.getDouble("dues_amount"));
-                param.put("totalSaving",rs.getDouble("total_discount_amount"));
-                param.put("receivedAmount",0.0);
+                String foodLicence = rs.getString("shop_food_licence");
+                String drugLicence = rs.getString("shop_drug_licence");
 
                 if (null == shopPhone2 || shopPhone2.isEmpty()) {
                     shopPhone2 = "";
@@ -330,46 +254,26 @@ public class GenerateInvoice {
                     shopPhone2 = "," + shopPhone2;
                 }
 
-                Method m = new Method();
+                param.put("SHOP_NAME", shopName.toUpperCase());
+                param.put("SHOP_PHONE_1", shopPhone1);
+                param.put("SHOP_PHONE_2", shopPhone2);
+                param.put("SHOP_EMAIL", shopEmail.toUpperCase());
+                param.put("SHOP_GST_NUMBER", method.rec(shopGstNum));
+                param.put("SHOP_ADDRESS", method.rec(shopAddress.toUpperCase()));
+                param.put("foodLicence", method.rec(foodLicence));
+                param.put("drugLicence", method.rec(drugLicence));
+                param.put("title_logo", new ImageLoader().reportLogo("img/company/gangotri_company_logo.png"));
 
-                shop_customer_details(param, rs, patientName, m.rec(patientPhone), m.rec(patientAddress), invoiceNum, saleDate, shopName, m.rec(shopAddress), shopEmail, shopPhone1, shopPhone2, m.rec(shopGstNum), additional_discount, m.rec(drName), m.rec(fl), m.rec(dl));
-                modelList.add(new RegularInvoiceModel(productName, m.rec(mfrName), m.rec(pack), m.rec(batch), m.rec(exp), saleRate, discountAmount, totalTab, saleDate));
             }
 
-            JRBeanCollectionDataSource cartBean = new JRBeanCollectionDataSource(modelList);
-            param.put("productDetails", cartBean);
-            JasperReport jasperReport = null;
-            jasperReport = JasperCompileManager.compileReport(fileLoader.load(INVOICE_ROOT_PATH + "Regular_Invoice.jrxml"));
-            JasperPrint print = JasperFillManager.fillReport(jasperReport, param, new JREmptyDataSource());
-
-            if (isDownLoad && null != downloadPath) {
-                JasperExportManager.exportReportToPdfFile(print, downloadPath);
-                Platform.runLater(() -> button.setGraphic(down_iv));
-                new CustomDialog().showAlertBox("Successful", "Invoice Successfully Download");
-
-            } else {
-                Platform.runLater(() -> {
-                    button.setGraphic(print_iv);
-                });
-                JasperViewer viewer = new JasperViewer(print, false);
-                viewer.setZoomRatio(pdfZoomRatio);
-                viewer.setVisible(true);
-            }
-        } catch (SQLException | JRException e) {
-            Platform.runLater(() -> {
-                if (null != button) {
-                    if (isDownLoad) {
-                        button.setGraphic(down_iv);
-                    } else {
-                        button.setGraphic(print_iv);
-
-                    }
-                }
-            });
+        } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             DBConnection.closeConnection(connection, ps, rs);
         }
+
+        return param;
+
     }
 
     public void prescriptionInvoice(int patientId, String consultDoctorName,

@@ -98,3 +98,23 @@ BEGIN
     return result;
 END ;
 $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION get_received_amount(saleMainId int)
+    RETURNS numeric AS
+$$
+DECLARE
+    result VARCHAR;
+BEGIN
+
+    result = (select coalesce(coalesce(received_amount,0)+
+    (select coalesce(sum(pi.amount),0) from tbl_dues td
+    left join payment_information pi on pi.document_id = td.dues_id
+     where td.source_id = tsm.sale_main_id and pi.document_source = 'DUES'),0) as received_amount
+    from tbl_sale_main tsm
+              where tsm.sale_main_id = saleMainId
+    );
+
+    return result;
+END ;
+$$ LANGUAGE plpgsql;

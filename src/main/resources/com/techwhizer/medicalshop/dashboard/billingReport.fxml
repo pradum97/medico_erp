@@ -28,13 +28,14 @@
                       <columns>
 
                           <TableColumn fx:id="col_sno" editable="false" minWidth="60.0" sortable="false" text="Sr.No" />
-                          <TableColumn fx:id="colPatientName" editable="false" minWidth="150.0" sortable="false" text="PATIENT NAME" />
+                          <TableColumn fx:id="colPatientName" editable="false" maxWidth="350.0" minWidth="150.0" sortable="false" text="PATIENT NAME" />
                           <TableColumn fx:id="colPhone" editable="false" maxWidth="110.0" minWidth="110.0" prefWidth="-1.0" sortable="false" text="PHONE" />
                           <TableColumn fx:id="colAddress" editable="false" minWidth="150.0" sortable="false" text="ADDRESS" />
                           <TableColumn fx:id="colInvoiceNumber" editable="false" maxWidth="107.0" minWidth="107.0" prefWidth="-1.0" sortable="false" text="INVOICE #" />
                           <TableColumn fx:id="colDate" editable="false" minWidth="150.0" sortable="false" text="DATE" />
                           <TableColumn fx:id="colCheck" editable="false" maxWidth="72.0" minWidth="72.0" sortable="false" text=" ITEMS" />
                           <TableColumn fx:id="colNetAmount" editable="false" minWidth="130.0" sortable="false" text="NET AMOUNT" />
+                          <TableColumn fx:id="colReceivedAmount" editable="false" minWidth="135.0" sortable="false" text="RECEIVED AMT" />
                           <TableColumn fx:id="colTotTax" editable="false" minWidth="80.0" sortable="false" text="TAX ₹" />
                           <TableColumn fx:id="colAddiDisc" editable="false" minWidth="90.0" sortable="false" text="DISC ₹" />
                           <TableColumn fx:id="colBillType" editable="false" minWidth="100.0" prefWidth="90.0" sortable="false" text="BILL TYPE" />
@@ -51,7 +52,7 @@
         </StackPane>
     </center>
     <top>
-        <VBox style="-fx-border-color: transparent transparent gray transparent;" BorderPane.alignment="CENTER">
+        <VBox style="-fx-border-color: transparent transparent grey transparent;" BorderPane.alignment="CENTER">
             <BorderPane.margin>
                 <Insets />
             </BorderPane.margin>
@@ -75,7 +76,7 @@
                                         <Font name="Arial Bold" size="11.0" />
                                     </font>
                                 </Label>
-                                <DatePicker fx:id="fromDateP" editable="false" focusTraversable="false" prefHeight="25.0" promptText="DD-MM-YYYY" showWeekNumbers="true" style="-fx-background-radius: 3; -fx-border-radius: 3; -fx-border-color: gray;">
+                                <DatePicker fx:id="fromDateP" editable="false" focusTraversable="false" prefHeight="25.0" promptText="DD-MM-YYYY" showWeekNumbers="true" style="-fx-background-radius: 3; -fx-border-radius: 3; -fx-border-color: grey;">
                                     <cursor>
                                         <Cursor fx:constant="HAND" />
                                     </cursor>
@@ -85,7 +86,7 @@
                                         <Font name="Arial Bold" size="11.0" />
                                     </font>
                                 </Label>
-                                <DatePicker fx:id="toDateP" editable="false" focusTraversable="false" layoutX="10.0" layoutY="17.0" prefHeight="25.0" promptText="DD-MM-YYYY" showWeekNumbers="true" style="-fx-background-radius: 3; -fx-border-radius: 3; -fx-border-color: gray;">
+                                <DatePicker fx:id="toDateP" editable="false" focusTraversable="false" layoutX="10.0" layoutY="17.0" prefHeight="25.0" promptText="DD-MM-YYYY" showWeekNumbers="true" style="-fx-background-radius: 3; -fx-border-radius: 3; -fx-border-color: grey;">
                                     <cursor>
                                         <Cursor fx:constant="HAND" />
                                     </cursor>
@@ -100,7 +101,7 @@
                         <HBox alignment="CENTER" fillHeight="false" spacing="15.0">
                             <children>
 
-                                <HBox alignment="CENTER" fillHeight="false" minHeight="30.0" prefHeight="30.0" prefWidth="280.0" spacing="10.0" style="-fx-border-color: GRAY; -fx-background-color: WHITE; -fx-background-radius: 4; -fx-border-radius: 4;">
+                                <HBox alignment="CENTER" fillHeight="false" minHeight="30.0" prefHeight="30.0" prefWidth="280.0" spacing="10.0" style="-fx-border-color: grey; -fx-background-color: WHITE; -fx-background-radius: 4; -fx-border-radius: 4;">
                                     <children>
                                         <TextField fx:id="searchTf" alignment="CENTER" focusTraversable="false" promptText="Enter Invoice No / Pt-Name / Phone" style="-fx-background-color: transparent; -fx-text-inner-color: BLACK;" HBox.hgrow="ALWAYS" />
                                     </children>

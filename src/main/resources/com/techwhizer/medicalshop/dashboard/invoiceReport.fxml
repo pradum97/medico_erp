@@ -31,12 +31,12 @@
                                 <TableView fx:id="tableView" focusTraversable="false" VBox.vgrow="ALWAYS">
                                     <columns>
                                         <TableColumn fx:id="colSrNo" maxWidth="60.0" minWidth="60.0" prefWidth="60.0" text="Sr No" />
-                                        <TableColumn fx:id="colCusName" minWidth="150.0" prefWidth="-1.0" text="CUSTOMER NAME" />
-                                        <TableColumn fx:id="colCusPhone" maxWidth="130.0" minWidth="140.0" prefWidth="100.0" text="CUSTOMER PHONE" />
-                                        <TableColumn fx:id="colTotItems" maxWidth="90.0" minWidth="90.0" prefWidth="90.0" text="TOTAL ITEMS" />
+                                        <TableColumn fx:id="colCusName" maxWidth="350.0" minWidth="150.0" prefWidth="-1.0" text="PATIENT NAME" />
+                                        <TableColumn fx:id="colCusPhone" maxWidth="130.0" minWidth="140.0" prefWidth="100.0" text="PHONE" />
+                                        <TableColumn fx:id="colTotItems" maxWidth="90.0" minWidth="90.0" prefWidth="90.0" text="TOTAL ITEMS" visible="false" />
+                                        <TableColumn fx:id="colDate" maxWidth="150.0" minWidth="140.0" prefWidth="130.0" text="DATE" />
+                                        <TableColumn fx:id="colInvoice" maxWidth="180.0" minWidth="150.0" prefWidth="136.0" text="INVOICE NUM" />
                                         <TableColumn fx:id="colBillType" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" text="BILL TYPE" />
-                                        <TableColumn fx:id="colDate" maxWidth="130.0" minWidth="120.0" prefWidth="130.0" text="DATE" />
-                                        <TableColumn fx:id="colInvoice" minWidth="150.0" prefWidth="136.0" text="INVOICE NUM" />
                                         <TableColumn fx:id="colAction" minWidth="180.0" prefWidth="-1.0" text="#" />
                                     </columns>
                                     <columnResizePolicy>
@@ -58,7 +58,7 @@
     </center>
 
     <top>
-        <VBox style="-fx-border-color: transparent transparent gray transparent;" BorderPane.alignment="CENTER">
+        <VBox style="-fx-border-color: transparent transparent grey transparent;" BorderPane.alignment="CENTER">
             <BorderPane.margin>
                 <Insets />
             </BorderPane.margin>
@@ -79,25 +79,25 @@
                             <children>
                                 <Label layoutX="185.0" layoutY="21.0" text="FROM">
                                     <font>
-                                        <Font name="Arial" size="13.0" />
+                                        <Font name="Arial Black" size="12.0" />
                                     </font>
                                 </Label>
-                                <DatePicker fx:id="fromDateP" editable="false" focusTraversable="false" prefHeight="32.0" prefWidth="180.0" promptText="DD-MM-YYYY" showWeekNumbers="true" style="-fx-background-radius: 3; -fx-border-radius: 3; -fx-border-color: gray;">
+                                <DatePicker fx:id="fromDateP" editable="false" focusTraversable="false" minHeight="27.0" prefHeight="27.0" prefWidth="180.0" promptText="DD-MM-YYYY" showWeekNumbers="true" style="-fx-background-radius: 3; -fx-border-radius: 3; -fx-border-color: grey;">
                                     <cursor>
                                         <Cursor fx:constant="HAND" />
                                     </cursor>
                                 </DatePicker>
                                 <Label text="TO">
                                     <font>
-                                        <Font name="Arial" size="13.0" />
+                                        <Font name="Arial Black" size="12.0" />
                                     </font>
                                 </Label>
-                                <DatePicker fx:id="toDateP" editable="false" focusTraversable="false" layoutX="10.0" layoutY="17.0" prefHeight="32.0" prefWidth="180.0" promptText="DD-MM-YYYY" showWeekNumbers="true" style="-fx-background-radius: 3; -fx-border-radius: 3; -fx-border-color: gray;">
+                                <DatePicker fx:id="toDateP" editable="false" focusTraversable="false" layoutX="10.0" layoutY="17.0" minHeight="27.0" prefHeight="27.0" prefWidth="180.0" promptText="DD-MM-YYYY" showWeekNumbers="true" style="-fx-background-radius: 3; -fx-border-radius: 3; -fx-border-color: grey;">
                                     <cursor>
                                         <Cursor fx:constant="HAND" />
                                     </cursor>
                                 </DatePicker>
-                                <Button fx:id="searchReportBn" focusTraversable="false" mnemonicParsing="false" onAction="#searchInvoice" prefHeight="30.0" prefWidth="81.0" style="-fx-cursor: hand; -fx-background-color: #008080; -fx-text-fill: WHITE; -fx-background-radius: 2; -fx-border-radius: 2;" text="SEARCH">
+                                <Button fx:id="searchReportBn" focusTraversable="false" minHeight="25.0" mnemonicParsing="false" onAction="#searchInvoice" prefHeight="25.0" prefWidth="81.0" style="-fx-cursor: hand; -fx-background-color: #008080; -fx-text-fill: WHITE; -fx-background-radius: 2; -fx-border-radius: 2;" text="SEARCH">
                                     <font>
                                         <Font name="Arial Bold" size="12.0" />
                                     </font>
@@ -111,8 +111,8 @@
 
                                         <HBox alignment="CENTER" fillHeight="false">
                                             <children>
-                                                <ComboBox fx:id="searchTypeC" focusTraversable="false" minWidth="40.0" prefHeight="32.0" prefWidth="80.0" style="-fx-background-radius: 3 0 0 3; -fx-border-color: gray transparent  gray gray; -fx-border-radius: 3 0 0 3;" />
-                                                <TextField fx:id="searchTf" alignment="CENTER" focusTraversable="false" minWidth="40.0" prefHeight="32.0" prefWidth="210.0" style="-fx-background-color: transparent; -fx-text-inner-color: BLACK; -fx-border-color: gray gray  gray transparent; -fx-background-radius: 1; -fx-border-radius: 0 3 3 0;" HBox.hgrow="ALWAYS" />
+                                                <ComboBox fx:id="searchTypeC" focusTraversable="false" minHeight="27.0" minWidth="40.0" prefHeight="27.0" prefWidth="80.0" style="-fx-background-radius: 3 0 0 3; -fx-border-color: grey transparent  grey grey; -fx-border-radius: 3 0 0 3;" />
+                                                <TextField fx:id="searchTf" alignment="CENTER" focusTraversable="false" minHeight="27.0" minWidth="25.0" prefHeight="27.0" prefWidth="210.0" style="-fx-background-color: transparent; -fx-text-inner-color: BLACK; -fx-border-color: grey grey  grey transparent; -fx-background-radius: 1; -fx-border-radius: 0 3 3 0;" HBox.hgrow="ALWAYS" />
                                             </children>
                                             <HBox.margin>
                                                 <Insets />
@@ -121,9 +121,9 @@
                                     </children>
                                 </HBox>
 
-                                <HBox fx:id="refresh_bn" alignment="CENTER" fillHeight="false" minHeight="30.0" onMouseClicked="#bnRefresh" prefHeight="30.0" prefWidth="60.0" style="-fx-cursor: hand; -fx-background-color: RED; -fx-background-radius: 3;">
+                                <HBox fx:id="refresh_bn" alignment="CENTER" fillHeight="false" minHeight="27.0" onMouseClicked="#bnRefresh" prefHeight="27.0" prefWidth="60.0" style="-fx-cursor: hand; -fx-background-color: RED; -fx-background-radius: 3;">
 
-                                    <ImageView fitHeight="20.0" fitWidth="20.0" onMouseClicked="#bnRefresh">
+                                    <ImageView fitHeight="17.0" fitWidth="17.0" onMouseClicked="#bnRefresh">
                                         <Image url="@../img/icon/refresh_ic.png" />
                                         <HBox.margin>
                                             <Insets left="7.0" right="7.0" />

@@ -41,6 +41,7 @@ public class BillingReport implements Initializable {
     public TableColumn<SaleMainModel, String> colPhone;
     public TableColumn<SaleMainModel, String> colAddress;
     public TableColumn<SaleMainModel, String> colNetAmount;
+    public TableColumn<SaleMainModel, String> colReceivedAmount;
     public TableColumn<SaleMainModel, String> colSellerName;
     public TableColumn<SaleMainModel, String> colBillType;
     public TableColumn<SaleMainModel, String> colDate;
@@ -144,7 +145,7 @@ public class BillingReport implements Initializable {
                     COALESCE(tc.first_name, ''), ' ',
                     COALESCE(tc.middle_name, ''), ' ',
                     COALESCE(tc.last_name, '')) ),'  ',' ' ) as name
-                           ,tc.phone,tc.address ,
+                           ,tc.phone,tc.address ,get_received_amount(tsm.sale_main_id) as received_amount,
                            tu.first_name,tu.last_name ,(select sum(tsi.net_amount) as netAmount from tbl_sale_items tsi
                                                                        where tsi.sale_main_id = tsm.sale_main_id group by tsm.sale_main_id)
                     from tbl_sale_main tsm
@@ -183,10 +184,11 @@ public class BillingReport implements Initializable {
                 String patientAddress = rs.getString("address");
                 String sellerName = rs.getString("first_name") + " " + rs.getString("last_name");
                 double totNetAmount = rs.getDouble("netAmount");
+                double receivedAmount = rs.getDouble("received_amount");
 
                 reportList.add(new SaleMainModel(saleMainId, patientId, sellerId, patientName, patientPhone, patientAddress, additionalDisc,
                         Double.parseDouble(method.decimalFormatter(totTaxAmt)), Double.parseDouble(method.decimalFormatter(netAmount)),
-                        paymentMode, billType, invoiceNumber, sellerName, sale_date));
+                        paymentMode, billType, invoiceNumber, sellerName, sale_date,receivedAmount));
 
                 totalNetAmount = totalNetAmount + totNetAmount;
             }
@@ -280,6 +282,7 @@ public class BillingReport implements Initializable {
         colAddiDisc.setCellValueFactory(new PropertyValueFactory<>("additionalDisc"));
         colTotTax.setCellValueFactory(new PropertyValueFactory<>("totalTaxAmount"));
         colNetAmount.setCellValueFactory(new PropertyValueFactory<>("netAmount"));
+        colReceivedAmount.setCellValueFactory(new PropertyValueFactory<>("receivedAmount"));
         colInvoiceNumber.setCellValueFactory(new PropertyValueFactory<>("invoiceNumber"));
         colPaymentMode.setCellValueFactory(new PropertyValueFactory<>("paymentMode"));
         colBillType.setCellValueFactory(new PropertyValueFactory<>("billType"));

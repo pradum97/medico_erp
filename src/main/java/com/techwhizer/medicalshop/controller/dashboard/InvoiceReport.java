@@ -147,13 +147,13 @@ public class InvoiceReport implements Initializable {
     private class MyAsyncTask extends AsyncTask<String, Integer, Boolean> {
         private boolean isDateFilter;
         private Map<String, Object> map;
-        private Label button;
+        private Label labelButton;
 
         public MyAsyncTask(boolean isDateFilter, Map<String, Object> map) {
             this.isDateFilter = isDateFilter;
             this.map = map;
             if (null != map){
-                button = (Label) map.get("button");
+                labelButton = (Label) map.get("button");
             }
         }
 
@@ -171,7 +171,7 @@ public class InvoiceReport implements Initializable {
             }
 
             if (null != map) {
-                button.setGraphic(pi);
+                labelButton.setGraphic(pi);
             }else {
                 method.hideElement(contentContainer);
                 progressBar.setVisible(true);
@@ -193,29 +193,11 @@ public class InvoiceReport implements Initializable {
                 boolean isDownloadable =  (boolean) map.get("isDownloadable");
                 int saleMainId = (int) map.get("saleMainId");
                 String fullPath = (String) map.get("path");
-                String billType = (String) map.get("billType");
-                switch (billType){
-                    case "REGULAR" -> {
-                        if (isDownloadable){
-
-                        new GenerateInvoice().regularInvoice(saleMainId, true, fullPath,button);
-
-                        }else if(isReportPrint){
-                            new GenerateInvoice().regularInvoice(saleMainId, false, fullPath,button);
-                        }
-                    }
-                    case "GST" -> {
-
-                        if (isDownloadable) {
-                            new GenerateInvoice().gstInvoice(saleMainId, false, fullPath, button);
-
-                        } else if (isReportPrint) {
-
-                            new GenerateInvoice().gstInvoice(saleMainId, false, fullPath, button);
-                        }
-                    }
+                if (isDownloadable){
+                    printReport(saleMainId, true, fullPath,labelButton);
+                }else if(isReportPrint){
+                    printReport(saleMainId, false, fullPath,labelButton);
                 }
-
             }else {
                 getSaleItems(isDateFilter);
             }
@@ -234,6 +216,10 @@ public class InvoiceReport implements Initializable {
         public void progressCallback(Integer... params) {
 
         }
+    }
+
+    private void printReport(int saleMainId, boolean isDownLoad, String downloadPath, Label labelButton){
+        new GenerateInvoice().billingInvoice(saleMainId, false, downloadPath, labelButton);
     }
 
     private void getSaleItems(boolean isDateFilter) {
@@ -542,9 +528,9 @@ public class InvoiceReport implements Initializable {
         columnName.setCellFactory(tc -> {
             TableCell<InvoiceModel, String> cell = new TableCell<>();
             Text text = new Text();
-            text.setStyle("-fx-font-size: 14");
+            text.setStyle("-fx-font-size: 12");
             cell.setGraphic(text);
-            text.setStyle("-fx-text-alignment: CENTER ;");
+            text.setStyle("-fx-text-alignment: LEFT-CENTER ;");
             cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
             text.wrappingWidthProperty().bind(columnName.widthProperty());
             text.textProperty().bind(cell.itemProperty());

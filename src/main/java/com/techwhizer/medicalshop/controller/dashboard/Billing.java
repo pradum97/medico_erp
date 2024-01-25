@@ -106,7 +106,7 @@ public class Billing implements Initializable {
     private FilteredList<PatientModel> filteredData;
     static private int rowsPerPage = 20;
     private  BatchChooserModel bcm ;
-    private double additionalDiscountAmount = 0.0, addDiscountPercentage = 0.0;
+    private double addDiscountPercentage = 0.0;
 
 
 
@@ -158,7 +158,6 @@ public class Billing implements Initializable {
             double mainValue = netTotalAmount;
             String val = addDiscTF.getText();
 
-            double invoiceValue = 0, discountAmount = 0;
             if (!val.isEmpty()) {
 
                 try {
@@ -168,37 +167,21 @@ public class Billing implements Initializable {
                         addDiscTF.setText(String.valueOf(0));
                         return;
                     }
-
-                    if (addDiscountPercentage != addDisPercentage){
-                        applyDiscountBn.setVisible(true);
-                    }else {
-                        applyDiscountBn.setVisible(false);
-                    }
-
+                    applyDiscountBn.setVisible(addDiscountPercentage != addDisPercentage);
                     addDiscountPercentage = addDisPercentage;
-                    discountAmount = mainValue * addDisPercentage / 100;
+                    double discountAmount = mainValue * addDisPercentage / 100;
 
                     if (discountAmount > mainValue) {
                         method.show_popup("Please enter amount less then invoice value", addDiscTF);
                         addDiscTF.setText(String.valueOf(0));
-                        discountAmount = 0;
                         return;
-                    } else {
-                        invoiceValue = mainValue - discountAmount;
                     }
                 } catch (NumberFormatException e) {
-                    invoiceValue = mainValue;
                     method.show_popup("Please enter amount less then invoice value", addDiscTF);
                     addDiscTF.setText(String.valueOf(0));
-                    discountAmount = 0;
-                }
-            } else {
-                invoiceValue = mainValue;
-                discountAmount = 0;
-            }
 
-            additionalDiscountAmount = discountAmount;
-            setInvoiceAmount(invoiceValue);
+                }
+            }
 
         });
 
@@ -304,7 +287,7 @@ public class Billing implements Initializable {
                                        select tim.items_name,tim.item_id , tc.stock_id , tc,cart_id,t.batch,tim.mfr_id ,tpt.hsn_sac as hsn,tpt.igst,tpt.sgst,tpt.cgst, tim.packing , tc.mrp  as sale_rate , tc.strip,tc.pcs,
                                               (select expiry_date from tbl_purchase_items tpi where ts.purchase_items_id = tpi.purchase_items_id),t.purchase_rate,t.mrp,
                                          
-                                              case when (coalesce(td.discount,0)+?) > 100 then 100 else (coalesce(td.discount,0)+?) end as discount
+                                              case when ? > 0 then ? else (coalesce(td.discount,0)) end as discount
                                              
                                               ,td.discount_id,tpt.tax_id,
                                               coalesce((coalesce(tpt.sgst,0)+coalesce(tpt.cgst,0)+coalesce(tpt.igst,0)),0)as total_gst,
@@ -316,21 +299,21 @@ public class Billing implements Initializable {
                                               case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else coalesce(tc.mrp,0)
                                                   end-(( ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0))*
                                                          case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else
-                                                             coalesce(tc.mrp,0) end )*
-                                                       (case when (coalesce(td.discount,0)+?) > 100 then 100 else (coalesce(td.discount,0)+?) end)/100) as netAmount,
+                                                             coalesce(tc.mrp,0) end )*(case when ? > 0 then ? else (coalesce(td.discount,0)) end)/100) as netAmount,
                                        
                                               ( ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0))*
                                                 case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else
-                                                    coalesce(tc.mrp,0) end )*(case when (coalesce(td.discount,0)+?) > 100 then 100 else (coalesce(td.discount,0)+?) end)/100 as discountAmount,
+                                                    coalesce(tc.mrp,0) end )*(
+                                                    case when ? > 0 then ? else (coalesce(td.discount,0)) end)/100 as discountAmount,
                                        
                                               ( coalesce( ( ( ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0))*case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else coalesce(tc.mrp,0) end )-
                                                             ( ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0))*case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else coalesce(tc.mrp,0) end )*
-                                                            (case when (coalesce(td.discount,0)+?) > 100 then 100 else (coalesce(td.discount,0)+?) end)/100),0)*100)/
+                                                            (case when ? > 0 then ? else (coalesce(td.discount,0)) end)/100),0)*100)/
                                               (100+(coalesce((coalesce(tpt.sgst,0)+coalesce(tpt.cgst,0)+coalesce(tpt.igst,0)),0))) as taxableAmount,
                                        
                                               ( coalesce( ( ( ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0))*case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else coalesce(tc.mrp,0) end )-
                                                             ( ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0))*case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else coalesce(tc.mrp,0) end )*
-                                                            (case when (coalesce(td.discount,0)+?) > 100 then 100 else (coalesce(td.discount,0)+?) end)/100),0)*100)/
+                                                            (case when ? > 0 then ? else (coalesce(td.discount,0)) end)/100),0)*100)/
                                               (100+(coalesce((coalesce(tpt.sgst,0)+coalesce(tpt.cgst,0)+coalesce(tpt.igst,0)),0)))*coalesce((coalesce(tpt.sgst,0)+coalesce(tpt.cgst,0)
                                                   +coalesce(tpt.igst,0)),0)/100 as gstAmount
                                        from tbl_cart tc
@@ -1200,7 +1183,7 @@ public class Billing implements Initializable {
             ps = connection.prepareStatement(saleMainQuery, new String[]{"sale_main_id"});
             ps.setInt(1, patientId);
             ps.setInt(2, Login.currentlyLogin_Id);
-            ps.setDouble(3, additionalDiscountAmount);
+            ps.setDouble(3, 0);
             ps.setString(4, paytmModeS);
             ps.setDouble(5, totalTaxAmtD);
             ps.setDouble(6, invoiceValue);
@@ -1313,14 +1296,7 @@ public class Billing implements Initializable {
                         patientModel = null;
                         Platform.runLater(() -> patientNameL.setText("SELECT PATIENT"));
                         clearAll();
-                        switch (billingType){
-                            case "REGULAR" -> {
-                                new GenerateInvoice().regularInvoice(sale_main_id, false, null, new Label());
-                            }
-                            case "GST" -> {
-                                new GenerateInvoice().gstInvoice(sale_main_id, false, null, new Label());
-                            }
-                        }
+                        new GenerateInvoice().billingInvoice(sale_main_id, false, null, new Label());
                     }
 
                 }

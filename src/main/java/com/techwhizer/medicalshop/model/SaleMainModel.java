@@ -6,9 +6,11 @@ public class SaleMainModel {
     private double additionalDisc, totalTaxAmount, netAmount;
     private String paymentMode, billType, invoiceNumber;
     private String sellerName, sellingDate;
+    private double receivedAmount;
 
     public SaleMainModel(int sale_main_id, int patientId, int sellerId, String patientName, String patientPhone, String patientAddress, double additionalDisc,
-                         double totalTaxAmount, double netAmount, String paymentMode, String billType, String invoiceNumber, String sellerName, String sellingDate) {
+                         double totalTaxAmount, double netAmount, String paymentMode, String billType, String invoiceNumber, String sellerName,
+                         String sellingDate,double receivedAmount) {
         this.sale_main_id = sale_main_id;
         this.patientId = patientId;
         this.sellerId = sellerId;
@@ -23,6 +25,15 @@ public class SaleMainModel {
         this.invoiceNumber = invoiceNumber;
         this.sellerName = sellerName;
         this.sellingDate = sellingDate;
+        this.receivedAmount = receivedAmount;
+    }
+
+    public double getReceivedAmount() {
+        return receivedAmount;
+    }
+
+    public void setReceivedAmount(double receivedAmount) {
+        this.receivedAmount = receivedAmount;
     }
 
     public int getSale_main_id() {
