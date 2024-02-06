@@ -69,6 +69,8 @@ public class Home implements Initializable {
         if (null == reportList) {
             return;
         }
+
+
         callThread();
 
         changeTableView(pagination.getCurrentPageIndex(), rowsPerPage);

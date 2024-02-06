@@ -166,6 +166,7 @@ CREATE TABLE TBL_ITEMS_MASTER
     COMPOSITION  VARCHAR(300) NOT NULL,
     DOSE         VARCHAR(200) NOT NULL,
     TAG          VARCHAR(300) NOT NULL,
+    is_stockable boolean,
     foreign key (GST_ID) REFERENCES tbl_product_tax (TAX_ID),
     foreign key (CREATED_BY) REFERENCES tbl_users (user_id),
     foreign key (MFR_ID) REFERENCES tbl_manufacturer_list (MFR_ID),
@@ -175,13 +176,12 @@ CREATE TABLE TBL_ITEMS_MASTER
 CREATE TABLE TBL_PURCHASE_MAIN
 (
     PURCHASE_MAIN_ID SERIAL PRIMARY KEY,
-    DEALER_ID        INT         NOT NULL,
+    DEALER_ID        INT         ,
     BILL_NUM         VARCHAR(50) NOT NULL,
     DEALER_BILL_NUM  VARCHAR(50),
     BILL_DATE        VARCHAR(15) NOT NULL,
     CREATED_DATE     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    IS_ACTIVE        INT       DEFAULT 1,
-    FOREIGN KEY (DEALER_ID) REFERENCES tbl_dealer (DEALER_ID)
+    IS_ACTIVE        INT       DEFAULT 1
 );
 
 CREATE TABLE TBL_PURCHASE_ITEMS
@@ -189,8 +189,8 @@ CREATE TABLE TBL_PURCHASE_ITEMS
     PURCHASE_ITEMS_ID SERIAL PRIMARY KEY,
     PURCHASE_MAIN_ID  INT          NOT NULL,
     ITEM_ID           INT          NOT NULL,
-    BATCH             VARCHAR(100) NOT NULL,
-    EXPIRY_DATE       VARCHAR(50)  NOT NULL,
+    BATCH             VARCHAR(100) ,
+    EXPIRY_DATE       VARCHAR(50) ,
     LOT_NUMBER        VARCHAR(50),
     PURCHASE_RATE     NUMERIC,
     MRP               NUMERIC,
@@ -251,7 +251,7 @@ CREATE TABLE TBL_CART
     MRP          NUMERIC               NOT NULL,
     STRIP        INT,
     PCS          INT,
-
+    created_by int not null,
     CREATED_DATE TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -302,6 +302,7 @@ CREATE TABLE TBL_SALE_ITEMS
     TAX_AMOUNT                     NUMERIC,
     sale_date                      timestamp default CURRENT_TIMESTAMP NOT NULL,
     stock_id                       integer                             not null,
+    is_stockable boolean,
     ADDITIONAL_DISCOUNT_PERCENTAGE numeric DEFAULT 0,
 
     FOREIGN KEY (SALE_MAIN_ID)

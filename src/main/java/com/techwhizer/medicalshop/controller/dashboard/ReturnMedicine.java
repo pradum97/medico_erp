@@ -36,9 +36,6 @@ public class ReturnMedicine implements Initializable {
     public TableColumn<ReturnProductModel, String> colProductName;
     public TableColumn<ReturnProductModel, String> colQty;
     public TableColumn<ReturnProductModel, String> colMrp;
-   // public TableColumn<ReturnProductModel, String> colDiscountAmount;
-   // public TableColumn<ReturnProductModel, String> colNetAmount;
-   // public TableColumn<ReturnProductModel, String> colPurchaseDate;
     public TableColumn<ReturnProductModel, String> colReturnQuantity;
     public TableColumn<ReturnProductModel, String> colRefundAmount;
     public TableColumn<ReturnProductModel, String> colReturnableQty;
@@ -134,26 +131,32 @@ public class ReturnMedicine implements Initializable {
                             ps.setInt(1, rm.getStockId());
                             ps.setInt(2, rm.getSaleItemID());
                             ps.setInt(3, quantity);
-                            ps.setString(4, "TAB");
+                            ps.setString(4, rm.getDisplayUnit());
                             ps.setInt(5, returnMainId);
                             ps.setDouble(6, rm.getReturnDiscountAmount());
                             ps.setDouble(7, rm.getAmount());
                             ps.setDouble(8, rm.getReturnNetAmount());
 
 
-                            if (ps.executeUpdate() > 0) {
+                            if ( ps.executeUpdate() > 0) {
 
-                                ps = null;
+                                if (rm.isStockable()){
+                                    ps = null;
 
-                                String stockUpdateQuery = """
+                                    String stockUpdateQuery = """
                                 update tbl_stock set quantity = quantity+? where stock_id = ?
                                 """;
-                                ps = connection.prepareStatement(stockUpdateQuery);
-                                ps.setInt(1, quantity);
-                                ps.setInt(2, rm.getStockId());
-                                if (ps.executeUpdate() > 0) {
+                                    ps = connection.prepareStatement(stockUpdateQuery);
+                                    ps.setInt(1, quantity);
+                                    ps.setInt(2, rm.getStockId());
+                                    if (ps.executeUpdate() > 0) {
+                                        count += 1;
+                                    }
+
+                                }else {
                                     count += 1;
                                 }
+
                             }
                         }
                     }
@@ -215,7 +218,7 @@ public class ReturnMedicine implements Initializable {
                 
                     select tsi.sale_item_id ,(TO_CHAR(tsm.sale_date, 'dd-MM-yyyy')) as sale_date,tsi.item_name,
                            concat(tsi.strip*case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end+tsi.pcs,'-',
-                                  (case when tsi.strip > 0 then 'TAB' ELSE 'PCS' END)) as quantity , tsi.discount as discount_Percentage,
+                                  (case when tsi.strip > 0 then 'TAB' ELSE 'PCS' END)) as quantity , tsi.discount as discount_Percentage,tsi.is_stockable,
                     
                            (((( tsi.strip*case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end)+tsi.pcs)*(tsi.sale_rate/case when
                                   case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end > 0 then case when tsi.strip_tab > 0 then tsi.strip_tab else 1
@@ -258,13 +261,16 @@ public class ReturnMedicine implements Initializable {
                 String returnable = ((totalQuantity - returnedQty) + "-" + displayUnit);
 
 
+                boolean isStockable = rs.getBoolean("is_stockable");
+
+
                 String displayMrp = mrpPerTab + " / " + displayUnit;
 
                 ReturnProductModel returnProductModel = new ReturnProductModel(saleItemId, productName,
                         Double.parseDouble(method.decimalFormatter(netAmount)), mrp,
                         quantity, saleDate, Double.parseDouble(method.decimalFormatter(discountAmount)),
                         "0", false, stockId, mrpPerTab, discountPercentage, returnable, displayMrp,
-                        displayUnit, 0, 0, 0);
+                        displayUnit, 0, 0, 0,isStockable);
                 itemList.add(returnProductModel);
             }
 
@@ -281,9 +287,6 @@ public class ReturnMedicine implements Initializable {
             colProductName.setCellValueFactory(new PropertyValueFactory<>("itemName"));
             colQty.setCellValueFactory(new PropertyValueFactory<>("quantity"));
             colMrp.setCellValueFactory(new PropertyValueFactory<>("displayMrp"));
-//            colDiscountAmount.setCellValueFactory(new PropertyValueFactory<>("discountAmount"));
-//            colNetAmount.setCellValueFactory(new PropertyValueFactory<>("netAmount"));
-//            colPurchaseDate.setCellValueFactory(new PropertyValueFactory<>("saleDate"));
             colReturnQuantity.setCellValueFactory(new PropertyValueFactory<>("returnQuantity"));
             colReturnableQty.setCellValueFactory(new PropertyValueFactory<>("returnableQuantity"));
             colRefundAmount.setCellValueFactory(new PropertyValueFactory<>("returnNetAmount"));

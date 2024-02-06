@@ -107,7 +107,7 @@ public class ItemMaster implements Initializable {
     }
 
     public void refresh(ActionEvent event) {
-
+        searchTf.setText("");
         callThread();
     }
 
@@ -168,7 +168,7 @@ public class ItemMaster implements Initializable {
                     "       coalesce(td.discount,0) as discount, tim.mr_id,coalesce(t.name,'-') as mr_name, tim.gst_id,coalesce(tpt.gstname,'-')as gstname,\n" +
                     "       coalesce(tpt.igst,0)as igst,coalesce(tpt.sgst,0) as sgst,coalesce(tpt.cgst,0) as cgst,\n" +
                     "      tim.type,tim.narcotic,tim.item_type,tim.status,(TO_CHAR(tim.created_date, 'DD-MM-YYYY')) as created_date ,tim.strip_tab,\n" +
-                    "      tpt.hsn_sac as hsn,tim.composition,tim.tag from tbl_items_master tim\n" +
+                    "      tpt.hsn_sac as hsn,tim.composition,tim.tag, tim.is_stockable from tbl_items_master tim\n" +
                     "left join tbl_company tc on tim.company_id = tc.company_id\n" +
                     "left join tbl_manufacturer_list tml on tml.mfr_id = tim.mfr_id\n" +
                     "left join tbl_mr_list t on t.mr_id = tim.mr_id\n" +
@@ -208,12 +208,13 @@ public class ItemMaster implements Initializable {
                 if (tabPerStrip > 0) {
                     fullUnit.concat("-" + (tabPerStrip));
                 }
+                boolean isStockable = rs.getBoolean("is_stockable");
 
                 ItemsModel im = new ItemsModel(itemID, method.rec(productName), method.rec(unit), method.rec(packing),
                         companyId, companyName, mfrId, discountId, discount,
                         mrId, mrName, manufacturerName, gstId, cGst, sGst, iGst, type,
                         narcotic, itemType, status, createdDate, tabPerStrip, hsn,
-                        method.rec(fullUnit),composition,tag,dose);
+                        method.rec(fullUnit), composition, tag, dose, isStockable);
                 itemList.add(im);
 
             }
@@ -243,6 +244,8 @@ public class ItemMaster implements Initializable {
                 if (products.getProductName().toLowerCase().contains(lowerCaseFilter)) {
                     return true;
                 } else if (products.getMfrName().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                } else if (products.getProductTag().toLowerCase().contains(lowerCaseFilter)) {
                     return true;
                 } else if (products.getPacking().toLowerCase().contains(lowerCaseFilter)) {
                     return true;
@@ -358,7 +361,14 @@ public class ItemMaster implements Initializable {
                             tableView.getSelectionModel().clearSelection();
                         }
                         customDialog.showFxmlDialog2("update/product/itemMasterUpdate.fxml", "UPDATE MASTER");
-                        callThread();
+
+                        if(Main.primaryStage.getUserData() instanceof Boolean isUpdated){
+                            if(isUpdated){
+                                callThread();
+                            }
+                        }
+
+
                     });
 
 

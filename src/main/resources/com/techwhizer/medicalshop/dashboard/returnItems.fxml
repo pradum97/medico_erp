@@ -9,7 +9,7 @@
       <TableView fx:id="tableview" style="-fx-background-color: white;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columns>
           <TableColumn fx:id="colSrNo" maxWidth="70.0" minWidth="60.0" prefWidth="75.0" text="SR#" />
-          <TableColumn fx:id="colProductName" maxWidth="500.0" minWidth="350.0" prefWidth="288.79998779296875" text="PRODUCT NAME" />
+          <TableColumn fx:id="colProductName" maxWidth="500.0" minWidth="350.0" prefWidth="288.79998779296875" text="ITEM NAME" />
             <TableColumn fx:id="colQty" maxWidth="200.0" minWidth="100.0" prefWidth="100.0" text="QUANTITY" />
             <TableColumn fx:id="colAmount" maxWidth="200.0" minWidth="100.0" text="AMOUNT" />
             <TableColumn fx:id="colDiscountAmt" maxWidth="200.0" minWidth="70.0" prefWidth="70.0" text="DIS AMT" />

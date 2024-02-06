@@ -15,7 +15,7 @@ drop view if exists stock_v;
 --alter view and create patient view
 --CREATE DUES TABLE
 
--- remove duplicate dealer [JYOTI MEDICAL AGENCY]
+-- CREATE ZERO GST
 
 
 -- age to dob
@@ -41,4 +41,19 @@ ALTER TABLE TBL_RETURN_ITEMS ADD DISCOUNT_AMOUNT numeric;
 ALTER TABLE TBL_RETURN_ITEMS ADD AMOUNT numeric;
 ALTER TABLE TBL_RETURN_ITEMS ADD NET_AMOUNT numeric;
 
+ALTER TABLE tbl_items_master ADD is_stockable boolean default true;
 
+
+ALTER TABLE tbl_purchase_main DROP CONSTRAINT tbl_purchase_main_dealer_id_fkey;
+
+
+ALTER TABLE tbl_purchase_items ALTER COLUMN batch DROP NOT NULL;
+ALTER TABLE tbl_purchase_items ALTER COLUMN expiry_date DROP NOT NULL;
+
+ALTER TABLE TBL_PURCHASE_MAIN ALTER COLUMN DEALER_ID DROP NOT NULL;
+
+delete from tbl_cart;
+ALTER TABLE tbl_cart ADD created_by int not null ;
+
+
+ALTER table tbl_sale_items add is_stockable boolean default true;

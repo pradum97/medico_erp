@@ -20,7 +20,7 @@
             <TableView fx:id="tableview" editable="true" style="-fx-background-color: white;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <columns>
                 <TableColumn fx:id="colSrNo" editable="false" maxWidth="60.0" minWidth="60.0" prefWidth="-1.0" sortable="false" text="SR #" />
-                <TableColumn fx:id="colProductName" editable="false" maxWidth="350.0" minWidth="280.0" prefWidth="0.0" sortable="false" text="PRODUCT NAME" />
+                <TableColumn fx:id="colProductName" editable="false" maxWidth="350.0" minWidth="280.0" prefWidth="0.0" sortable="false" text="ITEM NAME" />
                   <TableColumn fx:id="colQty" editable="false" maxWidth="150.0" minWidth="140.0" prefWidth="0.0" sortable="false" text="QUANTITY" />
                   <TableColumn fx:id="colMrp" editable="false" maxWidth="115.0" minWidth="110.0" prefWidth="0.0" sortable="false" text="MRP" />
 <!--                  <TableColumn fx:id="colDiscountAmount" editable="false" maxWidth="15.0" minWidth="100.0" prefWidth="0.0" sortable="false" text="DIS AMOUNT" />-->

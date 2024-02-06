@@ -30,9 +30,9 @@
                                               <TableColumn fx:id="col_sno" editable="false" maxWidth="100.0" minWidth="50.0" prefWidth="75.0" sortable="false" text="Sr.No" />
                                               <TableColumn fx:id="colItemName" editable="false" minWidth="160.0" prefWidth="-1.0" sortable="false" text="NAME" />
                                               <TableColumn fx:id="colBatch" editable="false" maxWidth="170.0" minWidth="130.0" prefWidth="-1.0" sortable="false" text="BATCH" />
-                                              <TableColumn fx:id="colExpiryDate" editable="false" maxWidth="150.0" minWidth="100.0" prefWidth="-1.0" sortable="false" text="EXPIRY DATE" />
+                                              <TableColumn fx:id="colExpiryDate" editable="false" maxWidth="150.0" minWidth="115.0" prefWidth="-1.0" sortable="false" text="EXPIRY DATE" />
                                               <TableColumn fx:id="colQuantity" editable="false" minWidth="-Infinity" prefWidth="120.0" sortable="false" text="QUANTITY" />
-                                              <TableColumn fx:id="colTotalItem" editable="false" minWidth="-Infinity" prefWidth="110.0" sortable="false" text="TOTAL ITEMS" />
+                                              <TableColumn fx:id="colTotalItem" editable="false" minWidth="-Infinity" prefWidth="110.0" sortable="false" text="TOT ITEMS" />
                                               <TableColumn fx:id="colNetAmount" editable="false" minWidth="-Infinity" prefWidth="120.0" sortable="false" text="NET AMOUNT" />
 
                                           </columns>

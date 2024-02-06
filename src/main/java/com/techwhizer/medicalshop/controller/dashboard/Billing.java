@@ -128,12 +128,15 @@ public class Billing implements Initializable {
         callThread(Type.GET_CART_DATA);
 
         discountConfig();
+
+//        Platform.runLater(()->{
+//            Stage stage = (Stage) genderL.getScene().getWindow();
+//            stage.setOnHiding( event -> new ClearCartAsync().execute());
+//        });
     }
 
     public void applyDiscountBnClick(MouseEvent mouseEvent) {
-
         String addDisc = addDiscTF.getText();
-
         if (!addDisc.isEmpty()){
             itemList.clear();
             itemList.removeAll();
@@ -150,7 +153,6 @@ public class Billing implements Initializable {
         }
 
     }
-
 
     private void discountConfig() {
 
@@ -235,9 +237,7 @@ public class Billing implements Initializable {
                 if (empty) {
                     setGraphic(null);
                     setText(null);
-
                 } else {
-
                     Button deleteBn = new Button();
                     ImageView iv = new ImageView(new ImageLoader().load("img/icon/delete_ic_white.png"));
                     iv.setFitHeight(12);
@@ -289,7 +289,7 @@ public class Billing implements Initializable {
                                          
                                               case when ? > 0 then ? else (coalesce(td.discount,0)) end as discount
                                              
-                                              ,td.discount_id,tpt.tax_id,
+                           ,td.discount_id,tpt.tax_id,tim.is_stockable,
                                               coalesce((coalesce(tpt.sgst,0)+coalesce(tpt.cgst,0)+coalesce(tpt.igst,0)),0)as total_gst,
                                               ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0)) totaltab,
                                        
@@ -315,24 +315,25 @@ public class Billing implements Initializable {
                                                             ( ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0))*case when ts.quantity_unit = 'TAB' then (coalesce(tc.mrp,0)/coalesce(tim.strip_tab,0)) else coalesce(tc.mrp,0) end )*
                                                             (case when ? > 0 then ? else (coalesce(td.discount,0)) end)/100),0)*100)/
                                               (100+(coalesce((coalesce(tpt.sgst,0)+coalesce(tpt.cgst,0)+coalesce(tpt.igst,0)),0)))*coalesce((coalesce(tpt.sgst,0)+coalesce(tpt.cgst,0)
-                                                  +coalesce(tpt.igst,0)),0)/100 as gstAmount
+                               +coalesce(tpt.igst,0)),0)/100 as gstAmount,
+                                ((coalesce(tc.strip,0)*coalesce(tim.strip_tab,0))+coalesce(tc.pcs,0)) as totalRequestQuantity
                                        from tbl_cart tc
                                                 left join tbl_stock ts on tc.stock_id = ts.stock_id
                                                 left join tbl_items_master tim on tim.item_id = ts.item_id
                                                 left join tbl_discount td on tim.discount_id = td.discount_id
                                                 left join tbl_product_tax tpt on tpt.tax_id = tim.gst_id
                                                 left outer join tbl_purchase_items t on ts.purchase_items_id = t.purchase_items_id
-                                                           
-                    """;
+                             
+                             where tc.created_by = """ + Login.currentlyLogin_Id;
             ps = connection.prepareStatement(qry);
+
+            System.out.println(ps);
 
 
             for (int i = 0; i < 10; i++) {
                 ps.setDouble(i+1,addDiscountPercentage);
             }
 
-
-            System.out.println(ps);
 
             rs = ps.executeQuery();
 
@@ -364,9 +365,13 @@ public class Billing implements Initializable {
 
                 int cartId = rs.getInt("cart_id");
                 int stockId = rs.getInt("stock_id");
-                SaleEntryModel sem = new SaleEntryModel(itemId, cartId, stockId, productName, saleRate, pack, strip, pcs, expiryDate, discountId,
-                        discount, gstId, totalGst, netAmount, hsn, iGst, cGst, sGst, gstAmount,
-                        purchaseRate, mrp, batch, mfrId, amountAsPerMrp);
+                double totalRequestQuantity = rs.getDouble("totalRequestQuantity");
+
+                boolean isStockable = rs.getBoolean("is_stockable");
+
+                SaleEntryModel sem = new SaleEntryModel(itemId, cartId, stockId, productName, saleRate, pack, strip, pcs, isStockable ? expiryDate : "-",
+                        discountId, discount, gstId, totalGst, netAmount, hsn, iGst, cGst, sGst, gstAmount,
+                        purchaseRate, mrp, batch, mfrId, amountAsPerMrp, totalRequestQuantity, isStockable);
 
 
                 if (!itemList.contains(sem)){
@@ -381,9 +386,7 @@ public class Billing implements Initializable {
                 netTotalAmount += netAmount;
                 totalAmtAsPerMrp += amountAsPerMrp;
             }
-
             setTableDate();
-
         } catch (SQLException e) {
             tableView.setPlaceholder(new Label("Something went wrong"));
             throw new RuntimeException(e);
@@ -391,7 +394,6 @@ public class Billing implements Initializable {
             DBConnection.closeConnection(connection, ps, rs);
         }
     }
-
 
     public void selectDoctor(MouseEvent mouseEvent) {
         customDialog.showFxmlDialog2("chooser/doctorChooser.fxml", "SELECT DOCTOR");
@@ -409,7 +411,6 @@ public class Billing implements Initializable {
     }
 
     public void clearAllBn(ActionEvent event) {
-
         Platform.runLater(() -> {
             ImageView image = new ImageView(new ImageLoader().load("img/icon/warning_ic.png"));
             image.setFitWidth(45);
@@ -433,15 +434,14 @@ public class Billing implements Initializable {
 
     private void clearAll() {
         Platform.runLater(() -> {
-
             Connection con = null;
             PreparedStatement ps = null;
-            String query = "TRUNCATE TABLE tbl_cart RESTART IDENTITY";
+            String query = "DELETE FROM tbl_cart WHERE created_by = ?";
 
             try {
                 con = dbConnection.getConnection();
                 ps = con.prepareStatement(query);
-
+                ps.setInt(1, Login.currentlyLogin_Id);
                 int res = ps.executeUpdate();
 
                 if (res >= 0) {
@@ -467,12 +467,13 @@ public class Billing implements Initializable {
     public void removeItem(int cartId) {
         Connection con = null;
         PreparedStatement ps = null;
-        String query = "DELETE FROM tbl_cart WHERE cart_id = ?";
+        String query = "DELETE FROM tbl_cart WHERE cart_id = ? and created_by = ?";
 
         try {
             con = dbConnection.getConnection();
             ps = con.prepareStatement(query);
             ps.setInt(1, cartId);
+            ps.setInt(2, Login.currentlyLogin_Id);
             int res = ps.executeUpdate();
             if (res >= 0) {
                 getCartData();
@@ -513,7 +514,7 @@ public class Billing implements Initializable {
 
     public void chooseItem(MouseEvent mouseEvent) {
         Main.primaryStage.setUserData(null);
-        customDialog.showFxmlDialog2("chooser/itemChooser.fxml", "SELECT ITEM");
+        customDialog.showFxmlDialog2("chooser/BillingitemChooser.fxml", "SELECT ITEM");
 
         if (Main.primaryStage.getUserData() instanceof ItemChooserModel icm) {
 
@@ -580,8 +581,26 @@ public class Billing implements Initializable {
                     return;
                 }
 
-                avlQuantity.setText(bcm.getFullQty());
-                tabPerStripL.setText(String.valueOf(bcm.getStripTab()));
+                if (icm.isStockable()) {
+
+                    avlQuantity.setText(bcm.getFullQty());
+                    tabPerStripL.setText(String.valueOf(bcm.getStripTab()));
+                    stripTf.setDisable(false);
+                    pcsTf.setDisable(false);
+                } else {
+                    avlQuantity.setText("∞");
+                    tabPerStripL.setText("");
+
+                    stripTf.setText("0");
+                    pcsTf.setText("1");
+                    stripTf.setDisable(true);
+                    pcsTf.setDisable(true);
+
+                }
+
+                saleRateTf.setEditable(false);
+                saleRateTf.setFocusTraversable(false);
+
                 itemNameL.setText(bcm.getItemName());
                 PriceTypeModel ptm = method.getStockPrice(bcm.getPurchaseItemId());
 
@@ -600,9 +619,10 @@ public class Billing implements Initializable {
 
                     try {
                         connection = new DBConnection().getConnection();
-                        String qry = "select * from tbl_cart where stock_id = ?";
+                        String qry = "select * from tbl_cart where stock_id = ? and created_by = ?";
                         ps = connection.prepareStatement(qry);
                         ps.setInt(1, bcm.getStockId());
+                        ps.setInt(2, Login.currentlyLogin_Id);
                         rs = ps.executeQuery();
                         if (rs.next()) {
                             double mrp = rs.getDouble("mrp");
@@ -740,9 +760,9 @@ public class Billing implements Initializable {
 
         String qry = "";
         if (method.isItemAvlInCart(bcm.getStockId())) {
-            qry = "UPDATE tbl_cart SET stock_id=?, MRP=?,  STRIP=?, PCS  = ? WHERE stock_id = " + bcm.getStockId();
+            qry = "UPDATE tbl_cart SET stock_id=?, MRP=?,  STRIP=?, PCS  = ? WHERE stock_id = " + bcm.getStockId() + " and created_by = ?";
         } else {
-            qry = "INSERT INTO TBL_CART(stock_id, MRP,  STRIP, PCS) VALUES (?,?,?,?)";
+            qry = "INSERT INTO TBL_CART(stock_id, MRP,  STRIP, PCS,created_by) VALUES (?,?,?,?,?)";
         }
         Connection connection = null;
         PreparedStatement ps = null;
@@ -754,6 +774,7 @@ public class Billing implements Initializable {
             ps.setDouble(2, saleRateD);
             ps.setInt(3, stripI);
             ps.setInt(4, pcsI);
+            ps.setInt(5, Login.currentlyLogin_Id);
 
             int res = ps.executeUpdate();
 
@@ -770,7 +791,6 @@ public class Billing implements Initializable {
 
 
     }
-
 
     private class MyAsyncTask extends AsyncTask<String, Integer, Boolean> {
         Type type;
@@ -852,6 +872,9 @@ public class Billing implements Initializable {
         mrpL.setText("");
         stripTf.setText("");
         pcsTf.setText("");
+        stripTf.setDisable(false);
+        pcsTf.setDisable(false);
+
 
     }
 
@@ -979,7 +1002,6 @@ public class Billing implements Initializable {
     }
 
     private void changeTableViewPatient(int index, int limit) {
-
         int totalPage = (int) (Math.ceil(filteredData.size() * 1.0 / rowsPerPage));
         Platform.runLater(() -> pagination.setPageCount(totalPage));
         colPatientSr.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(
@@ -1062,8 +1084,6 @@ public class Billing implements Initializable {
         try {
             receivedAmountDouble = Double.parseDouble(receivedAmountStr);
 
-            System.out.println("receivedAmountDouble-"+receivedAmountDouble);
-
         } catch (NumberFormatException e) {
             method.show_popup("Please enter valid received Amount",receivedAmountTf);
             return;
@@ -1118,8 +1138,56 @@ public class Billing implements Initializable {
 
         @Override
         public Boolean doInBackground(String... params) {
-            addSaleItem(patientId, billType,receivedAmountDouble);
+
+            boolean isAvailable = checkAllItemStock();
+            if (isAvailable) {
+                addSaleItem(patientId, billType, receivedAmountDouble);
+            }
             return true;
+        }
+
+        private boolean checkAllItemStock() {
+
+            ObservableList<SaleEntryModel> items = tableView.getItems();
+
+            boolean isAvailable = true;
+
+            Connection connection = null;
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            String qry = "select concat(quantity,'-',quantity_unit) as quantity from tbl_stock where  stock_id = ? and quantity >= ?";
+
+            try {
+                connection = new DBConnection().getConnection();
+                ps = connection.prepareStatement(qry);
+
+                for (SaleEntryModel sem : items) {
+                    ps.setInt(1, sem.getStockId());
+                    ps.setDouble(2, sem.getTotalRequestQuantity());
+                    rs = ps.executeQuery();
+
+                    if (!rs.next()) {
+                        isAvailable = false;
+
+                        Platform.runLater(() -> {
+                            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                            alert.setTitle("Quantity Not Available.");
+                            alert.setHeaderText("First delete this ( " + sem.getProductName() + ") item and then add it again.");
+                            alert.initOwner(Main.primaryStage);
+                            alert.show();
+                        });
+
+                        break;
+                    }
+                }
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            } finally {
+                DBConnection.closeConnection(connection, ps, rs);
+            }
+
+            return isAvailable;
         }
 
         @Override
@@ -1237,8 +1305,8 @@ public class Billing implements Initializable {
                     int resItem = 0;
                     String query = "INSERT INTO TBL_SALE_ITEMS(SALE_MAIN_ID, ITEM_ID, ITEM_NAME, " +
                             "sale_rate, STRIP, PCS, DISCOUNT, HSN_SAC, igst, sgst, cgst, NET_AMOUNT, TAX_AMOUNT," +
-                            "strip_tab,purchase_rate,mrp, PACK ,MFR_ID,BATCH ,EXPIRY_DATE,stock_id,additional_discount_percentage)" +
-                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                            "strip_tab,purchase_rate,mrp, PACK ,MFR_ID,BATCH ,EXPIRY_DATE,stock_id,additional_discount_percentage,is_stockable)" +
+                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                     ps = connection.prepareStatement(query);
 
                     for (SaleEntryModel model : items) {
@@ -1265,24 +1333,23 @@ public class Billing implements Initializable {
                         ps.setString(20,model.getExpiryDate());
                         ps.setInt(21,model.getStockId());
                         ps.setDouble(22, addDiscountPercentage);
+                        ps.setBoolean(23, model.isStockable());
 
                         resItem = ps.executeUpdate();
 
-                        if (resItem > 0) {
+                        if (model.isStockable() && resItem > 0) {
                             int pcs = model.getPcs();
                             if (model.getStrip() > 0) {
                                 int tab = model.getStrip() * method.getTbPerStrip(model.getItemId());
                                 pcs += tab;
                             }
+                            resItem = 0;
                             String qry = "UPDATE tbl_stock SET quantity = quantity-? WHERE  stock_id= ?";
                             psUpdateQty = connection.prepareStatement(qry);
                             psUpdateQty.setInt(1, pcs);
                             psUpdateQty.setInt(2, model.getStockId());
-                            psUpdateQty.executeUpdate();
-
+                            resItem = psUpdateQty.executeUpdate();
                         }
-
-                        System.out.println("count");
                     }
 
                     if(isDues && !isDuesInserted){
@@ -1290,13 +1357,17 @@ public class Billing implements Initializable {
                     }
 
                     if (resItem > 0) {
-                        psUpdateQty.close();
+
                         connection.commit();
                         addDiscTF.setText(String.valueOf(0));
                         patientModel = null;
                         Platform.runLater(() -> patientNameL.setText("SELECT PATIENT"));
                         clearAll();
                         new GenerateInvoice().billingInvoice(sale_main_id, false, null, new Label());
+
+                       if(psUpdateQty != null){
+                           psUpdateQty.close();
+                       }
                     }
 
                 }
@@ -1315,4 +1386,55 @@ public class Billing implements Initializable {
         }
 
     }
+
+    private static class ClearCartAsync extends AsyncTask<String, Integer, Boolean> {
+        @Override
+        public void onPreExecute() {
+
+        }
+
+        @Override
+        public Boolean doInBackground(String... params) {
+
+            cartClean();
+
+            return false;
+
+        }
+
+        private void cartClean() {
+
+            Connection con = null;
+            PreparedStatement ps = null;
+            String query = "DELETE FROM tbl_cart WHERE created_by = ?";
+            try {
+                con = new DBConnection().getConnection();
+                ps = con.prepareStatement(query);
+                ps.setInt(1, Login.currentlyLogin_Id);
+                int res = ps.executeUpdate();
+
+                if (res > 0) {
+                    System.out.println("Cart clean successfully.");
+                }
+
+            } catch (SQLException e) {
+                new CustomDialog().showAlertBox("ERROR", "Failed to Clear Cart !");
+                e.printStackTrace();
+            } finally {
+                DBConnection.closeConnection(con, ps, null);
+            }
+        }
+
+        @Override
+        public void onPostExecute(Boolean success) {
+
+        }
+
+        @Override
+        public void progressCallback(Integer... params) {
+
+        }
+    }
+
+
 }

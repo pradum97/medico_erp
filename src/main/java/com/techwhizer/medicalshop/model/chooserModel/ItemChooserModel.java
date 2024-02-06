@@ -12,10 +12,11 @@ public class ItemChooserModel {
     private String unit;
     private int tabPerStrip;
     private String composition,productTag,medicineDose,availableQuantity;
+    private boolean isStockable;
 
     public ItemChooserModel(int itemId, String itemName, String packing,
                              GstModel discountModel,String unit,int tabPerStrip,
-                            String composition, String productTag,String medicineDose,String availableQuantity) {
+                            String composition, String productTag,String medicineDose,String availableQuantity,boolean isStockable) {
         this.itemId = itemId;
         this.itemName = itemName;
         this.discountModel = discountModel;
@@ -26,6 +27,15 @@ public class ItemChooserModel {
         this.productTag = productTag;
         this.medicineDose = medicineDose;
         this.availableQuantity = availableQuantity;
+        this.isStockable = isStockable;
+    }
+
+    public boolean isStockable() {
+        return isStockable;
+    }
+
+    public void setStockable(boolean stockable) {
+        isStockable = stockable;
     }
 
     public String getAvailableQuantity() {

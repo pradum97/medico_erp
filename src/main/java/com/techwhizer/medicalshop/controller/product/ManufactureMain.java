@@ -29,7 +29,7 @@ import java.util.ResourceBundle;
 public class ManufactureMain implements Initializable {
     public TextField searchTf;
     public TableColumn<ManufacturerModal,String> colCreatedDate;
-    private int rowsPerPage = 8;
+    private int rowsPerPage = 200;
     public TextField manufactureNameTf;
     public TableView<ManufacturerModal> tableView;
     public TableColumn<ManufacturerModal,Integer> colSrNo;
@@ -45,7 +45,7 @@ public class ManufactureMain implements Initializable {
         method = new Method();
         dbConnection = new DBConnection();
         customDialog = new CustomDialog();
-
+        tableView.setFixedCellSize(28);
         callThread();
         manufactureNameTf.setFocusTraversable(false);
     }

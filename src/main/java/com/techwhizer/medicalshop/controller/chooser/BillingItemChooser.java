@@ -32,11 +32,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ResourceBundle;
 
-public class ItemChooser implements Initializable {
+public class BillingItemChooser implements Initializable {
     public ProgressIndicator progressBar;
     private int rowsPerPage = 100;
     public TextField searchTf;
@@ -89,6 +87,7 @@ public class ItemChooser implements Initializable {
             method.hideElement(progressBar);
             tableView.setPlaceholder(new Label(msg));
         }
+
         @Override
         public void progressCallback(Integer... params) {
 
@@ -100,7 +99,7 @@ public class ItemChooser implements Initializable {
         if (null != itemList) {
             itemList.clear();
         }
-       String msg ;
+        String msg;
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -109,7 +108,7 @@ public class ItemChooser implements Initializable {
             connection = dbConnection.getConnection();
 
             String qry = """
-                    select * from available_quantity_v where is_stockable = true
+                    select * from available_quantity_v where avl_qty_pcs > 0
                     """;
             ps = connection.prepareStatement(qry);
             rs = ps.executeQuery();
@@ -140,15 +139,15 @@ public class ItemChooser implements Initializable {
 
                 GstModel gm = new GstModel(gstId, hsn, sGst, cGst, iGst, gstName, null);
 
-                if (status == 1){
+                if (status == 1) {
                     if (Constant.ITEM_TYPE_PROHIBIT.equalsIgnoreCase(type)) {
                         if (Login.currentRoleName.equalsIgnoreCase("admin")) {
-                            itemList.add(new ItemChooserModel(itemId, itemName, packing, gm, unit, tabPerStrip,composition,tag,medicineDose,avlQty,isStockable));
+                            itemList.add(new ItemChooserModel(itemId, itemName, packing, gm, unit, tabPerStrip, composition, tag, medicineDose, avlQty,isStockable));
                         }
                     } else {
-                        itemList.add(new ItemChooserModel(itemId, itemName, packing, gm, unit, tabPerStrip,composition,tag,medicineDose,avlQty,isStockable));
+                        itemList.add(new ItemChooserModel(itemId, itemName, packing, gm, unit, tabPerStrip, composition, tag, medicineDose, avlQty,isStockable));
                     }
-                }else {
+                } else {
                     msg = "All items are disabled.";
                 }
             }
@@ -162,7 +161,6 @@ public class ItemChooser implements Initializable {
 
                 msg = "";
             } else {
-
                 msg = "Item not available";
             }
 
@@ -192,7 +190,7 @@ public class ItemChooser implements Initializable {
 
                 if (products.getItemName().toLowerCase().contains(lowerCaseFilter)) {
                     return true;
-                }  else if (products.getProductTag().toLowerCase().contains(lowerCaseFilter)) {
+                } else if (products.getProductTag().toLowerCase().contains(lowerCaseFilter)) {
                     return true;
                 } else return String.valueOf(products.getPacking()).toLowerCase().contains(lowerCaseFilter);
             });
@@ -245,12 +243,14 @@ public class ItemChooser implements Initializable {
                     String qtyStr = tableView.getItems().get(getIndex()).getAvailableQuantity();
                     int qty = qtyStr == null ? 0 : Integer.parseInt(qtyStr.split("-")[0]);
 
-                    Label qtyLabel = new Label(qtyStr);
+                    boolean isStockable =  tableView.getItems().get(getIndex()).isStockable();
 
-                    if (qty > 0 && qty < StockReport.lowQuantity) {
+                    Label qtyLabel = new Label(isStockable?qtyStr:"∞");
+
+                    if (isStockable && qty > 0 && qty < StockReport.lowQuantity) {
                         qtyLabel.setStyle("-fx-text-fill: white;-fx-font-weight: bold;-fx-background-color: #ff9933;" +
                                 "-fx-padding: 0px 3px 0px 3px;-fx-background-radius: 3px");
-                    } else if (qty == 0) {
+                    } else if ( isStockable && qty == 0) {
                         qtyLabel.setStyle("-fx-text-fill: white;-fx-font-weight: bold;-fx-background-color: red;" +
                                 "-fx-padding: 0px 3px 0px 3px;-fx-background-radius: 3px");
                     } else {
@@ -314,7 +314,7 @@ public class ItemChooser implements Initializable {
             }
 
         };
-colAvlQty.setCellFactory(cellQty);
+        colAvlQty.setCellFactory(cellQty);
         colAction.setCellFactory(cellFactory);
     }
 

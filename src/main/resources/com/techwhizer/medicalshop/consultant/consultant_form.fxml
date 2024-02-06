@@ -62,7 +62,7 @@
                                                 </HBox>
                                                 <HBox alignment="CENTER_LEFT">
                                                    <children>
-                                                      <Label text="Gender : ">
+                                                      <Label minWidth="55.0" prefWidth="55.0" text="Gender : ">
                                                          <font>
                                                             <Font name="System Bold" size="13.0" />
                                                          </font>
@@ -76,7 +76,7 @@
                                                 </HBox>
                                                 <HBox alignment="CENTER_LEFT" layoutX="342.0" layoutY="10.0" spacing="2.0">
                                                    <children>
-                                                      <Label text="Age :">
+                                                      <Label minWidth="35.0" prefWidth="35.0" text="Age :">
                                                          <font>
                                                             <Font name="System Bold" size="13.0" />
                                                          </font>
@@ -90,7 +90,7 @@
                                                 </HBox>
                                                 <HBox alignment="CENTER_LEFT" layoutX="499.0" layoutY="10.0" spacing="5.0">
                                                    <children>
-                                                      <Label text="Mob # : ">
+                                                      <Label minWidth="50.0" prefWidth="0.0" text="Mob # : ">
                                                          <font>
                                                             <Font name="System Bold" size="12.179104804992676" />
                                                          </font>

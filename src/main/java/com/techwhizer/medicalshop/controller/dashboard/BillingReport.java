@@ -235,6 +235,7 @@ public class BillingReport implements Initializable {
         if (null != toDateP) {
             toDateP.setValue(null);
         }
+        searchTf.setText("");
     }
 
     private void search_Item() {

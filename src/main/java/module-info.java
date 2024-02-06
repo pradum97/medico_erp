@@ -9,8 +9,8 @@ module com.techwhizer.medicalshop {
     requires org.apache.httpcomponents.httpmime;
     requires org.apache.httpcomponents.httpclient;
     requires java.base;
-    requires jasperreports;
     requires java.mail;
+    requires jasperreports;
     opens com.techwhizer.medicalshop to javafx.fxml;
     exports com.techwhizer.medicalshop;
     requires java.naming;

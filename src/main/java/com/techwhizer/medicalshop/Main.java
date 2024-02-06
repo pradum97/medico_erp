@@ -1,6 +1,10 @@
 package com.techwhizer.medicalshop;
 
+import com.techwhizer.medicalshop.controller.auth.Login;
+import com.techwhizer.medicalshop.controller.dashboard.Billing;
 import com.techwhizer.medicalshop.util.AppConfig;
+import com.techwhizer.medicalshop.util.DBConnection;
+import com.victorlaerte.asynctask.AsyncTask;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -9,7 +13,10 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.Objects;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.*;
 
 public class Main extends Application {
     public static Stage primaryStage;
@@ -17,6 +24,17 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         primaryStage = stage;
+
+//        new Timer().schedule(
+//                new TimerTask() {
+//                    @Override
+//                    public void run() {
+//                        if(Login.currentlyLogin_Id > 0){
+//                            new MyAsyncTask().execute();
+//                        }
+//                    }
+//                }, 0, 10000);
+
         Parent root = FXMLLoader.load(Objects.requireNonNull(Main.class.getResource("auth/login.fxml")));
       //  Parent root = FXMLLoader.load(Objects.requireNonNull(Main.class.getResource("dashboard.fxml")));
         stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream(AppConfig.APPLICATION_ICON))));
@@ -45,6 +63,7 @@ public class Main extends Application {
     public static void main(String... args) {
         launch(args);
     }
+
 
 
 }

@@ -79,6 +79,8 @@ select ts.stock_id,
        ts.quantity,
        ts.quantity_unit,
        tim.strip_tab,
+       tpm.purchase_main_id,
+       tpi.purchase_items_id,
        tab_to_strip(cast(ts.quantity as int), cast(tim.strip_tab as int),
                     ts.quantity_unit) as full_quantity,
        EXTRACT(EPOCH FROM ( convert_expiry_date(expiry_date)::timestamp - to_char(now(),'yyyy-MM-dd')::timestamp)) / 86400 as expiry_days_left,
@@ -93,7 +95,7 @@ from tbl_stock ts
 left join tbl_dealer td on td.dealer_id = tpm.dealer_id;
 
 CREATE OR REPLACE VIEW available_quantity_v as
-SELECT tim.item_id, items_name, unit, strip_tab, packing, company_id, mfr_id,
+SELECT tim.item_id,tim.is_stockable, items_name, unit, strip_tab, packing, company_id, mfr_id,
        discount_id, mr_id, gst_id, type, narcotic, item_type, status, created_by, created_date,
        is_active, composition, dose, tag,(concat((tpt.igst + tpt.cgst + tpt.sgst), ' %')) as totalGst,
     coalesce(get_available_quantity(tim.item_id,'STRIP'),'0')

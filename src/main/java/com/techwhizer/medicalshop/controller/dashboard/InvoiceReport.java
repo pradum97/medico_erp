@@ -530,7 +530,7 @@ public class InvoiceReport implements Initializable {
             Text text = new Text();
             text.setStyle("-fx-font-size: 12");
             cell.setGraphic(text);
-            text.setStyle("-fx-text-alignment: LEFT-CENTER ;");
+            text.setStyle("-fx-text-alignment: LEFT ;");
             cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
             text.wrappingWidthProperty().bind(columnName.widthProperty());
             text.textProperty().bind(cell.itemProperty());

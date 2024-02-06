@@ -1,6 +1,7 @@
 package com.techwhizer.medicalshop.method;
 
 import com.techwhizer.medicalshop.PropertiesLoader;
+import com.techwhizer.medicalshop.controller.auth.Login;
 import com.techwhizer.medicalshop.model.*;
 import com.techwhizer.medicalshop.util.DBConnection;
 import javafx.collections.FXCollections;
@@ -725,9 +726,10 @@ public class Method extends StaticData {
 
         try {
             connection = new DBConnection().getConnection();
-            String qry = "select stock_id from tbl_cart where stock_id = ?";
+            String qry = "select stock_id from tbl_cart where stock_id = ? and created_by = ?";
             ps = connection.prepareStatement(qry);
             ps.setInt(1, stockId);
+            ps.setInt(2, Login.currentlyLogin_Id);
             rs = ps.executeQuery();
 
             return rs.next();
@@ -736,9 +738,7 @@ public class Method extends StaticData {
         } finally {
             DBConnection.closeConnection(connection, ps, rs);
         }
-
     }
-
     public String decimalFormatter(Object o) {
         DecimalFormat formatter = new DecimalFormat("#0.00");
         return formatter.format(o);

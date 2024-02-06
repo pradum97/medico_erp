@@ -18,11 +18,12 @@ public class ReturnProductModel {
     private String returnableQuantity,displayMrp;
     private String displayUnit;
     private double returnDiscountAmount,amount,returnNetAmount;
+    private boolean isStockable;
 
     public ReturnProductModel(int saleItemID, String itemName, double netAmount, double mrp, String quantity, String saleDate, double discountAmount, String returnQuantity,
                               boolean isReturn, int stockId, double mrpPerTab, double discountPercentage,
                               String returnableQuantity,String displayMrp,String displayUnit,double returnDiscountAmount,
-                              double amount,double returnNetAmount) {
+                              double amount,double returnNetAmount,boolean isStockable) {
         this.saleItemID = saleItemID;
         this.itemName = itemName;
         this.netAmount = netAmount;
@@ -41,8 +42,16 @@ public class ReturnProductModel {
         this.returnDiscountAmount = returnDiscountAmount;
         this.amount = amount;
         this.returnNetAmount = returnNetAmount;
+        this.isStockable = isStockable;
     }
 
+    public boolean isStockable() {
+        return isStockable;
+    }
+
+    public void setStockable(boolean stockable) {
+        isStockable = stockable;
+    }
 
     public double getReturnNetAmount() {
         return returnNetAmount;

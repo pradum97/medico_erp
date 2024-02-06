@@ -23,11 +23,15 @@ public class ItemsModel {
     private String createdDate;
     private long tabPerStrip;
     private String hsn, fullUnit,productComposition,productTag,medicineDose;
+    private boolean isStockable;
+    double purchaseMrp;
+    double mrp;
+    double saleRate;
 
     public ItemsModel(int itemId, String productName, String unit, String packing, int company_id, String companyName, int mfr_id, int discount_id, Double discount,
                       int mr_id, String mrName, String mfrName, int gstId,
                       int cGst, int sGst, int iGst, String type, String narcotic, String itemType, int status, String createdDate,
-                      long tabPerStrip, String hsn, String fullUnit,String productComposition,String productTag,String medicineDose) {
+                      long tabPerStrip, String hsn, String fullUnit,String productComposition,String productTag,String medicineDose,boolean isStockable) {
         this.itemId = itemId;
         this.productName = productName;
         this.unit = unit;
@@ -55,7 +59,16 @@ public class ItemsModel {
         this.productComposition = productComposition;
         this.productTag = productTag;
         this.medicineDose = medicineDose;
+        this.isStockable = isStockable;
 
+    }
+
+    public boolean isStockable() {
+        return isStockable;
+    }
+
+    public void setStockable(boolean stockable) {
+        isStockable = stockable;
     }
 
     public String getMedicineDose() {
@@ -110,7 +123,7 @@ public class ItemsModel {
     public ItemsModel(String productName, String unit, String packing, int discount_id,
                       int gstId, double purchaseMrp, double mrp,
                       double saleRate, String type, String narcotic, String itemType, int status,
-                      long tabPerStrip,String productComposition,String productTag,String medicineDose) {
+                      long tabPerStrip,String productComposition,String productTag,String medicineDose,boolean isStockable) {
         this.productName = productName;
         this.unit = unit;
         this.packing = packing;
@@ -124,6 +137,34 @@ public class ItemsModel {
         this.productComposition = productComposition;
         this.productTag = productTag;
         this.medicineDose = medicineDose;
+        this.isStockable = isStockable;
+        this.purchaseMrp = purchaseMrp;
+        this.mrp = mrp;
+        this.saleRate = saleRate;
+    }
+
+    public double getPurchaseMrp() {
+        return purchaseMrp;
+    }
+
+    public void setPurchaseMrp(double purchaseMrp) {
+        this.purchaseMrp = purchaseMrp;
+    }
+
+    public double getMrp() {
+        return mrp;
+    }
+
+    public void setMrp(double mrp) {
+        this.mrp = mrp;
+    }
+
+    public double getSaleRate() {
+        return saleRate;
+    }
+
+    public void setSaleRate(double saleRate) {
+        this.saleRate = saleRate;
     }
 
     public int getMfr_id() {

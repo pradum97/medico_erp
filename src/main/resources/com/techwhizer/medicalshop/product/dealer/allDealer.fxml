@@ -64,7 +64,7 @@
                         <TableView fx:id="tableView" editable="true" focusTraversable="false" VBox.vgrow="ALWAYS">
                           <columns>
                             <TableColumn fx:id="colSrNo" maxWidth="50.0" minWidth="50.0" prefWidth="75.0" text="SL #" />
-                            <TableColumn fx:id="colName" minWidth="120.0" text="NAME " />
+                            <TableColumn fx:id="colName" minWidth="300.0" text="NAME " />
                               <TableColumn fx:id="colPhone" minWidth="120.0" text="PHONE" />
                               <TableColumn fx:id="colEmail" minWidth="120.0" text="EMAIL" />
                               <TableColumn fx:id="colDl" minWidth="120.0" text="DRUG LICENCE" />
