@@ -167,6 +167,7 @@ CREATE TABLE TBL_ITEMS_MASTER
     DOSE         VARCHAR(200) NOT NULL,
     TAG          VARCHAR(300) NOT NULL,
     is_stockable boolean,
+    department_code VARCHAR(50),
     foreign key (GST_ID) REFERENCES tbl_product_tax (TAX_ID),
     foreign key (CREATED_BY) REFERENCES tbl_users (user_id),
     foreign key (MFR_ID) REFERENCES tbl_manufacturer_list (MFR_ID),
@@ -515,6 +516,15 @@ CREATE  TABLE TBL_DUES(
     CREATED_BY INT,
     CREATED_DATE timestamp DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE TBL_DEPARTMENTS(
+    DEPARTMENT_ID SERIAL PRIMARY KEY ,
+    DEPARTMENT_NAME VARCHAR(300),
+    DEPARTMENT_CODE VARCHAR(50),
+    STATUS BOOLEAN DEFAULT TRUE,
+    CREATED_BY INT,
+    CREATED_DATE timestamp DEFAULT CURRENT_TIMESTAMP
+)
 
 
 

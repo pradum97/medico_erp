@@ -16,6 +16,7 @@ drop view if exists stock_v;
 --CREATE DUES TABLE
 
 -- CREATE ZERO GST
+-- CTEATE DEPARTMENT TABLE
 
 
 -- age to dob
@@ -57,3 +58,6 @@ ALTER TABLE tbl_cart ADD created_by int not null ;
 
 
 ALTER table tbl_sale_items add is_stockable boolean default true;
+
+
+ALTER table tbl_items_master add department_code VARCHAR(50) DEFAULT 'Medicine';

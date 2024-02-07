@@ -2,10 +2,12 @@ package com.techwhizer.medicalshop.controller.update.product;
 
 import com.techwhizer.medicalshop.CustomDialog;
 import com.techwhizer.medicalshop.Main;
+import com.techwhizer.medicalshop.controller.common.model.DepartmentModel;
 import com.techwhizer.medicalshop.method.GetTax;
 import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.method.StaticData;
 import com.techwhizer.medicalshop.model.*;
+import com.techwhizer.medicalshop.util.CommonUtil;
 import com.techwhizer.medicalshop.util.DBConnection;
 import com.victorlaerte.asynctask.AsyncTask;
 import javafx.application.Platform;
@@ -51,6 +53,7 @@ public class ItemMasterUpdate implements Initializable {
     public HBox mrpContainer;
     public TextField mrpTf;
     public VBox stockableContaier;
+    public ComboBox<DepartmentModel> departmentCom;
     private Method method;
     public Label stripTabLabel;
     public VBox stripTabContainer;
@@ -168,6 +171,7 @@ public class ItemMasterUpdate implements Initializable {
             if (!icm.isStockable()){
                 getMrp(icm.getItemId());
             }
+            departmentCom.setItems(CommonUtil.getDepartmentsList());
             getGst();
             Platform.runLater(ItemMasterUpdate.this::setComboBoxData);
             return true;
@@ -196,8 +200,6 @@ public class ItemMasterUpdate implements Initializable {
         }else {
             discountCom.setItems((ObservableList<DiscountModel>) method.getDiscount().get("data"));
         }
-
-
 
         setData(icm);
         if (icm.getMr_id() > 0) {
@@ -278,7 +280,8 @@ public class ItemMasterUpdate implements Initializable {
             connection = dbConnection.getConnection();
             connection.setAutoCommit(false);
             String qry = "UPDATE TBL_ITEMS_MASTER SET ITEMS_NAME = ?, UNIT= ?, PACKING= ?, COMPANY_ID= ?, mfr_id= ?, DISCOUNT_ID= ?, mr_id= ?, GST_ID= ?,\n" +
-                    "                             TYPE= ?, NARCOTIC= ?, ITEM_TYPE= ?, STATUS= ? ,STRIP_TAB= ?,composition=?,tag=?,dose = ? WHERE item_id = ?";
+                    "                             TYPE= ?, NARCOTIC= ?, ITEM_TYPE= ?, STATUS= ? ,STRIP_TAB= ?," +
+                    "composition=?,tag=?,dose = ?,department_code = ? WHERE item_id = ?";
 
             ps = connection.prepareStatement(qry);
 
@@ -319,7 +322,8 @@ public class ItemMasterUpdate implements Initializable {
             ps.setString(14, im.getProductComposition());
             ps.setString(15, im.getProductTag());
             ps.setString(16, im.getMedicineDose());
-            ps.setInt(17, icm.getItemId());
+            ps.setString(17, im.getDepartmentCode());
+            ps.setInt(18, icm.getItemId());
 
             int res = ps.executeUpdate();
             if (res > 0) {
@@ -415,6 +419,9 @@ public class ItemMasterUpdate implements Initializable {
             unitCom.setItems(staticData.getUnit());
             unitCom.getSelectionModel().select(icm.getUnit());
         }
+
+        DepartmentModel departmentModel = CommonUtil.getDepartment(icm.getDepartmentCode());
+        departmentCom.getSelectionModel().select(departmentModel);
     }
 
     public void updateBn(ActionEvent actionEvent) {
@@ -448,11 +455,18 @@ public class ItemMasterUpdate implements Initializable {
         String medicineDose = medicineDoseTf.getText();
         String mrp = mrpTf.getText();
 
+
         long stripTabL = 0;
         double mrpD = 0;
 
         if (productName.isEmpty()) {
             method.show_popup("Please enter product name", productNameTf);
+            return;
+        } else if (tag.isEmpty()) {
+            method.show_popup("Please enter product tag", productTag);
+            return;
+        } else if (departmentCom.getSelectionModel().isEmpty()) {
+            method.show_popup("Please select item department", departmentCom);
             return;
         }
 
@@ -498,13 +512,7 @@ public class ItemMasterUpdate implements Initializable {
         }
 
 
-
-
-        if (tag.isEmpty()) {
-            method.show_popup("Please enter product tag", productTag);
-            return;
-        }
-         else if (hsnCom.getSelectionModel().isEmpty()) {
+        if (hsnCom.getSelectionModel().isEmpty()) {
             method.show_popup("Please select hsn code", hsnCom);
             return;
         }
@@ -512,6 +520,8 @@ public class ItemMasterUpdate implements Initializable {
         String type = typeCom.getSelectionModel().getSelectedItem();
         String narcotic = narcoticCom.getSelectionModel().getSelectedItem();
         String itemType = itemTypeCom.getSelectionModel().getSelectedItem();
+        String departmentCode = departmentCom.getSelectionModel().getSelectedItem().getDepartmentCode();
+
         int status = 0;
         switch (statusCom.getSelectionModel().getSelectedItem()) {
             case "CONTINUE" -> status = 1;
@@ -526,8 +536,11 @@ public class ItemMasterUpdate implements Initializable {
             discountId = discountCom.getSelectionModel().getSelectedItem().getDiscount_id();
         }
 
+
+        System.out.println("departmentCode-"+departmentCode);
+
         ItemsModel itemsModel = new ItemsModel(productName, unit, null, discountId, gstId,
-                mrpD, mrpD, mrpD, type, narcotic, itemType, status, stripTabL,composition,tag,medicineDose,icm.isStockable());
+                mrpD, mrpD, mrpD, type, narcotic, itemType, status, stripTabL,composition,tag,medicineDose,icm.isStockable(),departmentCode);
 
         UpdateDataTask task = new UpdateDataTask(itemsModel);
         task.setDaemon(false);

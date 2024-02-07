@@ -1,5 +1,6 @@
 package com.techwhizer.medicalshop.util;
 
+import com.techwhizer.medicalshop.controller.common.model.DepartmentModel;
 import com.techwhizer.medicalshop.model.ConsultationSetupModel;
 import com.techwhizer.medicalshop.model.DoctorModel;
 import com.techwhizer.medicalshop.model.SalutationModel;
@@ -87,6 +88,74 @@ public class CommonUtil {
 
         );
 
+    }
+
+    public static ObservableList<DepartmentModel> getDepartmentsList(){
+
+       ObservableList<DepartmentModel> departmentList = FXCollections.observableArrayList();
+
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+
+            connection = new DBConnection().getConnection();
+
+            String query = """
+                    select * from tbl_departments order by department_name asc
+                    """;
+            ps = connection.prepareStatement(query);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                int departmentId = rs.getInt("department_id");
+                String departmentName = rs.getString("department_name");
+                String departmentCode = rs.getString("department_code");
+                departmentList.add(new DepartmentModel(departmentId,departmentName,departmentCode));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBConnection.closeConnection(connection, ps, rs);
+        }
+
+        return departmentList;
+    }
+
+
+    public static DepartmentModel getDepartment(String departmentCode){
+
+        DepartmentModel departmentModel = new  DepartmentModel();
+
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+
+            connection = new DBConnection().getConnection();
+
+            String query = """
+                    select * from tbl_departments where department_code = ? order by department_name asc
+                    """;
+            ps = connection.prepareStatement(query);
+            ps.setString(1,departmentCode);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                int departmentId = rs.getInt("department_id");
+                String departmentName = rs.getString("department_name");
+                String deptCode = rs.getString("department_code");
+               departmentModel = new DepartmentModel(departmentId,departmentName,deptCode);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBConnection.closeConnection(connection, ps, rs);
+        }
+
+        return departmentModel;
     }
 
     public static ObservableList<String> getPaymentMethod(){

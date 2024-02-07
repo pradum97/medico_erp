@@ -24,14 +24,17 @@ public class ItemsModel {
     private long tabPerStrip;
     private String hsn, fullUnit,productComposition,productTag,medicineDose;
     private boolean isStockable;
-    double purchaseMrp;
-    double mrp;
-    double saleRate;
+    private double purchaseMrp;
+    private  double mrp;
+    private double saleRate;
+    private String departmentName, departmentCode;
+
 
     public ItemsModel(int itemId, String productName, String unit, String packing, int company_id, String companyName, int mfr_id, int discount_id, Double discount,
                       int mr_id, String mrName, String mfrName, int gstId,
                       int cGst, int sGst, int iGst, String type, String narcotic, String itemType, int status, String createdDate,
-                      long tabPerStrip, String hsn, String fullUnit,String productComposition,String productTag,String medicineDose,boolean isStockable) {
+                      long tabPerStrip, String hsn, String fullUnit,String productComposition,String productTag,String medicineDose,
+                      boolean isStockable,String departmentName,String departmentCode) {
         this.itemId = itemId;
         this.productName = productName;
         this.unit = unit;
@@ -60,7 +63,25 @@ public class ItemsModel {
         this.productTag = productTag;
         this.medicineDose = medicineDose;
         this.isStockable = isStockable;
+        this.departmentName = departmentName;
+        this.departmentCode = departmentCode;
 
+    }
+
+    public String getDepartmentName() {
+        return departmentName;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
+    }
+
+    public String getDepartmentCode() {
+        return departmentCode;
+    }
+
+    public void setDepartmentCode(String departmentCode) {
+        this.departmentCode = departmentCode;
     }
 
     public boolean isStockable() {
@@ -123,7 +144,8 @@ public class ItemsModel {
     public ItemsModel(String productName, String unit, String packing, int discount_id,
                       int gstId, double purchaseMrp, double mrp,
                       double saleRate, String type, String narcotic, String itemType, int status,
-                      long tabPerStrip,String productComposition,String productTag,String medicineDose,boolean isStockable) {
+                      long tabPerStrip,String productComposition,String productTag,String medicineDose,
+                      boolean isStockable,String departmentCode) {
         this.productName = productName;
         this.unit = unit;
         this.packing = packing;
@@ -141,6 +163,7 @@ public class ItemsModel {
         this.purchaseMrp = purchaseMrp;
         this.mrp = mrp;
         this.saleRate = saleRate;
+        this.departmentCode = departmentCode;
     }
 
     public double getPurchaseMrp() {

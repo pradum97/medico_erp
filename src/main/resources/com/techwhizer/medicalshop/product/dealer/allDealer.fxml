@@ -65,11 +65,11 @@
                           <columns>
                             <TableColumn fx:id="colSrNo" maxWidth="50.0" minWidth="50.0" prefWidth="75.0" text="SL #" />
                             <TableColumn fx:id="colName" minWidth="300.0" text="NAME " />
-                              <TableColumn fx:id="colPhone" minWidth="120.0" text="PHONE" />
-                              <TableColumn fx:id="colEmail" minWidth="120.0" text="EMAIL" />
-                              <TableColumn fx:id="colDl" minWidth="120.0" text="DRUG LICENCE" />
-                              <TableColumn fx:id="colGstNum" minWidth="120.0" text="GST NUMBER" />
-                              <TableColumn fx:id="colAddress" minWidth="120.0" text="ADDRESS" />
+                              <TableColumn fx:id="colPhone" maxWidth="120.0" minWidth="120.0" text="PHONE" />
+                              <TableColumn fx:id="colEmail" minWidth="220.0" text="EMAIL" />
+                              <TableColumn fx:id="colAddress" maxWidth="-1.0" minWidth="250.0" prefWidth="-1.0" text="ADDRESS" />
+                              <TableColumn fx:id="colDl" maxWidth="200.0" minWidth="200.0" prefWidth="-1.0" text="DRUG LICENCE" />
+                              <TableColumn fx:id="colGstNum" maxWidth="200.0" minWidth="200.0" text="GST NUMBER" />
                               <TableColumn fx:id="colState" minWidth="90.0" text="STATE" />
                               <TableColumn fx:id="colDate" minWidth="100.0" text="DATE" />
                               <TableColumn fx:id="colAction" minWidth="60.0" text="ACTION" />

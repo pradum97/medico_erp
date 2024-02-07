@@ -74,6 +74,48 @@
                                                                 <TextField fx:id="productNameTf" minHeight="45.0" minWidth="510.0" onKeyPressed="#enterKeyPress" prefHeight="45.0" prefWidth="510.0" promptText="Enter item name Enter Description  ( Max 200 Characters  ) :" style="-fx-border-color: grey; -fx-border-radius: 4;" />
                                                             </children>
                                                         </VBox>
+                                          <HBox spacing="10.0">
+                                             <children>
+                                                <VBox prefHeight="42.0" prefWidth="334.0" HBox.hgrow="ALWAYS">
+                                                   <children>
+                                                      <Label text="PRODUCT TAG :">
+                                                         <font>
+                                                            <Font name="Arial Black" size="10.0" />
+                                                         </font>
+                                                         <VBox.margin>
+                                                            <Insets left="3.0" />
+                                                         </VBox.margin>
+                                                      </Label>
+                                                      <HBox>
+                                                         <children>
+                                                            <TextField fx:id="productTag" minHeight="27.0" onKeyPressed="#enterKeyPress" prefHeight="27.0" prefWidth="192.0" promptText="Enter product tag" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
+                                                         </children>
+                                                      </HBox>
+                                                   </children>
+                                                </VBox>
+                                                <VBox prefWidth="250.0">
+                                                   <children>
+                                                      <Label text="DEPARTMENT *">
+                                                         <font>
+                                                            <Font name="Arial Black" size="10.0" />
+                                                         </font>
+                                                         <VBox.margin>
+                                                            <Insets />
+                                                         </VBox.margin>
+                                                      </Label>
+                                                      <HBox>
+                                                         <children>
+                                                            <ComboBox fx:id="departmentCom" minHeight="27.0" onKeyPressed="#enterKeyPress" prefHeight="27.0" prefWidth="373.0" promptText="Select Department" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS">
+                                                               <HBox.margin>
+                                                                  <Insets />
+                                                               </HBox.margin>
+                                                            </ComboBox>
+                                                         </children>
+                                                      </HBox>
+                                                   </children>
+                                                </VBox>
+                                             </children>
+                                          </HBox>
                                           <HBox fx:id="mrpContainerHB">
                                              <children>
                                                 <VBox HBox.hgrow="ALWAYS">
@@ -92,7 +134,7 @@
                                              <children>
                                                 <HBox spacing="10.0">
                                                    <children>
-                                                      <VBox prefWidth="417.0" HBox.hgrow="ALWAYS">
+                                                      <VBox prefHeight="42.0" prefWidth="351.0" HBox.hgrow="ALWAYS">
                                                          <children>
                                                             <Label text="COMPOSITION *">
                                                                <font>
@@ -104,7 +146,7 @@
                                                             </Label>
                                                             <HBox>
                                                                <children>
-                                                                  <TextField fx:id="compositionTf" minHeight="27.0" onKeyPressed="#enterKeyPress" prefHeight="27.0" prefWidth="294.0" promptText="Enter medicine composition" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
+                                                                  <TextField fx:id="compositionTf" minHeight="27.0" onKeyPressed="#enterKeyPress" prefHeight="27.0" prefWidth="359.0" promptText="Enter medicine composition" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
                                                                </children>
                                                             </HBox>
                                                          </children>
@@ -175,23 +217,6 @@
                                           </VBox>
                                                         <HBox spacing="10.0">
                                                             <children>
-                                                <VBox prefHeight="42.0" prefWidth="277.0" HBox.hgrow="ALWAYS">
-                                                   <children>
-                                                      <Label text="PRODUCT TAG :">
-                                                         <font>
-                                                            <Font name="Arial Black" size="10.0" />
-                                                         </font>
-                                                         <VBox.margin>
-                                                            <Insets left="3.0" />
-                                                         </VBox.margin>
-                                                      </Label>
-                                                      <HBox>
-                                                         <children>
-                                                            <TextField fx:id="productTag" minHeight="27.0" onKeyPressed="#enterKeyPress" prefHeight="27.0" prefWidth="192.0" promptText="Enter product tag" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
-                                                         </children>
-                                                      </HBox>
-                                                   </children>
-                                                </VBox>
                                                                 <VBox HBox.hgrow="ALWAYS">
                                                                     <children>
                                                                         <Label text="MANUFACTURERS : ">
@@ -202,11 +227,15 @@
                                                                                 <Insets left="3.0" />
                                                                             </VBox.margin>
                                                                         </Label>
-                                                                        <Label fx:id="mfrL" alignment="CENTER" minHeight="27.0" minWidth="323.0" onMouseClicked="#chooseMfr" prefHeight="27.0" style="-fx-border-color: grey; -fx-border-radius: 3; -fx-cursor: hand; -fx-font-size: 11;" text="SELECT MANUFACTURER" textAlignment="CENTER">
-                                                                            <font>
-                                                                                <Font size="11.0" />
-                                                                            </font>
-                                                                        </Label>
+                                                      <HBox>
+                                                         <children>
+                                                                              <Label fx:id="mfrL" alignment="CENTER" minHeight="27.0" minWidth="323.0" onMouseClicked="#chooseMfr" prefHeight="27.0" prefWidth="619.0" style="-fx-border-color: grey; -fx-border-radius: 3; -fx-cursor: hand; -fx-font-size: 11;" text="SELECT MANUFACTURER" textAlignment="CENTER">
+                                                                                  <font>
+                                                                                      <Font size="11.0" />
+                                                                                  </font>
+                                                                              </Label>
+                                                         </children>
+                                                      </HBox>
                                                                     </children>
                                                                 </VBox>
                                                             </children>
