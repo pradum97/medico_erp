@@ -322,8 +322,6 @@ public class GenerateInvoice {
                 String address = rs.getString("address");
 
                 String gender = rs.getString("gender");
-                String age = rs.getString("age");
-
                 String weight = rs.getString("weight");
                 String bp = rs.getString("bp");
                 String pulse = rs.getString("pulse");
@@ -336,8 +334,6 @@ public class GenerateInvoice {
                 String cns = rs.getString("cns");
                 String chest = rs.getString("chest");
                 String  uhid_no= rs.getString("uhid_no");
-
-                param.put("age", age);
                 param.put("gender", String.valueOf(gender.charAt(0)).toUpperCase());
                 param.put("weight", weight);
                 param.put("name", name);

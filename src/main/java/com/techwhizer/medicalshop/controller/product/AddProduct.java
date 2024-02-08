@@ -78,10 +78,13 @@ public class AddProduct implements Initializable {
         method.hideElement(progressBar);
         stripTabContainer.setDisable(true);
         callInitializeThread();
-
         selectionChooser();
-
         setRadioGroup();
+
+        Platform.runLater(() -> {
+            Stage stage = (Stage) stripTabLabel.getScene().getWindow();
+            stage.setMaximized(true);
+        });
 
     }
 

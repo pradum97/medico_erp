@@ -91,7 +91,6 @@ public class Billing implements Initializable {
     public TableColumn<PatientModel, String> colPatientName;
     public Pagination pagination;
     public Label genderL;
-    public Label guardianNameL;
     public TextField receivedAmountTf;
     public ImageView applyDiscountBn;
     private CustomDialog customDialog;
@@ -129,10 +128,10 @@ public class Billing implements Initializable {
 
         discountConfig();
 
-//        Platform.runLater(()->{
-//            Stage stage = (Stage) genderL.getScene().getWindow();
-//            stage.setOnHiding( event -> new ClearCartAsync().execute());
-//        });
+        Platform.runLater(()->{
+            Stage stage = (Stage) genderL.getScene().getWindow();
+           stage.setMaximized(true);
+        });
     }
 
     public void applyDiscountBnClick(MouseEvent mouseEvent) {
@@ -1036,7 +1035,7 @@ public class Billing implements Initializable {
                     Hyperlink admNumHl = new Hyperlink(tableViewPatient.getItems().get(getIndex()).getAdmissionNumber());
 
                     admNumHl.setStyle("-fx-background-color: transparent; -fx-text-fill: blue;" +
-                            "-fx-border-color: transparent;-fx-font-size: 12;-fx-alignment: center-left");
+                            "-fx-border-color: transparent;-fx-font-size: 10px;-fx-alignment: center-left");
 
                     admNumHl.setMinWidth(130);
 
@@ -1047,7 +1046,6 @@ public class Billing implements Initializable {
                         genderL.setText(patientModel.getGender());
                         patientAgeL.setText(patientModel.getAge());
                         patientAddressL.setText(patientModel.getAddress());
-                        guardianNameL.setText(patientModel.getGuardianName());
                                            });
                     HBox managebtn = new HBox(admNumHl);
                     managebtn.setStyle("-fx-alignment: center-left");

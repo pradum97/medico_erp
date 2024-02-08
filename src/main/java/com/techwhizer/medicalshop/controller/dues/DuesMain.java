@@ -18,6 +18,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.net.URL;
@@ -89,6 +90,11 @@ public class DuesMain implements Initializable {
         data.put("to_date",toDataDP.getEditor().getText());
 
         startThread(data);
+
+        Platform.runLater(() -> {
+            Stage stage = (Stage) tableview.getScene().getWindow();
+            stage.setMaximized(true);
+        });
     }
 
     public void searchBnClick(ActionEvent actionEvent) {

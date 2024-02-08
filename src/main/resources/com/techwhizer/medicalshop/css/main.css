@@ -1,9 +1,15 @@
+.body{
+    -fx-font-size: 10px;
+}
+
+
+
 .button {
     -fx-cursor: hand;
 }
 
 .text-input {
-    -fx-font-size: 14px;
+    -fx-font-size: 11px;
 }
 
 .context-menu {
@@ -97,20 +103,21 @@
 }
 
 .table-view .column-header .label {
-    -fx-padding: 0.5em;
+    -fx-padding: 0.4em;
     -fx-text-fill: black;
     -fx-alignment: center-left;
+    -fx-font-size: 9px;
 }
 
 .table-view .table-cell {
-    -fx-padding: 0.5em;
+    -fx-padding: 0.3em;
     -fx-background-color: transparent;
     -fx-border-color: transparent -fx-table-cell-border-color -fx-table-cell-border-color transparent;
     -fx-alignment:center-left;
     -fx-table-cell-border-color: transparent;
     -fx-text-fill: black;
-    -fx-cell-size: 30;
-    -fx-font-size: 12;
+    -fx-cell-size: 25;
+    -fx-font-size: 10;
 }
 
 

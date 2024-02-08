@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.auth.Login">
+<BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.auth.Login">
    <center>
       <VBox alignment="CENTER" fillWidth="false" prefHeight="700.0" prefWidth="800.0">
 
@@ -35,7 +43,7 @@
                         <Insets left="3.0" />
                      </VBox.margin>
                          </Label>
-                         <TextField fx:id="email_f" onKeyReleased="#enterPress" prefHeight="37.0" promptText="Enter email  / username / phone" style="-fx-background-color: white; -fx-border-color: grey; -fx-border-radius: 4;" text="admin">
+                         <TextField fx:id="email_f" onKeyReleased="#enterPress" prefHeight="37.0" promptText="Enter email  / username / phone" style="-fx-background-color: white; -fx-border-color: grey; -fx-border-radius: 4;">
                              <font>
                                  <Font name="Arial" size="12.0" />
                              </font>
@@ -57,7 +65,7 @@
                               <Insets left="3.0" />
                            </VBox.margin>
                                </Label>
-                               <PasswordField fx:id="password_f" onKeyReleased="#enterPress" prefHeight="37.0" promptText="Enter password" style="-fx-background-color: white; -fx-border-color: grey; -fx-border-radius: 4;" text="admin">
+                               <PasswordField fx:id="password_f" onKeyReleased="#enterPress" prefHeight="37.0" promptText="Enter password" style="-fx-background-color: white; -fx-border-color: grey; -fx-border-radius: 4;">
                                    <font>
                                        <Font name="Arial" size="12.0" />
                                    </font>

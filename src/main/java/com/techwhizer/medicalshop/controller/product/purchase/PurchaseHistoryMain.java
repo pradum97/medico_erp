@@ -20,6 +20,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.net.URL;
@@ -77,7 +78,10 @@ public class PurchaseHistoryMain implements Initializable {
 
         setDefaultValue();
 
-
+        Platform.runLater(()->{
+            Stage stage = (Stage) searchTf.getScene().getWindow();
+            stage.setMaximized(true);
+        });
 
     }
 

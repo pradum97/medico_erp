@@ -1,4 +1,4 @@
-
+--view count \dv
 -------------------09-Jan-2024---------------------
 
 drop view if exists print_consultant_slip_v;
@@ -38,6 +38,8 @@ ALTER TABLE tbl_sale_main
 
 ALTER TABLE tbl_sale_items ADD ADDITIONAL_DISCOUNT_PERCENTAGE numeric DEFAULT 0;
 
+
+
 ALTER TABLE TBL_RETURN_ITEMS ADD DISCOUNT_AMOUNT numeric;
 ALTER TABLE TBL_RETURN_ITEMS ADD AMOUNT numeric;
 ALTER TABLE TBL_RETURN_ITEMS ADD NET_AMOUNT numeric;
@@ -61,3 +63,7 @@ ALTER table tbl_sale_items add is_stockable boolean default true;
 
 
 ALTER table tbl_items_master add department_code VARCHAR(50) DEFAULT 'Medicine';
+
+
+ALTER TABLE tbl_patient
+    DROP COLUMN age;

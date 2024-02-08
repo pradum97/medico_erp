@@ -6,6 +6,7 @@ import com.techwhizer.medicalshop.controller.product.purchase.model.PurchaseHist
 import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.util.DBConnection;
 import com.victorlaerte.asynctask.AsyncTask;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,6 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 
 import java.net.URL;
 import java.sql.Connection;
@@ -64,7 +66,10 @@ public class PurchaseHistoryItems implements Initializable {
             dealerAddressL.setText(dealerAddress);
 
             startThread(purchaseMainId);
-
+//            Platform.runLater(()->{
+//                Stage stage = (Stage) dealerAddressL.getScene().getWindow();
+//                stage.setMaximized(true);
+//            });
         }
 
     }

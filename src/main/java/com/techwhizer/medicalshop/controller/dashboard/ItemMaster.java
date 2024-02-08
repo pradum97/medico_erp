@@ -40,6 +40,7 @@ public class ItemMaster implements Initializable {
     public Label createdDate;
     public Label statusL;
     public Button refresh_bn;
+    public HBox itemDetailsContainer;
     int rowsPerPage = 30;
 
     public TextField searchTf;
@@ -78,6 +79,8 @@ public class ItemMaster implements Initializable {
         setToolTip(colMfr);
         setToolTip(mrName);
         setToolTip(colCompany);
+
+        method.hideElement(itemDetailsContainer);
 
     }
 

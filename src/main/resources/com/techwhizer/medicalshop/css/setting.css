@@ -1,3 +1,9 @@
+.body{
+    -fx-font-size: 11px;
+}
+
+
+
 .context-menu {
     -fx-background-color: #dbdcde;
     -fx-border-color: transparent;

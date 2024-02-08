@@ -24,6 +24,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.net.URL;
@@ -67,6 +68,10 @@ public class AllDealer implements Initializable {
 
         tableView.setColumnResizePolicy((param) -> true );
         Platform.runLater(() -> customResize(tableView));
+        Platform.runLater(()->{
+            Stage stage = (Stage) searchTf.getScene().getWindow();
+            stage.setMaximized(true);
+        });
     }
 
     private void callThread() {

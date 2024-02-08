@@ -69,6 +69,11 @@ public class PurchaseMain implements Initializable {
         method.hideElement(progressBar);
 
         setData();
+
+        Platform.runLater(()->{
+            Stage stage = (Stage) submitButton.getScene().getWindow();
+            stage.setMaximized(true);
+        });
     }
 
     private void setData() {

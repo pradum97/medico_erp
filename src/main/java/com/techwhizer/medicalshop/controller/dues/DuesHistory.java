@@ -15,6 +15,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
+
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -57,13 +59,16 @@ public class DuesHistory implements Initializable {
             String patientAddress = (String) map.get("patient_address");
             patientNameL.setText(patientName);
             patientAddressL.setText(patientAddress);
-
             new MyAsyncTask(map).execute();
 
         } else {
             customDialog.showAlertBox("", "Something went wrong. Please re-open.");
         }
 
+        Platform.runLater(() -> {
+            Stage stage = (Stage) patientNameL.getScene().getWindow();
+            stage.setMaximized(true);
+        });
     }
 
     private class MyAsyncTask extends AsyncTask<String, Integer, Boolean> {

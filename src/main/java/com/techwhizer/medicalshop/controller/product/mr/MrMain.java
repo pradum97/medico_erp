@@ -16,6 +16,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.stage.Stage;
 
 import java.net.URL;
 import java.sql.Connection;
@@ -54,6 +55,10 @@ public class MrMain implements Initializable {
         customDialog = new CustomDialog();
         tableView.setFixedCellSize(28);
         callThread();
+        Platform.runLater(()->{
+            Stage stage = (Stage) searchTf.getScene().getWindow();
+            stage.setMaximized(true);
+        });
     }
 
     private void callThread() {
