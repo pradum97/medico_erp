@@ -50,6 +50,7 @@ public class ReturnMedicine implements Initializable {
     private ObservableList<ReturnProductModel> itemList = FXCollections.observableArrayList();
     private String saleInvoiceNumber;
     private double totalRefundAmount, totalDiscountAmount;
+    private int saleMainId;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -91,13 +92,14 @@ public class ReturnMedicine implements Initializable {
             connection = new DBConnection().getConnection();
             connection.setAutoCommit(false);
             String returnMainQuery = """
-                    INSERT INTO TBL_RETURN_MAIN(INVOICE_NUMBER, RETURN_BY_ID, REFUND_AMOUNT,REMARK) VALUES (?,?,?,?)
+                    INSERT INTO TBL_RETURN_MAIN(INVOICE_NUMBER, RETURN_BY_ID, REFUND_AMOUNT,REMARK,sale_main_id) VALUES (?,?,?,?,?)
                     """;
             ps = connection.prepareStatement(returnMainQuery, new String[]{"return_main_id"});
             ps.setString(1, invoiceNumber);
             ps.setInt(2, returnBy);
             ps.setDouble(3, totalRefundAmount);
             ps.setString(4, remark);
+            ps.setInt(5, saleMainId);
 
             if (ps.executeUpdate() > 0) {
                 rs = ps.getGeneratedKeys();
@@ -216,7 +218,7 @@ public class ReturnMedicine implements Initializable {
 
             String query = """
                 
-                    select tsi.sale_item_id ,(TO_CHAR(tsm.sale_date, 'dd-MM-yyyy')) as sale_date,tsi.item_name,
+                    select tsi.sale_item_id,tsm.sale_main_id ,(TO_CHAR(tsm.sale_date, 'dd-MM-yyyy')) as sale_date,tsi.item_name,
                            concat(tsi.strip*case when tsi.strip_tab > 0 then tsi.strip_tab else 1 end+tsi.pcs,'-',
                                   (case when tsi.strip > 0 then 'TAB' ELSE 'PCS' END)) as quantity , tsi.discount as discount_Percentage,tsi.is_stockable,
                     
@@ -262,6 +264,8 @@ public class ReturnMedicine implements Initializable {
 
 
                 boolean isStockable = rs.getBoolean("is_stockable");
+
+                saleMainId = rs.getInt("sale_main_id");
 
 
                 String displayMrp = mrpPerTab + " / " + displayUnit;

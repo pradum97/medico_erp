@@ -17,6 +17,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.net.URL;
@@ -48,6 +49,11 @@ public class ReturnHistoryMain implements Initializable {
         customDialog = new CustomDialog();
         tableview.setFixedCellSize(28.0);
         callThread();
+
+        Platform.runLater(()->{
+            Stage stage = (Stage) tableview.getScene().getWindow();
+            stage.setMaximized(true);
+        });
     }
 
     private void callThread() {
@@ -96,17 +102,16 @@ public class ReturnHistoryMain implements Initializable {
         try {
             connection = new DBConnection().getConnection();
             String query = """
-                    select regexp_replace(trim( concat(COALESCE(ts.name, ''), ' ',
-                                                       COALESCE(tp.first_name, ''), ' ',
-                                                       COALESCE(tp.middle_name, ''), ' ',
-                                                       COALESCE(tp.last_name, '')) ),'  ',' ' ) as patientName,tri.return_main_id , trm.invoice_number,
-                           to_char(trm.return_date,'dd-MM-yyyy') as returnDate,trm.refund_amount,coalesce(trm.remark,'-') as remark
-                    from tbl_return_main trm
-                             left join tbl_return_items tri on trm.return_main_id = tri.return_main_id
-                             left join tbl_sale_items tsi on tri.sale_item_id = tsi.sale_item_id
-                             left join tbl_sale_main tsm on tsm.sale_main_id = tsi.sale_main_id
-                             left outer join tbl_patient tp on tp.patient_id = tsm.patient_id
-                             left join tbl_salutation ts on ts.salutation_id = tp.salutation_id
+                  
+                    select distinct regexp_replace(trim( concat(COALESCE(ts.name, ''), ' ',
+                                                     COALESCE(tp.first_name, ''), ' ',
+                                                     COALESCE(tp.middle_name, ''), ' ',
+                                                     COALESCE(tp.last_name, '')) ),'  ',' ' ) as patientName , trm.invoice_number,trm.return_main_id,
+                         to_char(trm.return_date,'dd-MM-yyyy') as returnDate,trm.refund_amount,coalesce(trm.remark,'-') as remark
+                  from tbl_return_main trm
+                           left join tbl_sale_main tsm on tsm.sale_main_id = trm.sale_main_id
+                           left outer join tbl_patient tp on tp.patient_id = tsm.patient_id
+                           left join tbl_salutation ts on ts.salutation_id = tp.salutation_id
                     """;
             ps = connection.prepareStatement(query);
             rs = ps.executeQuery();

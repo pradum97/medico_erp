@@ -19,7 +19,7 @@ public class ItemChooserModel {
                             String composition, String productTag,String medicineDose,String availableQuantity,boolean isStockable) {
         this.itemId = itemId;
         this.itemName = itemName;
-        this.discountModel = discountModel;
+      //  this.discountModel = discountModel;
         this.unit = unit;
         this.tabPerStrip = tabPerStrip;
         this.packing = packing;
@@ -70,13 +70,13 @@ public class ItemChooserModel {
         this.productTag = productTag;
     }
 
-    public GstModel getDiscountModel() {
-        return discountModel;
-    }
-
-    public void setDiscountModel(GstModel discountModel) {
-        this.discountModel = discountModel;
-    }
+//    public GstModel getDiscountModel() {
+//        return discountModel;
+//    }
+//
+//    public void setDiscountModel(GstModel discountModel) {
+//        this.discountModel = discountModel;
+//    }
 
     public String getUnit() {
         return unit;

@@ -65,10 +65,10 @@ public class DuesHistory implements Initializable {
             customDialog.showAlertBox("", "Something went wrong. Please re-open.");
         }
 
-        Platform.runLater(() -> {
-            Stage stage = (Stage) patientNameL.getScene().getWindow();
-            stage.setMaximized(true);
-        });
+//        Platform.runLater(() -> {
+//            Stage stage = (Stage) patientNameL.getScene().getWindow();
+//            stage.setMaximized(true);
+//        });
     }
 
     private class MyAsyncTask extends AsyncTask<String, Integer, Boolean> {

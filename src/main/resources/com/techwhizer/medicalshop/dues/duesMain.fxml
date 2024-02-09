@@ -88,7 +88,7 @@
                   <TableColumn fx:id="colRemainingDues" editable="false" maxWidth="80.0" minWidth="70.0" prefWidth="70.0" sortable="false" text="Dues" />
                   <TableColumn fx:id="colReceivedDues" editable="false" maxWidth="80.0" minWidth="80.0" sortable="false" text="Rcvd. Amt" />
                   <TableColumn fx:id="colAction" editable="false" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" sortable="false" text="#" />
-                  <TableColumn fx:id="colLastPayment" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="75.0" sortable="false" text="Last Payment" />
+                  <TableColumn fx:id="colLastPayment" editable="false" maxWidth="130.0" minWidth="130.0" prefWidth="-1.0" sortable="false" text="Last Payment" />
                   <TableColumn fx:id="colTotalDues" editable="false" maxWidth="110.0" minWidth="75.0" prefWidth="75.0" sortable="false" text="Tot Dues" />
                   <TableColumn fx:id="colDuseDate" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="75.0" sortable="false" text="Dues Date" />
               </columns>

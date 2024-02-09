@@ -107,11 +107,12 @@ public class Billing implements Initializable {
     private  BatchChooserModel bcm ;
     private double addDiscountPercentage = 0.0;
 
+    private static ObservableList<ItemChooserModel> popItemList = FXCollections.observableArrayList();
 
 
 
     enum Type{
-        GET_PATIENT,SAVE,GET_CART_DATA
+        GET_PATIENT,SAVE,GET_CART_DATA,GET_POPUP_ITEM,GET_POPUP_ITEM_CART_DATA
     }
 
     @Override
@@ -124,7 +125,7 @@ public class Billing implements Initializable {
         tableViewPatient.setFixedCellSize(26);
         setData();
         callThread(Type.GET_PATIENT);
-        callThread(Type.GET_CART_DATA);
+        callThread(Type.GET_POPUP_ITEM_CART_DATA);
 
         discountConfig();
 
@@ -361,15 +362,13 @@ public class Billing implements Initializable {
                 double mrp = rs.getDouble("mrp");
                 String batch = rs.getString("batch");
                 int mfrId = rs.getInt("mfr_id");
-
                 int cartId = rs.getInt("cart_id");
                 int stockId = rs.getInt("stock_id");
                 double totalRequestQuantity = rs.getDouble("totalRequestQuantity");
-
                 boolean isStockable = rs.getBoolean("is_stockable");
 
                 SaleEntryModel sem = new SaleEntryModel(itemId, cartId, stockId, productName, saleRate, pack, strip, pcs, isStockable ? expiryDate : "-",
-                        discountId, discount, gstId, totalGst, netAmount, hsn, iGst, cGst, sGst, gstAmount,
+                        discountId, discount, gstId, totalGst, Math.round(netAmount), hsn, iGst, cGst, sGst, gstAmount,
                         purchaseRate, mrp, batch, mfrId, amountAsPerMrp, totalRequestQuantity, isStockable);
 
 
@@ -378,7 +377,6 @@ public class Billing implements Initializable {
                 }else {
                     System.out.println("duplicate");
                 }
-
 
                 totGstAmount += gstAmount;
                 totalDiscount += discountAmt;
@@ -450,15 +448,14 @@ public class Billing implements Initializable {
                     addDiscTF.setText("0");
                     remarksTf.setText("");
                     referenceNumTf.setText("");
-                    callThread(Type.GET_CART_DATA);
+                    callThread(Type.GET_POPUP_ITEM_CART_DATA);
                 }
-
             } catch (SQLException e) {
                 customDialog.showAlertBox("ERROR", "Failed to Clear Cart !");
                 e.printStackTrace();
             } finally {
                 DBConnection.closeConnection(con, ps, null);
-                callThread(Type.GET_CART_DATA);
+                //callThread(Type.GET_CART_DATA);
             }
         });
     }
@@ -512,7 +509,7 @@ public class Billing implements Initializable {
     }
 
     public void chooseItem(MouseEvent mouseEvent) {
-        Main.primaryStage.setUserData(null);
+        Main.primaryStage.setUserData(popItemList);
         customDialog.showFxmlDialog2("chooser/BillingitemChooser.fxml", "SELECT ITEM");
 
         if (Main.primaryStage.getUserData() instanceof ItemChooserModel icm) {
@@ -597,7 +594,7 @@ public class Billing implements Initializable {
 
                 }
 
-                saleRateTf.setEditable(false);
+
                 saleRateTf.setFocusTraversable(false);
 
                 itemNameL.setText(bcm.getItemName());
@@ -788,7 +785,6 @@ public class Billing implements Initializable {
             DBConnection.closeConnection(connection, ps, null);
         }
 
-
     }
 
     private class MyAsyncTask extends AsyncTask<String, Integer, Boolean> {
@@ -817,6 +813,8 @@ public class Billing implements Initializable {
                 case GET_PATIENT -> {
                     tableViewPatient.setPlaceholder(method.getProgressBarRed(40, 40));
                 }
+
+
             }
 
 
@@ -834,6 +832,10 @@ public class Billing implements Initializable {
             case GET_PATIENT -> {
                 getPatient();
             }
+            case GET_POPUP_ITEM_CART_DATA -> {
+                    getItems();
+                    getCartData();
+                }
         }
 
             return true;
@@ -1434,5 +1436,50 @@ public class Billing implements Initializable {
         }
     }
 
+    private void getItems() {
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            connection = dbConnection.getConnection();
+
+            String qry = """
+                    select * from available_quantity_v where avl_qty_pcs > 0 and status = 1
+                    """;
+            ps = connection.prepareStatement(qry);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                int itemId = rs.getInt("ITEM_ID");
+                String itemName = rs.getString("ITEMS_NAME");
+                String packing = rs.getString("PACKING");
+//                int gstId = rs.getInt("gst_id");
+//                int cGst = rs.getInt("cgst");
+//                int iGst = rs.getInt("igst");
+//                int sGst = rs.getInt("sgst");
+//                int hsn = rs.getInt("hsn_sac");
+                int tabPerStrip = rs.getInt("STRIP_TAB");
+                // String gstName = rs.getString("gstName");
+                String unit = rs.getString("unit");
+                String composition = rs.getString("composition");
+                String tag = rs.getString("tag");
+                String medicineDose = rs.getString("dose");
+                String avlQty = rs.getString("avl_qty_strip");
+                boolean isStockable = rs.getBoolean("is_stockable");
+
+                //   GstModel gm = new GstModel(gstId, hsn, sGst, cGst, iGst, gstName, null);
+
+                popItemList.add(new ItemChooserModel(itemId, itemName, packing, null, unit, tabPerStrip, composition, tag,
+                        medicineDose,isStockable?avlQty:"∞" ,isStockable));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            DBConnection.closeConnection(connection, ps, rs);
+        }
+    }
 
 }

@@ -286,7 +286,7 @@ public class PatientMain implements Initializable {
                     Hyperlink admNumHl = new Hyperlink(tableView.getItems().get(getIndex()).getAdmissionNumber());
 
                     admNumHl.setStyle("-fx-background-color: transparent; -fx-text-fill: blue;" +
-                            "-fx-border-color: transparent;-fx-font-size: 12;-fx-alignment: center-left");
+                            "-fx-border-color: transparent;-fx-font-size: 10;-fx-alignment: center-left");
 
                     admNumHl.setMinWidth(125);
 

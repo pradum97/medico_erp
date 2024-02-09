@@ -10,6 +10,7 @@ import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.model.GstModel;
 import com.techwhizer.medicalshop.model.chooserModel.ItemChooserModel;
 import com.techwhizer.medicalshop.util.DBConnection;
+import com.techwhizer.medicalshop.util.TableViewConfig;
 import com.victorlaerte.asynctask.AsyncTask;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -38,7 +39,6 @@ import java.util.ResourceBundle;
 
 public class ItemChooser implements Initializable {
     public ProgressIndicator progressBar;
-    private int rowsPerPage = 100;
     public TextField searchTf;
     public TableColumn<ItemChooserModel, Integer> colSrNo;
     public TableColumn<ItemChooserModel, String> colProductName;
@@ -58,7 +58,15 @@ public class ItemChooser implements Initializable {
         customDialog = new CustomDialog();
         dbConnection = new DBConnection();
         tableView.setFixedCellSize(27);
-        callThread();
+        var data = Main.primaryStage.getUserData();
+
+        if (data instanceof ObservableList){
+            itemList = ( ObservableList<ItemChooserModel> ) data;
+            pagination.setVisible(true);
+            search_Item();
+        }else {
+            callThread();
+        }
     }
 
     private void callThread() {
@@ -197,20 +205,20 @@ public class ItemChooser implements Initializable {
                 } else return String.valueOf(products.getPacking()).toLowerCase().contains(lowerCaseFilter);
             });
 
-            changeTableView(pagination.getCurrentPageIndex(), rowsPerPage);
+            changeTableView(pagination.getCurrentPageIndex(), TableViewConfig.POPUP_ROW_PER_PAGE);
         });
 
         pagination.setCurrentPageIndex(0);
-        changeTableView(0, rowsPerPage);
+        changeTableView(0, TableViewConfig.POPUP_ROW_PER_PAGE);
         pagination.currentPageIndexProperty().addListener(
                 (observable1, oldValue1, newValue1) -> {
-                    changeTableView(newValue1.intValue(), rowsPerPage);
+                    changeTableView(newValue1.intValue(), TableViewConfig.POPUP_ROW_PER_PAGE);
                 });
     }
 
     private void changeTableView(int index, int limit) {
 
-        int totalPage = (int) (Math.ceil(filteredData.size() * 1.0 / rowsPerPage));
+        int totalPage = (int) (Math.ceil(filteredData.size() * 1.0 / TableViewConfig.POPUP_ROW_PER_PAGE));
         Platform.runLater(() -> pagination.setPageCount(totalPage));
 
         colSrNo.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(

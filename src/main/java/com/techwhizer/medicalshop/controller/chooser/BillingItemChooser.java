@@ -10,6 +10,7 @@ import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.model.GstModel;
 import com.techwhizer.medicalshop.model.chooserModel.ItemChooserModel;
 import com.techwhizer.medicalshop.util.DBConnection;
+import com.techwhizer.medicalshop.util.TableViewConfig;
 import com.victorlaerte.asynctask.AsyncTask;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -36,7 +37,6 @@ import java.util.ResourceBundle;
 
 public class BillingItemChooser implements Initializable {
     public ProgressIndicator progressBar;
-    private int rowsPerPage = 100;
     public TextField searchTf;
     public TableColumn<ItemChooserModel, Integer> colSrNo;
     public TableColumn<ItemChooserModel, String> colProductName;
@@ -47,8 +47,8 @@ public class BillingItemChooser implements Initializable {
     private Method method;
     private CustomDialog customDialog;
     private DBConnection dbConnection;
-    private ObservableList<ItemChooserModel> itemList = FXCollections.observableArrayList();
-    private FilteredList<ItemChooserModel> filteredData;
+    private static ObservableList<ItemChooserModel> itemList = FXCollections.observableArrayList();
+    private static FilteredList<ItemChooserModel> filteredData;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -56,12 +56,21 @@ public class BillingItemChooser implements Initializable {
         customDialog = new CustomDialog();
         dbConnection = new DBConnection();
         tableView.setFixedCellSize(27);
-        callThread();
+
+        var data = Main.primaryStage.getUserData();
+
+        if (data instanceof ObservableList){
+            itemList = ( ObservableList<ItemChooserModel> ) data;
+            pagination.setVisible(true);
+            search_Item();
+        }else {
+            callThread();
+        }
+
     }
 
     private void callThread() {
         MyAsyncTask myAsyncTask = new MyAsyncTask();
-        myAsyncTask.setDaemon(false);
         myAsyncTask.execute();
     }
 
@@ -70,14 +79,13 @@ public class BillingItemChooser implements Initializable {
 
         @Override
         public void onPreExecute() {
-            //Background Thread will start
             method.hideElement(tableView);
             msg = "";
         }
 
         @Override
         public Boolean doInBackground(String... params) {
-            msg = getItems();
+            getItems();
             return true;
         }
 
@@ -94,12 +102,7 @@ public class BillingItemChooser implements Initializable {
         }
     }
 
-    private String getItems() {
-
-        if (null != itemList) {
-            itemList.clear();
-        }
-        String msg;
+    private void getItems() {
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -108,48 +111,34 @@ public class BillingItemChooser implements Initializable {
             connection = dbConnection.getConnection();
 
             String qry = """
-                    select * from available_quantity_v where avl_qty_pcs > 0
+                    select * from available_quantity_v where avl_qty_pcs > 0 and status = 1
                     """;
             ps = connection.prepareStatement(qry);
             rs = ps.executeQuery();
-
-            int count = 0;
 
             while (rs.next()) {
 
                 int itemId = rs.getInt("ITEM_ID");
                 String itemName = rs.getString("ITEMS_NAME");
                 String packing = rs.getString("PACKING");
-                int gstId = rs.getInt("gst_id");
-                int cGst = rs.getInt("cgst");
-                int iGst = rs.getInt("igst");
-                int sGst = rs.getInt("sgst");
-                int hsn = rs.getInt("hsn_sac");
+//                int gstId = rs.getInt("gst_id");
+//                int cGst = rs.getInt("cgst");
+//                int iGst = rs.getInt("igst");
+//                int sGst = rs.getInt("sgst");
+//                int hsn = rs.getInt("hsn_sac");
                 int tabPerStrip = rs.getInt("STRIP_TAB");
-                int status = rs.getInt("status");
-                String gstName = rs.getString("gstName");
-                String type = rs.getString("type");
+               // String gstName = rs.getString("gstName");
                 String unit = rs.getString("unit");
                 String composition = rs.getString("composition");
                 String tag = rs.getString("tag");
                 String medicineDose = rs.getString("dose");
                 String avlQty = rs.getString("avl_qty_strip");
                 boolean isStockable = rs.getBoolean("is_stockable");
-                count++;
 
-                GstModel gm = new GstModel(gstId, hsn, sGst, cGst, iGst, gstName, null);
+             //   GstModel gm = new GstModel(gstId, hsn, sGst, cGst, iGst, gstName, null);
 
-                if (status == 1) {
-                    if (Constant.ITEM_TYPE_PROHIBIT.equalsIgnoreCase(type)) {
-                        if (Login.currentRoleName.equalsIgnoreCase("admin")) {
-                            itemList.add(new ItemChooserModel(itemId, itemName, packing, gm, unit, tabPerStrip, composition, tag, medicineDose, avlQty,isStockable));
-                        }
-                    } else {
-                        itemList.add(new ItemChooserModel(itemId, itemName, packing, gm, unit, tabPerStrip, composition, tag, medicineDose, avlQty,isStockable));
-                    }
-                } else {
-                    msg = "All items are disabled.";
-                }
+                itemList.add(new ItemChooserModel(itemId, itemName, packing, null, unit, tabPerStrip, composition, tag,
+                        medicineDose,isStockable?avlQty:"∞" ,isStockable));
             }
 
             if (!itemList.isEmpty()) {
@@ -157,21 +146,11 @@ public class BillingItemChooser implements Initializable {
                 search_Item();
             }
 
-            if (count > 0) {
-
-                msg = "";
-            } else {
-                msg = "Item not available";
-            }
-
-
         } catch (SQLException e) {
-            msg = "Something went wrong ";
             throw new RuntimeException(e);
         } finally {
             DBConnection.closeConnection(connection, ps, rs);
         }
-        return msg;
     }
 
     private void search_Item() {
@@ -195,25 +174,26 @@ public class BillingItemChooser implements Initializable {
                 } else return String.valueOf(products.getPacking()).toLowerCase().contains(lowerCaseFilter);
             });
 
-            changeTableView(pagination.getCurrentPageIndex(), rowsPerPage);
+            changeTableView(pagination.getCurrentPageIndex(), TableViewConfig.POPUP_ROW_PER_PAGE);
         });
 
         pagination.setCurrentPageIndex(0);
-        changeTableView(0, rowsPerPage);
+        changeTableView(0, TableViewConfig.POPUP_ROW_PER_PAGE);
         pagination.currentPageIndexProperty().addListener(
                 (observable1, oldValue1, newValue1) -> {
-                    changeTableView(newValue1.intValue(), rowsPerPage);
+                    changeTableView(newValue1.intValue(), TableViewConfig.POPUP_ROW_PER_PAGE);
                 });
     }
 
     private void changeTableView(int index, int limit) {
 
-        int totalPage = (int) (Math.ceil(filteredData.size() * 1.0 / rowsPerPage));
+        int totalPage = (int) (Math.ceil(filteredData.size() * 1.0 / TableViewConfig.POPUP_ROW_PER_PAGE));
         Platform.runLater(() -> pagination.setPageCount(totalPage));
 
         colSrNo.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(
                 tableView.getItems().indexOf(cellData.getValue()) + 1));
         colProductName.setCellValueFactory(new PropertyValueFactory<>("itemName"));
+        colAvlQty.setCellValueFactory(new PropertyValueFactory<>("availableQuantity"));
 
         setOptionalCell();
         int fromIndex = index * limit;
@@ -229,7 +209,7 @@ public class BillingItemChooser implements Initializable {
 
     private void setOptionalCell() {
 
-        Callback<TableColumn<ItemChooserModel, String>, TableCell<ItemChooserModel, String>>
+      /*  Callback<TableColumn<ItemChooserModel, String>, TableCell<ItemChooserModel, String>>
                 cellQty = (TableColumn<ItemChooserModel, String> param) -> new TableCell<>() {
             @Override
             public void updateItem(String item, boolean empty) {
@@ -267,7 +247,9 @@ public class BillingItemChooser implements Initializable {
                 }
             }
 
-        };
+        };*/
+
+        String style = "-fx-cursor: hand ; -fx-padding: 1 7 1 7; -fx-background-color: #06a5c1 ; -fx-background-radius: 3";
 
         Callback<TableColumn<ItemChooserModel, String>, TableCell<ItemChooserModel, String>>
                 cellFactory = (TableColumn<ItemChooserModel, String> param) -> new TableCell<>() {
@@ -280,41 +262,40 @@ public class BillingItemChooser implements Initializable {
 
                 } else {
 
-                    Button selectBn = new Button();
+                        Button selectBn = new Button();
 
-                    ImageView iv = new ImageView(new ImageLoader().load("img/icon/rightArrow_ic_white.png"));
-                    iv.setFitHeight(13);
-                    iv.setFitWidth(13);
+                        ImageView iv = new ImageView(new ImageLoader().load("img/icon/rightArrow_ic_white.png"));
+                        iv.setFitHeight(13);
+                        iv.setFitWidth(13);
 
-                    selectBn.setGraphic(iv);
-                    selectBn.setStyle("-fx-cursor: hand ; -fx-padding: 1 7 1 7; -fx-background-color: #06a5c1 ; -fx-background-radius: 3 ");
+                        selectBn.setGraphic(iv);
+                        selectBn.setStyle(style);
 
-                    selectBn.setOnAction((event) -> {
-                        method.selectTable(getIndex(), tableView);
-                        ItemChooserModel icm = tableView.getSelectionModel().getSelectedItem();
+                        selectBn.setOnAction((event) -> {
+                            method.selectTable(getIndex(), tableView);
+                            ItemChooserModel icm = tableView.getSelectionModel().getSelectedItem();
 
-                        if (null != icm) {
-                            Main.primaryStage.setUserData(icm);
-                            Stage stage = (Stage) searchTf.getScene().getWindow();
-                            if (null != stage && stage.isShowing()) {
-                                stage.close();
+                            if (null != icm) {
+                                Main.primaryStage.setUserData(icm);
+                                Stage stage = (Stage) searchTf.getScene().getWindow();
+                                if (null != stage && stage.isShowing()) {
+                                    stage.close();
+                                }
                             }
-                        }
-                    });
+                        });
+                        HBox managebtn = new HBox(selectBn);
+                        managebtn.setStyle("-fx-alignment:center");
+                        HBox.setMargin(selectBn, new Insets(0, 0, 0, 0));
+                        setGraphic(managebtn);
+                        setText(null);
 
-                    HBox managebtn = new HBox(selectBn);
-                    managebtn.setStyle("-fx-alignment:center");
-                    HBox.setMargin(selectBn, new Insets(0, 0, 0, 0));
 
-                    setGraphic(managebtn);
 
-                    setText(null);
 
                 }
             }
 
         };
-        colAvlQty.setCellFactory(cellQty);
         colAction.setCellFactory(cellFactory);
     }
 

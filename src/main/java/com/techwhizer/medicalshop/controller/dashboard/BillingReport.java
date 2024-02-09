@@ -316,7 +316,7 @@ public class BillingReport implements Initializable {
                     Label bnChecItem = new Label("ITEMS");
 
                     bnChecItem.getStyleClass().add("checkItem");
-                    bnChecItem.setMinWidth(90);
+                    bnChecItem.setMinWidth(80);
 
 
                     bnChecItem.setOnMouseClicked(event -> {

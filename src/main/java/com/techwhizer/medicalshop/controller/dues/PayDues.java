@@ -184,7 +184,6 @@ public class PayDues implements Initializable {
             if (res > 0) {
                 customDialog.showAlertBox("","Payment Success.");
                 Main.primaryStage.setUserData((boolean)true);
-
                 Platform.runLater(() -> method.closeStage(receivedAmountTF));
             }
         } catch (SQLException e) {

@@ -212,7 +212,7 @@ public class DuesMain implements Initializable {
                 search_Item();
             }
 
-        }catch (Exception e){
+        }catch (Exception ignored){
 
         }finally {
             DBConnection.closeConnection(connection,ps,rs);
@@ -313,16 +313,7 @@ public class DuesMain implements Initializable {
 
                         Main.primaryStage.setUserData(data);
                         customDialog.showFxmlFullDialog("dues/payDues.fxml",phm.getPatientName());
-
-                        if (Main.primaryStage.getUserData() instanceof Boolean){
-
-                            boolean isSuccess =(Boolean) Main.primaryStage.getUserData();
-                            if (isSuccess){
-
-                                reset();
-                            }
-
-                        }
+                        reset();
                     });
 
                     history.setOnAction(actionEvent -> {

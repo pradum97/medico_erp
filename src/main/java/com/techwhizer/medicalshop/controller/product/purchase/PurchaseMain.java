@@ -3,10 +3,14 @@ package com.techwhizer.medicalshop.controller.product.purchase;
 import com.techwhizer.medicalshop.CustomDialog;
 import com.techwhizer.medicalshop.ImageLoader;
 import com.techwhizer.medicalshop.Main;
+import com.techwhizer.medicalshop.controller.Constant;
+import com.techwhizer.medicalshop.controller.auth.Login;
 import com.techwhizer.medicalshop.method.GenerateBillNumber;
 import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.model.DealerModel;
+import com.techwhizer.medicalshop.model.GstModel;
 import com.techwhizer.medicalshop.model.PurchaseItemsTemp;
+import com.techwhizer.medicalshop.model.chooserModel.ItemChooserModel;
 import com.techwhizer.medicalshop.util.DBConnection;
 import com.victorlaerte.asynctask.AsyncTask;
 import javafx.application.Platform;
@@ -60,6 +64,8 @@ public class PurchaseMain implements Initializable {
     private ObservableList<PurchaseItemsTemp> itemList = FXCollections.observableArrayList();
     private DealerModel dealerModel;
     private PurchaseItemsTemp pit;
+    private ObservableList<ItemChooserModel> popupItemList = FXCollections.observableArrayList();
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -67,7 +73,7 @@ public class PurchaseMain implements Initializable {
         customDialog = new CustomDialog();
         dbConnection = new DBConnection();
         method.hideElement(progressBar);
-
+        callThread("INIT");
         setData();
 
         Platform.runLater(()->{
@@ -75,6 +81,60 @@ public class PurchaseMain implements Initializable {
             stage.setMaximized(true);
         });
     }
+
+    private void getItems() {
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            connection = dbConnection.getConnection();
+
+            String qry = """
+                    select * from available_quantity_v where is_stockable = true and status = 1
+                    """;
+            ps = connection.prepareStatement(qry);
+            rs = ps.executeQuery();
+
+            int count = 0;
+
+            while (rs.next()) {
+
+                int itemId = rs.getInt("ITEM_ID");
+                String itemName = rs.getString("ITEMS_NAME");
+                String packing = rs.getString("PACKING");
+                int gstId = rs.getInt("gst_id");
+                int cGst = rs.getInt("cgst");
+                int iGst = rs.getInt("igst");
+                int sGst = rs.getInt("sgst");
+                int hsn = rs.getInt("hsn_sac");
+                int tabPerStrip = rs.getInt("STRIP_TAB");
+                int status = rs.getInt("status");
+                String gstName = rs.getString("gstName");
+                String type = rs.getString("type");
+                String unit = rs.getString("unit");
+                String composition = rs.getString("composition");
+                String tag = rs.getString("tag");
+                String medicineDose = rs.getString("dose");
+                String avlQty = rs.getString("avl_qty_strip");
+                boolean isStockable = rs.getBoolean("is_stockable");
+                count++;
+
+                GstModel gm = new GstModel(gstId, hsn, sGst, cGst, iGst, gstName, null);
+                popupItemList.add(new ItemChooserModel(itemId, itemName, packing, gm, unit, tabPerStrip,composition,tag,medicineDose,avlQty,isStockable));
+
+            }
+
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            DBConnection.closeConnection(connection, ps, rs);
+        }
+
+    }
+
 
     private void setData() {
         setOptionalCell();
@@ -85,6 +145,8 @@ public class PurchaseMain implements Initializable {
     }
 
     public void addPurchaseItem(ActionEvent actionEvent) {
+
+        Main.primaryStage.setUserData(popupItemList);
         customDialog.showFxmlDialog2("product/purchase/addPurchaseItems.fxml","ADD PURCHASE ITEM");
 
         if (Main.primaryStage.getUserData() instanceof PurchaseItemsTemp pit){
@@ -187,42 +249,57 @@ public class PurchaseMain implements Initializable {
         if (null == dealerModel) {
             method.show_popup("Please select dealer", dealerNameL);
             return;
-        } else if (itemList.size() < 1) {
+        } else if (itemList.isEmpty()) {
             customDialog.showAlertBox("Items not found", "Please enter item");
             return;
         }
 
-        MyAsyncTask myAsyncTask = new MyAsyncTask();
-        myAsyncTask.setDaemon(false);
-        myAsyncTask.execute();
+      callThread("SAVE");
 
     }
 
+    private void callThread(String type){
+
+        MyAsyncTask myAsyncTask = new MyAsyncTask(type);
+        myAsyncTask.setDaemon(false);
+        myAsyncTask.execute();
+    }
+
     private class MyAsyncTask extends AsyncTask<String, Integer, Boolean> {
-        private String msg;
+        String type;
+
+        public MyAsyncTask(String type) {
+            this.type = type;
+        }
 
         @Override
         public void onPreExecute() {
-            msg = "";
             method.hideElement(buttonContainer);
             progressBar.setVisible(true);
+            tableView.setPlaceholder(method.getProgressBarRed(40,40));
 
         }
 
         @Override
         public Boolean doInBackground(String... params) {
-            uploadData();
-            return false;
+            switch (type){
 
+                case "SAVE"-> uploadData();
+
+                case "INIT"->{
+                    getItems();
+                }
+
+            }
+
+            return false;
         }
 
         @Override
         public void onPostExecute(Boolean success) {
             method.hideElement(progressBar);
             buttonContainer.setVisible(true);
-            if (!success) {
-
-            }
+            tableView.setPlaceholder(new Label("Item Not Found."));
         }
 
         @Override
