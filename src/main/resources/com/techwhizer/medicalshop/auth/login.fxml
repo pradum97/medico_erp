@@ -43,7 +43,7 @@
                         <Insets left="3.0" />
                      </VBox.margin>
                          </Label>
-                         <TextField fx:id="email_f" onKeyReleased="#enterPress" prefHeight="37.0" promptText="Enter email  / username / phone" style="-fx-background-color: white; -fx-border-color: grey; -fx-border-radius: 4;" text="admin">
+                         <TextField fx:id="email_f" onKeyReleased="#enterPress" prefHeight="37.0" promptText="Enter email  / username / phone" style="-fx-background-color: white; -fx-border-color: grey; -fx-border-radius: 4;">
                              <font>
                                  <Font name="Arial" size="12.0" />
                              </font>
@@ -65,7 +65,7 @@
                               <Insets left="3.0" />
                            </VBox.margin>
                                </Label>
-                               <PasswordField fx:id="password_f" onKeyReleased="#enterPress" prefHeight="37.0" promptText="Enter password" style="-fx-background-color: white; -fx-border-color: grey; -fx-border-radius: 4;" text="admin">
+                               <PasswordField fx:id="password_f" onKeyReleased="#enterPress" prefHeight="37.0" promptText="Enter password" style="-fx-background-color: white; -fx-border-color: grey; -fx-border-radius: 4;">
                                    <font>
                                        <Font name="Arial" size="12.0" />
                                    </font>

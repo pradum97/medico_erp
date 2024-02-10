@@ -136,7 +136,7 @@ public class CommonUtil {
             connection = new DBConnection().getConnection();
 
             String query = """
-                    select * from tbl_departments where department_code = ? order by department_name asc
+                    select * from tbl_departments where department_code = ? limit 1
                     """;
             ps = connection.prepareStatement(query);
             ps.setString(1,departmentCode);

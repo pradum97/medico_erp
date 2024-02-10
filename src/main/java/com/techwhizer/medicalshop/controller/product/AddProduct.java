@@ -333,12 +333,13 @@ public class AddProduct implements Initializable {
         String billNum = new GenerateBillNumber().generatePurchaseBillNum();
 
         try {
-            String purMainQry = "INSERT INTO TBL_PURCHASE_MAIN(DEALER_ID, BILL_NUM, DEALER_BILL_NUM, BILL_DATE)VALUES (?,?,?,?)";
+            String purMainQry = "INSERT INTO TBL_PURCHASE_MAIN(DEALER_ID, BILL_NUM, DEALER_BILL_NUM, BILL_DATE,created_by)VALUES (?,?,?,?,?)";
             ps = connection.prepareStatement(purMainQry, new String[]{"purchase_main_id"});
             ps.setNull(1, 0);
             ps.setString(2, billNum);
             ps.setNull(3, Types.NULL);
             ps.setString(4, method.getCurrentDate());
+            ps.setInt(5, Login.currentlyLogin_Id);
             int res = ps.executeUpdate();
 
             if (res > 0) {
@@ -349,7 +350,7 @@ public class AddProduct implements Initializable {
                     rs = null;
                     res = 0;
 
-                    String purItemsQry = "INSERT INTO TBL_PURCHASE_ITEMS(purchase_main_id, item_id, batch, expiry_date, lot_number, quantity, quantity_unit,purchase_rate,mrp,sale_price) VALUES (?,?,?,?,?,?,?,?,?,?)";
+                    String purItemsQry = "INSERT INTO TBL_PURCHASE_ITEMS(purchase_main_id, item_id, batch, expiry_date, lot_number, quantity, quantity_unit,purchase_rate,mrp,sale_price,created_by) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
                     ps = connection.prepareStatement(purItemsQry, new String[]{"purchase_items_id"});
                     ps.setInt(1, purMainId);
@@ -362,6 +363,7 @@ public class AddProduct implements Initializable {
                     ps.setDouble(8, mrp);
                     ps.setDouble(9, mrp);
                     ps.setDouble(10, mrp);
+                    ps.setInt(11, Login.currentlyLogin_Id);
                     res = ps.executeUpdate();
 
                     if (res > 0) {
@@ -373,7 +375,7 @@ public class AddProduct implements Initializable {
                             rs = null;
                             res = 0;
 
-                            String stockQryInsertQry = "INSERT INTO TBL_STOCK(ITEM_ID, PURCHASE_MAIN_ID, PURCHASE_ITEMS_ID, QUANTITY," + " QUANTITY_UNIT,UPDATE_DATE)VALUES(?,?,?,?,?,?)";
+                            String stockQryInsertQry = "INSERT INTO TBL_STOCK(ITEM_ID, PURCHASE_MAIN_ID, PURCHASE_ITEMS_ID, QUANTITY," + " QUANTITY_UNIT,UPDATE_DATE,created_by)VALUES(?,?,?,?,?,?,?)";
                             ps = connection.prepareStatement(stockQryInsertQry);
                             ps.setInt(1, itemId);
                             ps.setInt(2, purMainId);
@@ -381,6 +383,7 @@ public class AddProduct implements Initializable {
                             ps.setInt(4, 1);
                             ps.setString(5, "PCS");
                             ps.setString(6, method.getCurrentDate());
+                            ps.setInt(7, Login.currentlyLogin_Id);
 
                             res = ps.executeUpdate();
 

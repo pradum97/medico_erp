@@ -123,15 +123,16 @@ public class Billing implements Initializable {
         dbConnection = new DBConnection();
         method.hideElement(progressBar);
         tableViewPatient.setFixedCellSize(26);
-        setData();
-        callThread(Type.GET_PATIENT);
-        callThread(Type.GET_POPUP_ITEM_CART_DATA);
 
-        discountConfig();
 
         Platform.runLater(()->{
             Stage stage = (Stage) genderL.getScene().getWindow();
            stage.setMaximized(true);
+            setData();
+            callThread(Type.GET_POPUP_ITEM_CART_DATA);
+            callThread(Type.GET_PATIENT);
+
+            discountConfig();
         });
     }
 
@@ -799,7 +800,7 @@ public class Billing implements Initializable {
 
             switch (type){
 
-                case GET_CART_DATA -> {
+                case GET_CART_DATA,GET_POPUP_ITEM_CART_DATA -> {
                     if (null != tableView) {
                         tableView.setItems(null);
                     }
@@ -843,19 +844,7 @@ public class Billing implements Initializable {
 
         @Override
         public void onPostExecute(Boolean success) {
-
-            switch (type){
-
-                case GET_CART_DATA -> {
-                    tableView.setPlaceholder(new Label("Not Available."));
-                }
-
-                case GET_PATIENT -> {
-                    tableViewPatient.setPlaceholder(new Label("Patient Not Available."));
-                }
-            }
-
-
+            tableViewPatient.setPlaceholder(new Label("Item Not Available."));
         }
 
         @Override
@@ -1437,6 +1426,7 @@ public class Billing implements Initializable {
     }
 
     private void getItems() {
+        popItemList.clear();
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet rs = null;

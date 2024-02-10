@@ -2,6 +2,7 @@ package com.techwhizer.medicalshop.controller.update.product;
 
 import com.techwhizer.medicalshop.CustomDialog;
 import com.techwhizer.medicalshop.Main;
+import com.techwhizer.medicalshop.controller.auth.Login;
 import com.techwhizer.medicalshop.controller.common.model.DepartmentModel;
 import com.techwhizer.medicalshop.method.GetTax;
 import com.techwhizer.medicalshop.method.Method;
@@ -171,7 +172,7 @@ public class ItemMasterUpdate implements Initializable {
             if (!icm.isStockable()){
                 getMrp(icm.getItemId());
             }
-            departmentCom.setItems(CommonUtil.getDepartmentsList());
+
             getGst();
             Platform.runLater(ItemMasterUpdate.this::setComboBoxData);
             return true;
@@ -200,6 +201,12 @@ public class ItemMasterUpdate implements Initializable {
         }else {
             discountCom.setItems((ObservableList<DiscountModel>) method.getDiscount().get("data"));
         }
+
+        DepartmentModel departmentModel = CommonUtil.getDepartment(icm.getDepartmentCode());
+
+        departmentCom.getItems().add(departmentModel);
+        departmentCom.getSelectionModel().selectFirst();
+       departmentCom.getItems().addAll(CommonUtil.getDepartmentsList());
 
         setData(icm);
         if (icm.getMr_id() > 0) {
@@ -335,13 +342,14 @@ public class ItemMasterUpdate implements Initializable {
                     res = 0;
                     ps = null;
 
-                    String mrpUpdateQry = "update tbl_purchase_items set purchase_rate = ? , mrp = ?, sale_price = ?  where purchase_items_id = ?";
+                    String mrpUpdateQry = "update tbl_purchase_items set purchase_rate = ? , mrp = ?, sale_price = ?,updated_by=?  where purchase_items_id = ?";
                     ps = connection.prepareStatement(mrpUpdateQry);
 
                     ps.setDouble(1,im.getPurchaseMrp());
                     ps.setDouble(2,im.getMrp());
                     ps.setDouble(3,im.getSaleRate());
-                    ps.setInt(4,purchaseItemId);
+                    ps.setInt(4, Login.currentlyLogin_Id);
+                    ps.setInt(5,purchaseItemId);
                     res = ps.executeUpdate();
 
                     if (res> 0){
@@ -420,8 +428,7 @@ public class ItemMasterUpdate implements Initializable {
             unitCom.getSelectionModel().select(icm.getUnit());
         }
 
-        DepartmentModel departmentModel = CommonUtil.getDepartment(icm.getDepartmentCode());
-        departmentCom.getSelectionModel().select(departmentModel);
+
     }
 
     public void updateBn(ActionEvent actionEvent) {

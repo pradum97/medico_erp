@@ -445,7 +445,7 @@ public class StockReport implements Initializable {
 
     private void getDealer() {
 
-            dealerList.clear();
+          Platform.runLater(()->{  dealerList.clear();});
 
 
         Connection connection = null;

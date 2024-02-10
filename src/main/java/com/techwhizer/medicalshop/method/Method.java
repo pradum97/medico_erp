@@ -431,7 +431,7 @@ public class Method extends StaticData {
             DBConnection.closeConnection(connection, ps, rs);
         }
     }
-    public boolean isBatchAvailableInStock(String batch) {
+    public int isBatchAvailableInStock(String batch) {
 
         batch = batch.trim();
 
@@ -442,14 +442,21 @@ public class Method extends StaticData {
         try {
             connection = new DBConnection().getConnection();
             String qry = """
-                    select tpi.batch from tbl_stock ts
+                    select ts.stock_id from tbl_stock ts
                     left join tbl_purchase_items tpi on tpi.purchase_items_id = ts.purchase_items_id
-                    where batch = ?
+                    where batch = ? and ts.quantity > 0 limit 1
                     """;
             ps = connection.prepareStatement(qry);
             ps.setString(1, batch);
             rs = ps.executeQuery();
-            return rs.next();
+
+            if (rs.next()){
+                int stockId = rs.getInt("stock_id");
+                return Math.max(stockId, 0);
+            }else {
+                return 0;
+            }
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {

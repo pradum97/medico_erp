@@ -89,6 +89,10 @@ module com.techwhizer.medicalshop {
     exports com.techwhizer.medicalshop.controller.dues.model;
     opens com.techwhizer.medicalshop.controller.dues.model to javafx.fxml;
 
+    exports com.techwhizer.medicalshop.controller.common.model;
+    opens com.techwhizer.medicalshop.controller.common.model to javafx.fxml;
+
+
 
 
 }
