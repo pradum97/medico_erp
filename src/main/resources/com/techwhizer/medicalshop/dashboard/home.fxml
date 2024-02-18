@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Pagination?>
 <?import javafx.scene.control.Separator?>
@@ -24,7 +25,7 @@
                      <children>
                               <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
                                   <children>
-      
+
                                       <TableView fx:id="tableViewHome" focusTraversable="false" tableMenuButtonVisible="true" BorderPane.alignment="CENTER" HBox.hgrow="ALWAYS">
                                           <columns>
                                               <TableColumn fx:id="col_sno" editable="false" maxWidth="100.0" minWidth="50.0" prefWidth="75.0" sortable="false" text="Sr.No" />
@@ -49,22 +50,30 @@
                                           <Pagination fx:id="pagination" maxPageIndicatorCount="0" visible="false" HBox.hgrow="ALWAYS" />
                                       </children>
                                   </HBox>
-                              <HBox alignment="CENTER_LEFT" fillHeight="false">
+                              <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="15.0">
                                  <children>
-                  
-                                             <HBox fx:id="refresh_bn" alignment="CENTER" fillHeight="false" onMouseClicked="#bnRefresh" prefHeight="30.0" prefWidth="50.0" style="-fx-cursor: hand; -fx-background-color: RED; -fx-background-radius: 3;">
-                  
-                                                 <ImageView fx:id="refresh_img" fitHeight="20.0" fitWidth="20.0" onMouseClicked="#bnRefresh">
-                                                     <Image url="@../img/icon/refresh_ic.png" />
-                                                     <HBox.margin>
-                                                         <Insets left="7.0" right="7.0" />
-                                                     </HBox.margin>
-                                                 </ImageView>
-                                                 <HBox.margin>
-                                                     <Insets bottom="2.0" right="40.0" top="2.0" />
-                                                 </HBox.margin>
-                                             </HBox>
-                        
+                                    <Button fx:id="downloadReportBn" mnemonicParsing="false" onAction="#downloadReportBnClick" style="-fx-background-color: #04852f;" text="Download" textFill="WHITE">
+                                       <graphic>
+                                          <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../img/icon/download_ic.png" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                       <font>
+                                          <Font name="System Bold" size="12.179104804992676" />
+                                       </font>
+                                    </Button>
+                                    <Button mnemonicParsing="false" fx:id="refresh_bn" onMouseClicked="#bnRefresh" prefHeight="27.0" prefWidth="52.0" style="-fx-border-color: grey; -fx-border-radius: 3; -fx-background-radius: 3;">
+                                       <graphic>
+                                          <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../img/icon/refresh_ic_red.png" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                    </Button>
+
                                           <HBox alignment="CENTER" spacing="10.0" style="-fx-background-color: #000666;">
                                               <children>
                                                     <Label text="TOTAL NET AMOUNT  : " textFill="WHITE" wrapText="true">

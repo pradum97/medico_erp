@@ -155,11 +155,11 @@ public class BillingReport implements Initializable {
 
 
             if (isDateFilter) {
-                String q = query.concat(" where TO_CHAR(tsm.sale_date, 'YYYY-MM-DD') between ? and ? order by sale_main_id desc  ");
+                String q = query.concat(" where TO_CHAR(tsm.sale_date, 'DD-MM-YYYY') between ? and ? order by sale_main_id desc  ");
 
                 ps = connection.prepareStatement(q);
-                ps.setString(1, fromDateP.getValue().toString());
-                ps.setString(2, toDateP.getValue().toString());
+                ps.setString(1, fromDateP.getEditor().getText());
+                ps.setString(2, toDateP.getEditor().getText());
 
             } else {
                 query = query.concat("  order by sale_main_id desc");

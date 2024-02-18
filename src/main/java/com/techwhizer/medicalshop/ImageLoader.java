@@ -43,4 +43,12 @@ public class ImageLoader {
         return iv;
     }
 
+    public ImageView getDownloadIcon(double width,double height) {
+
+        ImageView iv = new ImageView(load("img/icon/download_ic.png"));
+        iv.setFitWidth(width);
+        iv.setFitHeight(height);
+        return iv;
+    }
+
 }

@@ -16,6 +16,7 @@ module com.techwhizer.medicalshop {
     requires java.naming;
     requires org.apache.poi.ooxml;
     requires org.apache.poi.poi;
+    requires itextpdf;
 
 
     opens com.techwhizer.medicalshop.controller to javafx.fxml;

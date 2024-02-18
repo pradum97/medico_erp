@@ -230,13 +230,6 @@ public class InvoiceReport implements Initializable {
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
-        if (null != fromDateP) {
-            fromDateP.setValue(null);
-        }
-
-        if (null != toDateP) {
-            toDateP.setValue(null);
-        }
 
         try {
             connection = dbConnection.getConnection();
@@ -254,15 +247,17 @@ public class InvoiceReport implements Initializable {
                     """;
 
             if (isDateFilter) {
-                String q = query.concat(" where TO_CHAR(tsm.sale_date, 'YYYY-MM-DD') between ? and ? order by sale_main_id asc  ");
+                String q = query.concat(" where TO_CHAR(tsm.sale_date, 'DD-MM-YYYY') between ? and ? order by sale_main_id asc  ");
                 ps = connection.prepareStatement(q);
-                ps.setString(1, fromDateP.getValue().toString());
-                ps.setString(2, toDateP.getValue().toString());
+                ps.setString(1, fromDateP.getEditor().getText().toString());
+                ps.setString(2, toDateP.getEditor().getText().toString());
 
             } else {
                 query = query.concat("  order by sale_main_id desc");
                 ps = connection.prepareStatement(query);
             }
+
+
             rs = ps.executeQuery();
             while (rs.next()) {
 
@@ -540,11 +535,11 @@ public class InvoiceReport implements Initializable {
 
     public void searchInvoice(ActionEvent event) {
 
-        if (null == fromDateP.getValue()) {
-            method.show_popup("SELECT START DATE", fromDateP);
+        if ( fromDateP.getEditor().getText().isEmpty()) {
+            method.show_popup_bottom("SELECT START DATE", fromDateP);
             return;
-        } else if (null == toDateP.getValue()) {
-            method.show_popup("SELECT END DATE", toDateP);
+        } else if (toDateP.getEditor().getText().isEmpty()) {
+            method.show_popup_bottom("SELECT END DATE", toDateP);
             return;
         }
         callThread(true);

@@ -287,6 +287,15 @@ public class Method extends StaticData {
         return form_Validator;
     }
 
+    public ContextMenu show_popup_bottom(String message, Object textField) {
+
+        ContextMenu form_Validator = new ContextMenu();
+        form_Validator.setAutoHide(true);
+        form_Validator.getItems().add(new MenuItem(message));
+        form_Validator.show((Node) textField, Side.BOTTOM, 10, 0);
+        return form_Validator;
+    }
+
     public String getTempFile() {
         try {
             String folderLocation = System.getenv("temp");
@@ -637,7 +646,7 @@ public class Method extends StaticData {
     public String tabToStrip(double tablet, int stripPerTab, String unitType) {
         String val = "";
 
-        if (unitType.equalsIgnoreCase("tab")) {
+        if (unitType != null && unitType.equalsIgnoreCase("tab")) {
             int strip = (int) (tablet / stripPerTab);
             int tab = (int) (tablet % stripPerTab);
 
@@ -890,5 +899,15 @@ public class Method extends StaticData {
             DBConnection.closeConnection(connection, ps, rs);
         }
 
+    }
+
+
+    public static Double removeDecimal(double value) {
+
+        try {
+            return Double.parseDouble(String.format("%.2f", value));
+        } catch (Exception e) {
+            return value;
+        }
     }
 }
