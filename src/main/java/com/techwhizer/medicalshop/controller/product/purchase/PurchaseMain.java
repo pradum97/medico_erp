@@ -3,7 +3,6 @@ package com.techwhizer.medicalshop.controller.product.purchase;
 import com.techwhizer.medicalshop.CustomDialog;
 import com.techwhizer.medicalshop.ImageLoader;
 import com.techwhizer.medicalshop.Main;
-import com.techwhizer.medicalshop.controller.Constant;
 import com.techwhizer.medicalshop.controller.auth.Login;
 import com.techwhizer.medicalshop.method.GenerateBillNumber;
 import com.techwhizer.medicalshop.method.Method;
@@ -20,6 +19,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
@@ -119,8 +119,12 @@ public class PurchaseMain implements Initializable {
                 boolean isStockable = rs.getBoolean("is_stockable");
                 count++;
 
+                int departmentId = rs.getInt("department_id");
+                String departmentName = rs.getString("department_name");
+
                 GstModel gm = new GstModel(gstId, hsn, sGst, cGst, iGst, gstName, null);
-                popupItemList.add(new ItemChooserModel(itemId, itemName, packing, gm, unit, tabPerStrip,composition,tag,medicineDose,avlQty,isStockable));
+                popupItemList.add(new ItemChooserModel(itemId, itemName, packing, gm, unit, tabPerStrip,composition,tag,medicineDose,
+                        avlQty,isStockable,departmentId,departmentName));
 
             }
 
@@ -246,7 +250,7 @@ public class PurchaseMain implements Initializable {
     public void submitButtonClick(ActionEvent event) {
 
         if (null == dealerModel) {
-            method.show_popup("Please select dealer", dealerNameL);
+            method.show_popup("Please select dealer", dealerNameL, Side.RIGHT);
             return;
         } else if (itemList.isEmpty()) {
             customDialog.showAlertBox("Items not found", "Please enter item");

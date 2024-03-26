@@ -2,6 +2,7 @@ package com.techwhizer.medicalshop;
 
 import com.techwhizer.medicalshop.controller.auth.Login;
 import com.techwhizer.medicalshop.controller.dashboard.Billing;
+import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.util.AppConfig;
 import com.techwhizer.medicalshop.util.DBConnection;
 import com.victorlaerte.asynctask.AsyncTask;
@@ -44,6 +45,7 @@ public class Main extends Application {
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("css/main.css")).toExternalForm());
         stage.setScene(scene);
         stage.show();
+
     }
 
     public void changeScene(String fxml, String title) {

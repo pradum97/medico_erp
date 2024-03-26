@@ -72,10 +72,12 @@
               <columns>
                 <TableColumn fx:id="colSrNum" editable="false" maxWidth="60.0" minWidth="60.0" prefWidth="-1.0" sortable="false" text="SR  #" />
                 <TableColumn fx:id="colPatientName" editable="false" maxWidth="230.0" minWidth="190.0" prefWidth="-1.0" sortable="false" text="Patient Name" />
-                  <TableColumn fx:id="colConsultDate" editable="false" maxWidth="160.0" minWidth="150.0" prefWidth="-1.0" sortable="false" text="Consult Date" />
-                  <TableColumn fx:id="colReferredBy" editable="false" maxWidth="250.0" minWidth="240.0" prefWidth="-1.0" sortable="false" text="Referred By" />
-                  <TableColumn fx:id="colConsultDoctorName" editable="false" maxWidth="250.0" minWidth="230.0" prefWidth="-1.0" sortable="false" text="Consult Doctor Name" />
-                  <TableColumn fx:id="colStatus" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="-1.0" sortable="false" text="Status" />
+                  <TableColumn fx:id="colConsultDate" editable="false" maxWidth="110.0" minWidth="110.0" prefWidth="-1.0" sortable="false" text="Booking Date" />
+                  <TableColumn fx:id="colReceiptNum" editable="false" maxWidth="90.0" minWidth="90.0" prefWidth="-1.0" sortable="false" text="Receipt #" />
+                  <TableColumn fx:id="colReferredBy" editable="false" maxWidth="140.0" minWidth="70.0" prefWidth="-1.0" sortable="false" text="Referred By" />
+                  <TableColumn fx:id="colConsultDoctorName" editable="false" maxWidth="200.0" minWidth="200.0" prefWidth="-1.0" sortable="false" text="Consult Doctor Name" />
+                  <TableColumn fx:id="colStatus" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="-1.0" sortable="false" text="Status" visible="false" />
+                  <TableColumn fx:id="colRemarks" editable="false" maxWidth="180.0" minWidth="90.0" prefWidth="-1.0" sortable="false" text="Remarks" />
                   <TableColumn fx:id="colAction" editable="false" maxWidth="1.7976931348623157E308" minWidth="120.0" sortable="false" text="Action" />
               </columns>
                <columnResizePolicy>

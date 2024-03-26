@@ -142,7 +142,7 @@
                         <children>
                             <Pagination fx:id="pagination" maxPageIndicatorCount="0" visible="false" HBox.hgrow="ALWAYS" />
 
-                            <HBox alignment="CENTER" minHeight="27.0" prefHeight="31.0" prefWidth="193.0" spacing="5.0" style="-fx-background-color: #006666; -fx-border-radius: 2;">
+                            <HBox alignment="CENTER" minHeight="27.0" prefHeight="31.0" spacing="5.0" style="-fx-background-color: #006666; -fx-border-radius: 2;">
                                 <children>
                                     <Label alignment="CENTER" style="-fx-text-fill: white;" text="TOTAL NET AMOUNT : " wrapText="true">
                                         <font>

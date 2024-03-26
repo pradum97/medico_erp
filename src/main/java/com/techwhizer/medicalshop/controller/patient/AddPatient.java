@@ -15,6 +15,7 @@ import com.victorlaerte.asynctask.AsyncTask;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -23,10 +24,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -65,6 +64,7 @@ public class AddPatient implements Initializable {
         method = new Method();
         customDialog = new CustomDialog();
         method.hideElement(progressBar);
+        method.convertDateFormat_2(dobDb);
         callTask("START",null);
         config();
     }
@@ -73,17 +73,12 @@ public class AddPatient implements Initializable {
 
         ageTf.textProperty().addListener((observable, oldValue, newValue) -> {
 
-           if (!newValue.isEmpty()){
-
-               try {
-                   dobDb.setValue(CommonUtil.calculateDOBFromAge(Integer.parseInt(newValue)));
-               }catch (Exception e){
-                   dobDb.getEditor().setText("");
-                   method.show_popup("Please enter valid age",ageTf);
-               }
-           }else {
-               dobDb.getEditor().setText("");
-           }
+            try {
+                dobDb.setValue(CommonUtil.calculateDOBFromAge(Integer.parseInt(newValue.isEmpty()?"0":newValue)));
+            }catch (Exception e){
+                dobDb.setValue(null);
+                method.show_popup("Please enter valid age",ageTf, Side.RIGHT);
+            }
         });
     }
 
@@ -102,8 +97,6 @@ public class AddPatient implements Initializable {
         lastNameTf.setText(pm.getLastName());
         ageTf.setText(pm.getAge());
         addressTf.setText(pm.getAddress());
-
-      //  dobDb.getEditor().setText(pm.getDateOfBirth());
         phoneTf.setText(pm.getPhone());
         idNumberTf.setText(pm.getIdNumber());
         guardianNameTf.setText(pm.getGuardianName());
@@ -123,7 +116,6 @@ public class AddPatient implements Initializable {
            addNewPatient();
         }
     }
-
 
     public void submit_bn(ActionEvent event) {
        addNewPatient();
@@ -152,7 +144,10 @@ public class AddPatient implements Initializable {
         String gender = genderCom.getSelectionModel().getSelectedItem();
         String age = ageTf.getText();
         String address = addressTf.getText();
-        String dob = dobDb.getEditor().getText();
+        LocalDate dob = dobDb.getValue();
+
+
+
         String phone = phoneTf.getText();
         String idType = idTypeCom.getSelectionModel().getSelectedItem();
         String idNumber = idNumberTf.getText();
@@ -169,22 +164,29 @@ public class AddPatient implements Initializable {
 
 
         if (firstName.isEmpty()) {
-            method.show_popup("Please enter patient first name", firstNameTf);
+            method.show_popup("Please enter patient first name", firstNameTf, Side.RIGHT);
             return;
         }else if (genderCom.getSelectionModel().isEmpty()) {
-            method.show_popup("Please select gender", genderCom);
+            method.show_popup("Please select gender", genderCom, Side.RIGHT);
             return;
         } else if (address.isEmpty()) {
-            method.show_popup("Please enter patient address", addressTf);
+            method.show_popup("Please enter patient address", addressTf, Side.RIGHT);
             return;
-        }else if (dobDb.getEditor().getText().isEmpty()) {
-            method.show_popup("Please enter AGE OR DOB", ageTf);
+        }else if (null == dob || age.isEmpty()) {
+            method.show_popup("Please enter AGE OR DOB", ageTf, Side.RIGHT);
+            return;
+        }
+
+        try {
+            Integer.parseInt(age);
+        } catch (NumberFormatException e) {
+            method.show_popup("Please enter valid age",ageTf, Side.RIGHT);
             return;
         }
 
         if (!phone.isEmpty()) {
             if (!pattern.matcher(phone).find()) {
-                method.show_popup("Enter 10-digit phone number", phoneTf);
+                method.show_popup("Enter 10-digit phone number", phoneTf, Side.RIGHT);
                 return;
             }
         }
@@ -192,7 +194,7 @@ public class AddPatient implements Initializable {
         if (!idNumber.isEmpty()) {
 
             if (idType == null || idType.isEmpty()) {
-                method.show_popup("Please select id type", idTypeCom);
+                method.show_popup("Please select id type", idTypeCom, Side.RIGHT);
             }
 
         }
@@ -245,7 +247,7 @@ public class AddPatient implements Initializable {
                             INSERT INTO tbl_patient(
                                  salutation_id, first_name, middle_name, last_name, gender, address, dob, phone, id_type, id_number,
                                   guardian_name, weight, bp, pulse, sugar, spo2, temp, cvs, cns, chest, created_by, last_update, last_update_by,
-                                  admission_number,UHID_NO)
+                                  patient_number,UHID_NO)
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,  ?, ?, ?, ?,?,?)
                             """;
             }else {
@@ -268,7 +270,7 @@ public class AddPatient implements Initializable {
             ps.setString(4, pium.getLastName());
             ps.setString(5, pium.getGender());
             ps.setString(6, pium.getAddress());
-            ps.setString(7, pium.getDob());
+            ps.setDate(7, Date.valueOf(pium.getDob()));
             ps.setString(8, pium.getPhone());
             ps.setString(9, pium.getIdType());
             ps.setString(10, pium.getIdNumber());
@@ -289,7 +291,7 @@ public class AddPatient implements Initializable {
             ps.setTimestamp(22, timestamp);
             if (null == pm) {
                 ps.setInt(23, Login.currentlyLogin_Id);
-                ps.setString(24,new  GenerateBillNumber().generatorAdmissionNumber());
+                ps.setString(24,new  GenerateBillNumber().generatorPatientNumber());
                 ps.setString(25,new  GenerateBillNumber().generateUHIDNum());
             } else {
                 ps.setInt(23, pm.getPatientId());
@@ -391,7 +393,7 @@ public class AddPatient implements Initializable {
     private String gender;
     private String age;
     private String address;
-    private String dob;
+    private LocalDate dob;
     private String phone;
     private String idType;
     private String idNumber;
@@ -408,7 +410,7 @@ public class AddPatient implements Initializable {
 
     // Constructor
     public PatientInsertUpdateModel(int salutation_id,String firstName, String middleName, String lastName, String gender,
-                   String age, String address, String dob, String phone, String idType,
+                   String age, String address, LocalDate dob, String phone, String idType,
                    String idNumber, String guardianName, String weight, String bp,
                    String pulse, String sugar, String spo2, String temp, String cvs,
                    String cns, String chest) {
@@ -464,7 +466,7 @@ public class AddPatient implements Initializable {
         return address;
     }
 
-    public String getDob() {
+    public LocalDate getDob() {
         return dob;
     }
 

@@ -16,6 +16,7 @@ import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
@@ -117,7 +118,7 @@ public class GstConfig implements Initializable {
                                         getSelectionModel().getSelectedItem();
 
                                 if (null == edit_selection) {
-                                    method.show_popup("Please Select", tableViewGst);
+                                    method.show_popup("Please Select", tableViewGst, Side.RIGHT);
                                     return;
                                 }
 
@@ -135,7 +136,7 @@ public class GstConfig implements Initializable {
                                         getSelectionModel().getSelectedItem();
 
                                 if (null == delete_selection) {
-                                    method.show_popup("Please Select ", tableViewGst);
+                                    method.show_popup("Please Select ", tableViewGst, Side.RIGHT);
                                     return;
                                 }
 

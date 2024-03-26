@@ -82,7 +82,7 @@ public class GenerateInvoice {
                            tsm.bill_type
                     from tbl_sale_main tsm
                              Left Join tbl_sale_items tsi on tsm.sale_main_id = tsi.sale_main_id
-                             LEFT JOIN tbl_doctor td on tsm.doctor_id = td.doctor_id
+                             LEFT JOIN tbl_doctor td on tsm.referred_by = td.doctor_id
                              left join tbl_stock ts on tsi.stock_id = ts.stock_id
                              LEFT JOIN tbl_patient tp on tsm.patient_id = tp.patient_id
                             left join tbl_salutation sal on sal.salutation_id = tp.salutation_id

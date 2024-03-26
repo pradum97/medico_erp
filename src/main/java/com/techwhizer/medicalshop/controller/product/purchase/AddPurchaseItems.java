@@ -1,32 +1,25 @@
 package com.techwhizer.medicalshop.controller.product.purchase;
 
 import com.techwhizer.medicalshop.CustomDialog;
-import com.techwhizer.medicalshop.ImageLoader;
 import com.techwhizer.medicalshop.Main;
-import com.techwhizer.medicalshop.controller.auth.Login;
 import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.method.StaticData;
 import com.techwhizer.medicalshop.model.PriceTypeModel;
 import com.techwhizer.medicalshop.model.PurchaseItemsTemp;
 import com.techwhizer.medicalshop.model.chooserModel.ItemChooserModel;
 import com.techwhizer.medicalshop.util.DBConnection;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.control.*;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.net.URL;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -129,93 +122,93 @@ public class AddPurchaseItems implements Initializable {
         boolean found = matcher.find();
 
         if (null == icm) {
-            method.show_popup("Please select product", productNameL);
+            method.show_popup("Please select product", productNameL, Side.RIGHT);
             return;
         } else if (batchNumber.isEmpty()) {
-            method.show_popup("Please enter batch", batchTf);
+            method.show_popup("Please enter batch", batchTf, Side.RIGHT);
             return;
         }else if (found){
-            method.show_popup("Please remove space from batch", batchTf);
+            method.show_popup("Please remove space from batch", batchTf, Side.RIGHT);
             return;
         }else if (monthCom.getSelectionModel().isEmpty()) {
-            method.show_popup("Please select expiry month", monthCom);
+            method.show_popup("Please select expiry month", monthCom, Side.RIGHT);
             return;
         } else if (yearCom.getSelectionModel().isEmpty()) {
-            method.show_popup("Please select expiry year", yearCom);
+            method.show_popup("Please select expiry year", yearCom, Side.RIGHT);
             return;
         } else if (unitCom.getSelectionModel().isEmpty()) {
-            method.show_popup("Please select unit", unitCom);
+            method.show_popup("Please select unit", unitCom, Side.RIGHT);
             return;
         } else if (unitCom.getSelectionModel().getSelectedItem().equals("STRIP")) {
             try {
                  stripTabInt  = Integer.parseInt(stripTab);
             } catch (NumberFormatException e) {
-                method.show_popup("Please enter number only", stripTabTf);
+                method.show_popup("Please enter number only", stripTabTf, Side.RIGHT);
                 return;
             }
 
             if (stripTab.isEmpty() || stripTabInt < 1) {
-                method.show_popup("Please enter tab per strip", stripTabTf);
+                method.show_popup("Please enter tab per strip", stripTabTf, Side.RIGHT);
                 return;
             }
         }else if (packing.isEmpty()){
-            method.show_popup("Please enter packing", packingTf);
+            method.show_popup("Please enter packing", packingTf, Side.RIGHT);
             return;
         }
         if (quantity.isEmpty()) {
-            method.show_popup("Please enter quantity", quantityTf);
+            method.show_popup("Please enter quantity", quantityTf, Side.RIGHT);
             return;
         }
         try {
             quantityD = Integer.parseInt(quantity);
         } catch (NumberFormatException e) {
-            method.show_popup("Please enter a valid quantity without decimals", quantityTf);
+            method.show_popup("Please enter a valid quantity without decimals", quantityTf, Side.RIGHT);
             return;
         }
         if (quantityD < 1 ){
-            method.show_popup("Enter quantity more then 0", quantityTf);
+            method.show_popup("Enter quantity more then 0", quantityTf, Side.RIGHT);
             return;
         }else if (quantityUnitCom.getSelectionModel().isEmpty()) {
-            method.show_popup("Please select quantity unit", quantityUnitCom);
+            method.show_popup("Please select quantity unit", quantityUnitCom, Side.RIGHT);
             return;
         } else if (purchaseRate.isEmpty()) {
-            method.show_popup("Please enter purchase price", purchaseRateTf);
+            method.show_popup("Please enter purchase price", purchaseRateTf, Side.RIGHT);
             return;
         }
 
         try {
         purchasePriceD =  Double.parseDouble(purchaseRate);
         } catch (NumberFormatException e) {
-            method.show_popup("Please enter valid purchase price", purchaseRateTf);
+            method.show_popup("Please enter valid purchase price", purchaseRateTf, Side.RIGHT);
             return;
         }
         if (purchasePriceD <1){
-            method.show_popup("Enter valid rate", purchaseRateTf);
+            method.show_popup("Enter valid rate", purchaseRateTf, Side.RIGHT);
             return;
         }else if (mrp.isEmpty()) {
-            method.show_popup("Please enter mrp", mrpTf);
+            method.show_popup("Please enter mrp", mrpTf, Side.RIGHT);
             return;
         }
         try {
          mrpD = Double.parseDouble(mrp);
         } catch (NumberFormatException e) {
-            method.show_popup("Please enter valid mrp", mrpTf);
+            method.show_popup("Please enter valid mrp", mrpTf, Side.RIGHT);
             return;
         }
 
         if (mrpD <0){
-            method.show_popup("Enter valid rate", mrpTf);
+            method.show_popup("Enter valid rate", mrpTf, Side.RIGHT);
             return;
         }else if (!saleRate.isEmpty()){
             try {
                 saleRateD =  Double.parseDouble(saleRate);
             } catch (NumberFormatException e) {
-                method.show_popup("Please enter valid sale rate", saleRateTf);
+                method.show_popup("Please enter valid sale rate", saleRateTf, Side.RIGHT);
                 return;
             }
 
             if (saleRateD <0){
-                method.show_popup("Enter valid rate", saleRateTf);
+                method.show_popup("Enter valid rate", saleRateTf, Side.RIGHT);
                 return;
             }
         }

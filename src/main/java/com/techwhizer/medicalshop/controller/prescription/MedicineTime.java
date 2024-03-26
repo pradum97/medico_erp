@@ -9,6 +9,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -40,7 +41,7 @@ public class MedicineTime implements Initializable {
         String time = timeTf.getText();
 
         if (time.isEmpty()){
-            method.show_popup("Please enter medicine time",timeTf);
+            method.show_popup("Please enter medicine time",timeTf, Side.RIGHT);
             return;
         }
 

@@ -10,6 +10,7 @@ import com.techwhizer.medicalshop.model.chooserModel.ItemChooserModel;
 import com.techwhizer.medicalshop.util.DBConnection;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -193,21 +194,21 @@ public class SaleQuantityChooser implements Initializable {
         double saleRateD = 0;
 
         if (null == bcm) {
-            method.show_popup("Please select item", itemNameL);
+            method.show_popup("Please select item", itemNameL, Side.RIGHT);
             return;
         } else if (strip.isEmpty() && pcs.isEmpty()) {
-            method.show_popup("Please enter strip or pcs", pcsTf);
+            method.show_popup("Please enter strip or pcs", pcsTf, Side.RIGHT);
             return;
         } else if (!strip.isEmpty()) {
             try {
                 stripI = Integer.parseInt(strip);
             } catch (NumberFormatException e) {
-                method.show_popup("Special characters are not allowed here", stripTf);
+                method.show_popup("Special characters are not allowed here", stripTf, Side.RIGHT);
                 return;
             }
             if (pcs.isEmpty()) {
                 if (stripI < 1) {
-                    method.show_popup("Please enter valid strip", stripTf);
+                    method.show_popup("Please enter valid strip", stripTf, Side.RIGHT);
                     return;
                 }
             }
@@ -216,33 +217,33 @@ public class SaleQuantityChooser implements Initializable {
             try {
                 pcsI = Integer.parseInt(pcs);
             } catch (NumberFormatException e) {
-                method.show_popup("Special characters are not allowed here", pcsTf);
+                method.show_popup("Special characters are not allowed here", pcsTf, Side.RIGHT);
                 return;
             }
             if (strip.isEmpty()) {
                 if (pcsI < 1) {
-                    method.show_popup("Please enter valid pcs or tab", pcsTf);
+                    method.show_popup("Please enter valid pcs or tab", pcsTf, Side.RIGHT);
                     return;
                 }
             }
         }
 
         if (stripI < 1 && pcsI < 1) {
-            method.show_popup("Please enter strip or pcs", pcsTf);
+            method.show_popup("Please enter strip or pcs", pcsTf, Side.RIGHT);
             return;
         } else if (saleRate.isEmpty()) {
-            method.show_popup("Please sale rate", saleRateTf);
+            method.show_popup("Please sale rate", saleRateTf, Side.RIGHT);
             return;
         } else if (!saleRate.isEmpty()) {
             try {
                 saleRateD = Double.parseDouble(saleRate);
             } catch (NumberFormatException e) {
-                method.show_popup("Please enter valid sale rate", saleRateTf);
+                method.show_popup("Please enter valid sale rate", saleRateTf, Side.RIGHT);
                 return;
             }
 
             if (saleRateD < 1) {
-                method.show_popup("Please enter valid sale rate", saleRateTf);
+                method.show_popup("Please enter valid sale rate", saleRateTf, Side.RIGHT);
                 return;
             }
         }

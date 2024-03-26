@@ -17,6 +17,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -27,8 +28,6 @@ import javafx.stage.Stage;
 
 import java.net.URL;
 import java.sql.*;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 public class ItemMasterUpdate implements Initializable {
@@ -467,13 +466,13 @@ public class ItemMasterUpdate implements Initializable {
         double mrpD = 0;
 
         if (productName.isEmpty()) {
-            method.show_popup("Please enter product name", productNameTf);
+            method.show_popup("Please enter product name", productNameTf, Side.RIGHT);
             return;
         } else if (tag.isEmpty()) {
-            method.show_popup("Please enter product tag", productTag);
+            method.show_popup("Please enter product tag", productTag, Side.RIGHT);
             return;
         } else if (departmentCom.getSelectionModel().isEmpty()) {
-            method.show_popup("Please select item department", departmentCom);
+            method.show_popup("Please select item department", departmentCom, Side.RIGHT);
             return;
         }
 
@@ -481,37 +480,37 @@ public class ItemMasterUpdate implements Initializable {
         if (icm.isStockable()){
 
             if (composition.isEmpty()) {
-                method.show_popup("Please enter product composition.", compositionTf);
+                method.show_popup("Please enter product composition.", compositionTf, Side.RIGHT);
                 return;
             }  else if (medicineDose.isEmpty()) {
-                method.show_popup("Please enter medicine dose", medicineDoseTf);
+                method.show_popup("Please enter medicine dose", medicineDoseTf, Side.RIGHT);
                 return;
             }  else if (unitCom.getSelectionModel().isEmpty()) {
-                method.show_popup("Please select unit", unitCom);
+                method.show_popup("Please select unit", unitCom, Side.RIGHT);
                 return;
             } else if (unitCom.getSelectionModel().getSelectedItem().equals("STRIP")) {
                 if (stripTab.isEmpty()) {
-                    method.show_popup("Please enter tab per strip", stripTabTf);
+                    method.show_popup("Please enter tab per strip", stripTabTf, Side.RIGHT);
                     return;
                 }
                 try {
                     stripTabL = Long.parseLong(stripTab);
                 } catch (NumberFormatException e) {
-                    method.show_popup("Please enter number only", stripTabTf);
+                    method.show_popup("Please enter number only", stripTabTf, Side.RIGHT);
                     return;
                 }
             }
         } else {
 
             if (mrp.isEmpty()) {
-                method.show_popup("Please enter item mrp", mrpTf);
+                method.show_popup("Please enter item mrp", mrpTf, Side.RIGHT);
                 return;
             }else {
 
                 try {
                     mrpD = Double.parseDouble(mrp);
                 } catch (NumberFormatException e) {
-                    method.show_popup("Please enter valid mrp", mrpTf);
+                    method.show_popup("Please enter valid mrp", mrpTf, Side.RIGHT);
                     return;
                 }
 
@@ -520,7 +519,7 @@ public class ItemMasterUpdate implements Initializable {
 
 
         if (hsnCom.getSelectionModel().isEmpty()) {
-            method.show_popup("Please select hsn code", hsnCom);
+            method.show_popup("Please select hsn code", hsnCom, Side.RIGHT);
             return;
         }
 

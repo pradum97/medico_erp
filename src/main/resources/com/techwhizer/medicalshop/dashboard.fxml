@@ -67,29 +67,11 @@
                                     </ImageView>
                                  </graphic>
                               </Hyperlink>
-                              <Hyperlink fx:id="consultBn" layoutX="10.0" layoutY="46.0" onAction="#consultBnClick" text="CONSULTANT FORM">
-                                 <graphic>
-                                    <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                                       <image>
-                                          <Image url="@img/menu_icon/consult_icon.png" />
-                                       </image>
-                                    </ImageView>
-                                 </graphic>
-                              </Hyperlink>
-                              <Hyperlink fx:id="prescriptionBn" layoutX="10.0" layoutY="76.0" onAction="#prescriptionBnClick" text="PRESCRIPTION">
-                                 <graphic>
-                                    <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                                       <image>
-                                          <Image url="@img/menu_icon/prescription_icon.png" />
-                                       </image>
-                                    </ImageView>
-                                 </graphic>
-                              </Hyperlink>
                               <Hyperlink fx:id="consultListBn" layoutX="10.0" layoutY="82.0" onAction="#consultListBnClick" text="CONSULTANTS LIST">
                                  <graphic>
                                     <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
-                                          <Image url="@img/menu_icon/consult_list.png" />
+                                          <Image url="@img/menu_icon/consult_icon.png" />
                                        </image>
                                     </ImageView>
                                  </graphic>

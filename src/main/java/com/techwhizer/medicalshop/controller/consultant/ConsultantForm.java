@@ -24,6 +24,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
@@ -385,12 +386,12 @@ public class ConsultantForm implements Initializable {
                 String chest = rs.getString("chest");
                 String creationDate = rs.getString("creation_date");
                 String lastUpdate = rs.getString("last_update");
-                String admission_number = rs.getString("admission_number");
+                String patient_number = rs.getString("patient_number");
                 String uhidNum = rs.getString("uhid_no");
 
                 PatientModel pm = new PatientModel(patient_id, salutation_id, created_by, last_update_by, salutation_name, first_name,
                         middle_name, last_name, fullName, gender, age, address, dob, phone, idType, idNum, guardianName, weight, bp, pulse,
-                        sugar, spo2, temp, cvs, cns, chest, creationDate, lastUpdate, admission_number,uhidNum);
+                        sugar, spo2, temp, cvs, cns, chest, creationDate, lastUpdate, patient_number,uhidNum);
                 patientList.add(pm);
             }
             if (null != patientList) {
@@ -486,14 +487,14 @@ public class ConsultantForm implements Initializable {
 
                 } else {
 
-                    Hyperlink admNumHl = new Hyperlink(tableViewPatient.getItems().get(getIndex()).getAdmissionNumber());
+                    Hyperlink patientNumHl = new Hyperlink(tableViewPatient.getItems().get(getIndex()).getPatientNumber());
 
-                    admNumHl.setStyle("-fx-background-color: transparent; -fx-text-fill: blue;" +
+                    patientNumHl.setStyle("-fx-background-color: transparent; -fx-text-fill: blue;" +
                             "-fx-border-color: transparent;-fx-font-size: 10;-fx-alignment: center-left");
 
-                    admNumHl.setMinWidth(130);
+                    patientNumHl.setMinWidth(130);
 
-                    admNumHl.setOnAction(actionEvent -> {
+                    patientNumHl.setOnAction(actionEvent -> {
                         tableViewPatient.getSelectionModel().select(getIndex());
                         patientModel = tableViewPatient.getSelectionModel().getSelectedItem();
                         patientNameL.setText(patientModel.getFullName());
@@ -504,10 +505,10 @@ public class ConsultantForm implements Initializable {
                         guardianNameL.setText(patientModel.getGuardianName());
                         Map<String,Object> data = new HashMap<>();
                         data.put("patient_id",patientModel.getPatientId());
-                        data.put("button",admNumHl);
+                        data.put("button",patientNumHl);
                         callThread(Type.GET_HISTORY,data);
                     });
-                    HBox managebtn = new HBox(admNumHl);
+                    HBox managebtn = new HBox(patientNumHl);
                     managebtn.setStyle("-fx-alignment: center-left");
                     setGraphic(managebtn);
                     setText(null);
@@ -528,7 +529,7 @@ public class ConsultantForm implements Initializable {
         }
 
         if (referByCom.getSelectionModel().isEmpty()) {
-            method.show_popup("Please select referred by", referByCom);
+            method.show_popup("Please select referred by", referByCom, Side.RIGHT);
             return;
         }
 
@@ -542,23 +543,23 @@ public class ConsultantForm implements Initializable {
 
         if (referByCom.getSelectionModel().getSelectedItem().getDoctorId() == 0) {
             if (referredByName.isEmpty()) {
-                method.show_popup("Please enter referred by name ", referByName);
+                method.show_popup("Please enter referred by name ", referByName, Side.RIGHT);
                 return;
             }
         }
 
         if (consultNameCom.getSelectionModel().isEmpty()) {
-            method.show_popup("Please select consult doctor", consultNameCom);
+            method.show_popup("Please select consult doctor", consultNameCom, Side.RIGHT);
             return;
         } else if (consultantFee.isEmpty()) {
-            method.show_popup("Please enter consultant fee", consultantFeeTf);
+            method.show_popup("Please enter consultant fee", consultantFeeTf, Side.RIGHT);
             return;
         }
 
         try {
             Double.parseDouble(consultantFee);
         } catch (Exception e) {
-            method.show_popup("Please enter valid consultant fee in digit", consultantFeeTf);
+            method.show_popup("Please enter valid consultant fee in digit", consultantFeeTf, Side.RIGHT);
             return;
         }
 

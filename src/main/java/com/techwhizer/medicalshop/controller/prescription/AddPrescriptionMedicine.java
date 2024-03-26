@@ -12,6 +12,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -113,31 +114,31 @@ public class AddPrescriptionMedicine implements Initializable {
         String remarks = remarkTf.getText();
 
         if (medicineName.isEmpty()) {
-            method.show_popup("Please enter medicine name", itemNameTf);
+            method.show_popup("Please enter medicine name", itemNameTf, Side.RIGHT);
             return;
         } else if (medicineTag.isEmpty()) {
-            method.show_popup("Please enter medicine tag", itemTagTf);
+            method.show_popup("Please enter medicine tag", itemTagTf, Side.RIGHT);
             return;
         } else if (quantity.isEmpty()) {
-            method.show_popup("Please enter quantity.", quantityTf);
+            method.show_popup("Please enter quantity.", quantityTf, Side.RIGHT);
             return;
         } else if (unitCom.getSelectionModel().isEmpty()) {
-            method.show_popup("Please select quantity unit.", unitCom);
+            method.show_popup("Please select quantity unit.", unitCom, Side.RIGHT);
             return;
         } else if (freqCom.getSelectionModel().isEmpty()) {
-            method.show_popup("Please select frequency.", freqCom);
+            method.show_popup("Please select frequency.", freqCom, Side.RIGHT);
             return;
         } else if (duration.isEmpty()) {
-            method.show_popup("Please enter duration", durationTf);
+            method.show_popup("Please enter duration", durationTf, Side.RIGHT);
             return;
         } else if (timingCom.getSelectionModel().isEmpty()) {
-            method.show_popup("Please select time.", timingCom);
+            method.show_popup("Please select time.", timingCom, Side.RIGHT);
             return;
         } else if (composition.isEmpty()) {
-            method.show_popup("Please enter medicine composition", compositionTf);
+            method.show_popup("Please enter medicine composition", compositionTf, Side.RIGHT);
             return;
         } else if (dose.isEmpty()) {
-            method.show_popup("Please enter medicine dose", doseTf);
+            method.show_popup("Please enter medicine dose", doseTf, Side.RIGHT);
             return;
         }
 

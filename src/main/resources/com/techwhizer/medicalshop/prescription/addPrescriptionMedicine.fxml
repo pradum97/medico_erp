@@ -6,59 +6,16 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-            prefWidth="687.0" xmlns="http://javafx.com/javafx/20.0.1"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.techwhizer.medicalshop.controller.prescription.AddPrescriptionMedicine">
-   <top>
-      <HBox alignment="CENTER_RIGHT" prefHeight="47.0" prefWidth="765.0" style="-fx-background-color: #04852f;" BorderPane.alignment="CENTER">
-         <padding>
-            <Insets right="20.0" />
-         </padding>
-         <children>
-            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
-               <padding>
-                  <Insets left="15.0" />
-               </padding>
-            </HBox>
-            <HBox alignment="CENTER">
-               <children>
-                  <Button mnemonicParsing="false" onAction="#addItemClick" style="-fx-background-color: #1a75ff; -fx-background-radius: 30;" text="Find Medicine" textFill="WHITE">
-                     <padding>
-                        <Insets bottom="3.0" left="15.0" right="15.0" top="3.0" />
-                     </padding>
-                     <graphic>
-                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../img/menu_icon/add_icon.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                  </Button>
-               </children>
-            </HBox>
-         </children>
-      </HBox>
-   </top>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="687.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.prescription.AddPrescriptionMedicine">
    <center>
       <VBox style="-fx-border-color: grey;" BorderPane.alignment="CENTER">
          <children>
-            <VBox alignment="CENTER">
-               <children>
-                  <Label text="Add External medicine label in form while prescribing external medicine">
-                     <font>
-                        <Font name="System Bold" size="12.179104804992676" />
-                     </font>
-                  </Label>
-               </children>
-            </VBox>
+            <VBox alignment="CENTER" />
             <VBox alignment="TOP_CENTER" prefWidth="765.0" spacing="10.0">
                <children>
                   <VBox alignment="CENTER" spacing="10.0">

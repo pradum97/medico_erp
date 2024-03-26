@@ -12,6 +12,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -189,10 +190,10 @@ public class ViewCompany implements Initializable {
         String cAddress = companyAddressTf.getText();
 
         if (cName.isEmpty()){
-            method.show_popup("Enter Company name",companyNameTF);
+            method.show_popup("Enter Company name",companyNameTF, Side.RIGHT);
             return;
         }else  if (cAddress.isEmpty()){
-            method.show_popup("Enter Company Address",companyAddressTf);
+            method.show_popup("Enter Company Address",companyAddressTf, Side.RIGHT);
             return;
         }
 

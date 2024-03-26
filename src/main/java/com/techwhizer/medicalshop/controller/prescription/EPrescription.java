@@ -4,19 +4,22 @@ import com.techwhizer.medicalshop.CustomDialog;
 import com.techwhizer.medicalshop.ImageLoader;
 import com.techwhizer.medicalshop.Main;
 import com.techwhizer.medicalshop.controller.auth.Login;
+import com.techwhizer.medicalshop.DateTimePicker;
+import com.techwhizer.medicalshop.controller.investigation.model.InvestigationModel;
 import com.techwhizer.medicalshop.method.GenerateBillNumber;
 import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.method.PrintPrescription;
 import com.techwhizer.medicalshop.model.*;
 import com.techwhizer.medicalshop.model.chooserModel.ItemChooserModel;
 import com.techwhizer.medicalshop.model.chooserModel.PrescribeMedicineChooserModel;
-import com.techwhizer.medicalshop.util.CommonUtil;
 import com.techwhizer.medicalshop.util.DBConnection;
-import com.techwhizer.medicalshop.util.type.DoctorType;
+import com.techwhizer.medicalshop.util.TimeSpinner;
 import com.victorlaerte.asynctask.AsyncTask;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
@@ -24,65 +27,49 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.util.Callback;
-
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
-public class PrescriptionMaster implements Initializable {
-
-    public TextField itemNameTf;
-    public TextField itemTagTf;
-    public TextField quantityTf;
-    public ComboBox<String> unitCom;
-    public ComboBox<FrequencyModel> freqCom;
-    public TextField durationTf;
-    public ComboBox<String> durationType;
-    public ComboBox<MedicineTimeModel> timingCom;
-    public TextField compositionTf;
-    public TextField remarkTf;
-
-    public TextField doseTf;
+public class EPrescription implements Initializable {
     public TableView<ConsultantModel> tableViewPatient;
     public TableColumn<ConsultantModel, Integer> colPatientSr;
     public TableColumn<ConsultantModel, String> colReceiptNum;
-    public TableColumn<ConsultantModel, String> colPatientName;
     public TableColumn<ConsultantModel, String> colConsultDate;
-    public TableColumn<ConsultantModel, String> colActionConsult;
-    public TextField searchTf;
+
     public Pagination pagination;
-    public ComboBox<String> comStatus;
-    public ComboBox<DoctorModel> comDoctor;
-    public Button searchPatientBn;
-    public Label gurdianNameL;
+
     public Label genderL;
     public Label ageL;
     public Label addressL;
     public Button print_save;
     public Button clearList;
     public Button addItemToList;
-    public Label consultDoctorNameL;
     public Label receiptNumL;
+    public TableView<InvestigationModel> investigationTableView;
+    public TableColumn<InvestigationModel,Integer> colInveSr;
+    public TableColumn<InvestigationModel,String> colInveItemName;
+    public TableColumn<InvestigationModel,String> colInvePrescribedDate;
+    public TableColumn<InvestigationModel,String> colInveResultDate;
+    public TableColumn<InvestigationModel,String> colInveResultValue;
     private ObservableList<ConsultantModel> consultList = FXCollections.observableArrayList();
-    private ObservableList<String> durationTypeList = FXCollections.observableArrayList("Days");
-    private ObservableList<String> unitList = FXCollections.observableArrayList("PCS", "STRIP");
-    private ObservableList<FrequencyModel> frequencyList = FXCollections.observableArrayList();
-    private ObservableList<MedicineTimeModel> timeList = FXCollections.observableArrayList();
-    private ObservableList<String> consultStatusList = FXCollections.observableArrayList("All", "Pending", "Done");
-    public Label patientNameL;
+      public Label patientNameL;
     public TableView<PrescribedMedicineModel> tableview;
     public TableColumn<PrescribedMedicineModel, Integer> colSr;
     public TableColumn<PrescribedMedicineModel, String> colMedicineName;
@@ -105,13 +92,14 @@ public class PrescriptionMaster implements Initializable {
     int selectedPrescribeMasterId;
 
     enum Type {
-        PRINT, GET_PATIENT, SAVE, UPDATE, INIT,
+        PRINT, SAVE, UPDATE, INIT,
         UPDATE_DELETE,
         VIEW_MEDICINE,
         GET_LAST
     }
 
     private ObservableList<PrescribedMedicineModel> medicineList = FXCollections.observableArrayList();
+    private ObservableList<InvestigationModel> investigationList = FXCollections.observableArrayList();
     private Method method;
     private ItemChooserModel icmGlobal;
 
@@ -130,7 +118,116 @@ public class PrescriptionMaster implements Initializable {
         setToolTip(colRemarks);
         setToolTip(colFrequency);
         setToolTip(colTimes);
+
+        setInvestigationDefaultRow();
     }
+
+    private void setInvestigationDefaultRow() {
+
+        InvestigationModel im = new InvestigationModel(0,0,"","",LocalDate.now(),null);
+
+        investigationList.add(im);
+        investigationList.add(im);
+
+
+        investigationTableView.setItems(investigationList);
+
+
+        colInveSr.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(
+                investigationTableView.getItems().indexOf(cellData.getValue()) + 1));
+
+//        colInveItemName.setCellValueFactory(new PropertyValueFactory<>("itemName"));
+        colInvePrescribedDate.setCellValueFactory(new PropertyValueFactory<>("prescribeDate"));
+//        colInveResultDate.setCellValueFactory(new PropertyValueFactory<>("resultDate"));
+//        colInveResultValue.setCellValueFactory(new PropertyValueFactory<>("resultValue"));
+
+
+        investigationSetOptionalCell();
+    }
+
+    private void investigationSetOptionalCell(){
+
+        Callback<TableColumn<InvestigationModel, String>, TableCell<InvestigationModel, String>>
+                cellItemName = (TableColumn<InvestigationModel, String> param) -> new TableCell<>() {
+            @Override
+            public void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                    setText(null);
+
+                } else {
+                    Button inveItemSelect = new Button("SELECT ITEM");
+                    inveItemSelect.setMinWidth(210);
+                    inveItemSelect.setStyle("-fx-border-color: grey;-fx-border-radius: 3;-fx-padding: 2 10 2 10");
+                    setGraphic(inveItemSelect);
+                    setText(null);
+                }
+            }
+
+        };
+
+
+        Callback<TableColumn<InvestigationModel, String>, TableCell<InvestigationModel, String>>
+                cellItemResultValue = (TableColumn<InvestigationModel, String> param) -> new TableCell<>() {
+            @Override
+            public void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                    setText(null);
+
+                } else {
+                    InvestigationModel im = investigationTableView.getItems().get(getIndex());
+                   TextField resultValue = new TextField();
+                    resultValue.setPromptText("Enter result value");
+
+                    resultValue.setMinWidth(190);
+                    resultValue.setStyle("-fx-border-color: grey;-fx-border-radius: 3;");
+
+                    resultValue.textProperty().addListener((observableValue, s, result) -> im.setResultValue(result));
+
+                    HBox managebtn = new HBox(resultValue);
+                    managebtn.setStyle("-fx-alignment:center-left;");
+
+                    HBox.setMargin(resultValue, new Insets(2, 2, 0, 2));
+                    setGraphic(resultValue);
+                    setText(null);
+
+                }
+            }
+
+        };
+
+        Callback<TableColumn<InvestigationModel, String>, TableCell<InvestigationModel, String>>
+                cellItemResultDateAndTime = (TableColumn<InvestigationModel, String> param) -> new TableCell<>() {
+            @Override
+            public void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                    setText(null);
+
+                } else {
+                    DateTimePicker dateTimePicker =   new DateTimePicker();
+
+                    InvestigationModel im = investigationTableView.getItems().get(getIndex());
+                    dateTimePicker.dateTimeProperty().addListener((observableValue, localDateTime, dateTimeString) -> im.setResultDate(dateTimeString));
+
+
+                    setGraphic(dateTimePicker);
+                    setText(null);
+
+                }
+            }
+
+        };
+
+        colInveResultDate.setCellFactory(cellItemResultDateAndTime);
+        colInveResultValue.setCellFactory(cellItemResultValue);
+        colInveItemName.setCellFactory(cellItemName);
+    }
+
 
     public void clearListClick(ActionEvent actionEvent) {
 
@@ -152,124 +249,14 @@ public class PrescriptionMaster implements Initializable {
         getMedicine();
     }
 
-    public void searchPatientBnClick(ActionEvent actionEvent) {
-
-        if (comDoctor.getSelectionModel().isEmpty() &&
-                comStatus.getSelectionModel().isEmpty() &&
-                searchTf.getText().isEmpty()) {
-
-            new CustomDialog().showAlertBox("", "Empty filter not allow");
-            return;
-        }
-
-        int doctorId = comDoctor.getSelectionModel().isEmpty() ? 0 : comDoctor.getSelectionModel().getSelectedItem().getDoctorId();
-        Map<String, Object> data = new HashMap<>();
-        data.put("status", comStatus.getSelectionModel().isEmpty() ? "All" : comStatus.getSelectionModel().getSelectedItem().toString());
-        data.put("search_key", searchTf.getText().toString());
-        data.put("doctor_id", doctorId);
-        data.put("button", searchPatientBn);
-        callThread(Type.GET_PATIENT, data);
-
-
-    }
 
     private void config() {
-        setComValue();
-        getFrequency();
-        getTimes();
-        Map<String, Object> data = new HashMap<>();
-        data.put("status", "Pending");
-        data.put("search_key", "");
-        data.put("doctor_id", 0);
-        callThread(Type.GET_PATIENT, data);
+
         tableview.setFixedCellSize(30.0);
-        comStatus.setItems(consultStatusList);
-        Platform.runLater(() -> comStatus.getSelectionModel().select("Pending"));
-        comDoctor.setItems(CommonUtil.getDoctor(DoctorType.IN_HOUSE));
         DoctorModel dm = new DoctorModel(0, "All");
-        comDoctor.getItems().add(0, dm);
     }
 
-    private void setComValue() {
-
-        durationType.setItems(durationTypeList);
-        unitCom.setItems(unitList);
-        Platform.runLater(() -> durationType.getSelectionModel().selectFirst());
-    }
-
-    public void getTimes() {
-
-        if (null != timeList) {
-            timeList.clear();
-        }
-
-
-        Connection connection = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            connection = new DBConnection().getConnection();
-            String qry = "select * from tbl_medicine_time";
-            ps = connection.prepareStatement(qry);
-            rs = ps.executeQuery();
-            while (rs.next()) {
-
-                String time = rs.getString("time");
-                MedicineTimeModel fm = new MedicineTimeModel(time);
-                timeList.add(fm);
-            }
-
-            timingCom.setItems(timeList);
-
-        } catch (Exception e) {
-
-        } finally {
-            DBConnection.closeConnection(connection, ps, rs);
-        }
-    }
-
-    public void getFrequency() {
-
-        if (null != frequencyList) {
-            frequencyList.clear();
-        }
-
-
-        Connection connection = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            connection = new DBConnection().getConnection();
-            String qry = "select * from tbl_frequency";
-            ps = connection.prepareStatement(qry);
-            rs = ps.executeQuery();
-            while (rs.next()) {
-
-                String frequency = rs.getString("frequency");
-                FrequencyModel fm = new FrequencyModel(frequency);
-                frequencyList.add(fm);
-            }
-
-            freqCom.setItems(frequencyList);
-
-
-        } catch (Exception e) {
-
-        } finally {
-            DBConnection.closeConnection(connection, ps, rs);
-        }
-    }
-
-    private void editableEnable() {
-
-        itemNameTf.setDisable(false);
-        itemTagTf.setDisable(false);
-        compositionTf.setDisable(false);
-        doseTf.setDisable(false);
-    }
-
+/*
     public void addItemClick(ActionEvent actionEvent) {
 
         new CustomDialog().showFxmlDialog2("chooser/itemChooser.fxml", "SELECT ITEM");
@@ -300,8 +287,9 @@ public class PrescriptionMaster implements Initializable {
             doseTf.setDisable(false);
         }
     }
+*/
 
-    public void addItemToListClick(ActionEvent actionEvent) {
+   /* public void addItemToListClick(ActionEvent actionEvent) {
 
         String medicineName = itemNameTf.getText();
         String medicineTag = itemTagTf.getText();
@@ -312,45 +300,45 @@ public class PrescriptionMaster implements Initializable {
         String remarks = remarkTf.getText();
 
         if (medicineName.isEmpty()) {
-            method.show_popup("Please enter medicine name", itemNameTf);
+            method.show_popup("Please enter medicine name", itemNameTf, Side.RIGHT);
             return;
         } else if (medicineTag.isEmpty()) {
-            method.show_popup("Please enter medicine tag", itemTagTf);
+            method.show_popup("Please enter medicine tag", itemTagTf, Side.RIGHT);
             return;
         } else if (quantity.isEmpty()) {
-            method.show_popup("Please enter quantity.", quantityTf);
+            method.show_popup("Please enter quantity.", quantityTf, Side.RIGHT);
             return;
         } else if (unitCom.getSelectionModel().isEmpty()) {
-            method.show_popup("Please select quantity unit.", unitCom);
+            method.show_popup("Please select quantity unit.", unitCom, Side.RIGHT);
             return;
         } else if (freqCom.getSelectionModel().isEmpty()) {
-            method.show_popup("Please select frequency.", freqCom);
+            method.show_popup("Please select frequency.", freqCom, Side.RIGHT);
             return;
         } else if (duration.isEmpty()) {
-            method.show_popup("Please enter duration", durationTf);
+            method.show_popup("Please enter duration", durationTf, Side.RIGHT);
             return;
         } else if (timingCom.getSelectionModel().isEmpty()) {
-            method.show_popup("Please select time.", timingCom);
+            method.show_popup("Please select time.", timingCom, Side.RIGHT);
             return;
         } else if (composition.isEmpty()) {
-            method.show_popup("Please enter medicine composition", compositionTf);
+            method.show_popup("Please enter medicine composition", compositionTf, Side.RIGHT);
             return;
         } else if (dose.isEmpty()) {
-            method.show_popup("Please enter medicine dose", doseTf);
+            method.show_popup("Please enter medicine dose", doseTf, Side.RIGHT);
             return;
         }
 
         try {
             Double.parseDouble(quantity);
         } catch (NumberFormatException e) {
-            method.show_popup("Please enter valid quantity.", quantityTf);
+            method.show_popup("Please enter valid quantity.", quantityTf, Side.RIGHT);
             return;
         }
 
         try {
             Double.parseDouble(duration);
         } catch (NumberFormatException e) {
-            method.show_popup("Please enter valid duration.", durationTf);
+            method.show_popup("Please enter valid duration.", durationTf, Side.RIGHT);
             return;
         }
 
@@ -380,7 +368,7 @@ public class PrescriptionMaster implements Initializable {
         doseTf.setText("");
         remarkTf.setText("");
         editableEnable();
-    }
+    }*/
 
     private void getMedicine() {
         tableview.setItems(medicineList);
@@ -593,22 +581,6 @@ public class PrescriptionMaster implements Initializable {
                     if (res > 0 || isUpdate) {
                         connection.commit();
 
-                        String status = comStatus.getSelectionModel().getSelectedItem().isEmpty() ?
-                                "Pending" : comStatus.getSelectionModel().getSelectedItem();
-
-                        String searchKey = searchTf.getText().isEmpty() ?
-                                "" : searchTf.getText();
-
-                        int doctorId = comDoctor.getSelectionModel().getSelectedItem() == null ?
-                                0 : comDoctor.getSelectionModel().getSelectedItem().getDoctorId();
-
-                        Map<String, Object> data = new HashMap<>();
-                        data.put("status", status);
-                        data.put("search_key", searchKey);
-                        data.put("doctor_id", doctorId);
-
-
-                        callThread(Type.GET_PATIENT, data);
                         new Method().hideElement(saveBn);
 
                         Platform.runLater(() -> {
@@ -782,17 +754,6 @@ public class PrescriptionMaster implements Initializable {
                         saveBn.setDisable(true);
                     }
 
-                    case GET_PATIENT -> {
-                        if (data.get("button") != null && data.get("button") instanceof Button) {
-                            Button bn = (Button) data.get("button");
-                            bn.setGraphic(method.getProgressBarWhite(20, 20));
-                            bn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-
-                        }
-                        tableViewPatient.setPlaceholder(method.getProgressBarRed(35, 35));
-                    }
-
-
                     case GET_LAST, UPDATE_DELETE, VIEW_MEDICINE -> {
 
                         tableview.setPlaceholder(method.getProgressBarRed(35, 35));
@@ -814,12 +775,6 @@ public class PrescriptionMaster implements Initializable {
                     boolean isOnlyPrint = (Boolean) data.get("isOnlyPrint");
                     save(isPrintable, isOnlyPrint, (Button) data.get("button"));
                 }
-                case GET_PATIENT -> {
-
-                    getConsultPatient(data);
-
-                }
-
                 case INIT -> {
                     config();
                 }
@@ -849,13 +804,6 @@ public class PrescriptionMaster implements Initializable {
                         saveBn.setContentDisplay(ContentDisplay.TEXT_ONLY);
                         saveBn.setDisable(false);
                     }
-                    case GET_PATIENT -> {
-                        if (data.get("button") != null && data.get("button") instanceof Button) {
-                            Button bn = (Button) data.get("button");
-                            bn.setContentDisplay(ContentDisplay.TEXT_ONLY);
-                        }
-                        tableViewPatient.setPlaceholder(null);
-                    }
                     case GET_LAST, UPDATE_DELETE, VIEW_MEDICINE -> {
 
                         tableview.setPlaceholder(null);
@@ -871,93 +819,12 @@ public class PrescriptionMaster implements Initializable {
         }
     }
 
-    private void getConsultPatient(Map<String, Object> data) {
-        if (null != consultList) {
-            consultList.clear();
-        }
-        Connection connection = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            connection = new DBConnection().getConnection();
-
-            String status = ((String) data.get("status"));
-            String searchKey = (String) data.get("search_key");
-            int doctorId = (int) data.get("doctor_id");
-
-
-            String qry = "select concat(coalesce(receipt_num,''),coalesce(patient_name,'')),* from consultant_history_v\n" +
-                    "         where concat(coalesce(receipt_num,''),coalesce(patient_name,'')) ilike '%" + searchKey + "%'" +
-                    "         and consultation_doctor_id = case when " + doctorId + "> 0 then " + doctorId + " else consultation_doctor_id end\n" +
-                    "         and consultant_status = case when lower('" + status + "') =  'all' or lower('" + status + "') = ''  then consultant_status   else '" + status + "'  end\n" +
-                    "         order by consultation_id desc\n";
-
-            ps = connection.prepareStatement(qry);
-
-            rs = ps.executeQuery();
-
-            while (rs.next()) {
-                int consultation_id = rs.getInt("consultation_id");
-                int referred_by_doctor_id = rs.getInt("referred_by_doctor_id");
-                int consultation_doctor_id = rs.getInt("consultation_doctor_id");
-                int patient_id = rs.getInt("patient_id");
-
-                String patient_name = rs.getString("patient_name");
-
-
-                String consult_date = rs.getString("consult_date");
-                String referred_by_name = rs.getString("referred_by_name");
-                String consult_name = rs.getString("consult_name");
-                String consultant_status = rs.getString("consultant_status");
-
-                String receipt_num = rs.getString("receipt_num");
-                String receipt_type = rs.getString("receipt_type");
-                String remarks = rs.getString("remarks");
-                String description = rs.getString("description");
-                String guardian_name = rs.getString("guardian_name");
-                String age = rs.getString("age");
-                String gender = rs.getString("gender");
-                String address = rs.getString("address");
-
-
-                ConsultantModel cm = new ConsultantModel(consultation_id, referred_by_doctor_id, patient_id, consultation_doctor_id, patient_name,
-                        consult_date, referred_by_name, consult_name, consultant_status, receipt_num, receipt_type, remarks, description,
-                        guardian_name, gender, age, address);
-                consultList.add(cm);
-            }
-
-            if (null != consultList) {
-                if (!consultList.isEmpty()) {
-                    pagination.setVisible(true);
-                }
-
-            }
-
-            pagination.setCurrentPageIndex(0);
-            changeTableViewPatient(0, rowsPerPage);
-            Platform.runLater(() -> {
-                pagination.currentPageIndexProperty().addListener(
-                        (observable1, oldValue1, newValue1) -> {
-                            changeTableViewPatient(newValue1.intValue(), rowsPerPage);
-                        });
-            });
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            DBConnection.closeConnection(connection, ps, rs);
-        }
-
-    }
-
     private void changeTableViewPatient(int index, int limit) {
 
         int totalPage = (int) (Math.ceil(consultList.size() * 1.0 / rowsPerPage));
         Platform.runLater(() -> pagination.setPageCount(totalPage));
         colPatientSr.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(
                 tableViewPatient.getItems().indexOf(cellData.getValue()) + 1));
-        colPatientName.setCellValueFactory(new PropertyValueFactory<>("patient_name"));
         colConsultDate.setCellValueFactory(new PropertyValueFactory<>("consult_date"));
 
 
@@ -976,7 +843,8 @@ public class PrescriptionMaster implements Initializable {
 
     private void setOptionalCellPatientView() {
 
-        Callback<TableColumn<ConsultantModel, String>, TableCell<ConsultantModel, String>> cellAction = (TableColumn<ConsultantModel, String> param) -> {
+      /*  Callback<TableColumn<ConsultantModel, String>, TableCell<ConsultantModel, String>> cellAction =
+                (TableColumn<ConsultantModel, String> param) -> {
             return new TableCell<>() {
                 @Override
                 public void updateItem(String item, boolean empty) {
@@ -1029,13 +897,13 @@ public class PrescriptionMaster implements Initializable {
                                 contextMenu.getItems().addAll(selectLast, itemEdit, viewItem);
 
                                 contextMenu.setStyle("""
-                                                                            
+
                                             -fx-background-color: #bfbfbf;
                                             -fx-border-color:  #04852f;
                                             -fx-min-width: 100;
                                             -fx-padding: 5;
                                             -fx-text-fill: white;
-                                                                            
+
                                         """);
                                 contextMenu.show(menuButton, Side.RIGHT, 10, 0);
                             }
@@ -1060,7 +928,7 @@ public class PrescriptionMaster implements Initializable {
                 }
 
             };
-        };
+        };*/
 
         Callback<TableColumn<ConsultantModel, String>, TableCell<ConsultantModel, String>>
                 cellEdit = (TableColumn<ConsultantModel, String> param) -> new TableCell<>() {
@@ -1097,19 +965,15 @@ public class PrescriptionMaster implements Initializable {
 
         };
 
-
-        colActionConsult.setCellFactory(cellAction);
         colReceiptNum.setCellFactory(cellEdit);
     }
 
     private void selectPatient(ConsultantModel cm) {
 
         patientNameL.setText(cm.getPatient_name());
-        gurdianNameL.setText(cm.getGuardianName());
         genderL.setText(cm.getGender());
         ageL.setText(cm.getAge());
         addressL.setText(cm.getAddress());
-        consultDoctorNameL.setText(cm.getConsult_name());
         receiptNumL.setText(cm.getReceiptNum());
     }
 
@@ -1154,7 +1018,6 @@ public class PrescriptionMaster implements Initializable {
                 oprationType = Type.GET_LAST;
                 clearList.setVisible(false);
                 addItemToList.setDisable(false);
-                clearItem();
                 getBilledItem(getLastPrescribeMasterId(consultId));
             }
 
@@ -1302,7 +1165,6 @@ public class PrescriptionMaster implements Initializable {
 
             if (!medicineList.isEmpty()) {
                 getMedicine();
-                clearItem();
             } else {
 
                 new CustomDialog().showAlertBox("Failed", "Item not exists.");

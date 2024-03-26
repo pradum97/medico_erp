@@ -121,7 +121,7 @@ public class GenerateBillNumber {
     }
 
 
-    public String generatorAdmissionNumber() {
+    public String generatorPatientNumber() {
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -130,11 +130,11 @@ public class GenerateBillNumber {
             connection = new DBConnection().getConnection();
             ps = connection.prepareStatement("select max(patient_id) from tbl_patient");
             rs = ps.executeQuery();
-            String invoiceNum = null;
+            String uniqueNumber = null;
 
             if (rs.next()) {
                 long id = rs.getInt(1) + 1;
-                invoiceNum = String.format("%04d", id);
+                uniqueNumber = String.format("%06d", id);
             }
 
             String year = String.valueOf(Year.now().getValue()).substring(2);
@@ -142,8 +142,7 @@ public class GenerateBillNumber {
             Calendar cal = Calendar.getInstance();
             cal.setTime(date);
             int month = cal.get(Calendar.MONTH);
-
-            return "ADM/" + year + "/" + month + "/" + invoiceNum;
+            return "PAT-"+uniqueNumber;
         } catch (SQLException e) {
             e.printStackTrace();
             return null;

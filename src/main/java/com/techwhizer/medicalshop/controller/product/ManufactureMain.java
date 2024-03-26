@@ -13,6 +13,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -63,7 +64,7 @@ public class ManufactureMain implements Initializable {
         String manufactureName = manufactureNameTf.getText();
 
         if (manufactureName.isEmpty()){
-            method.show_popup("Enter manufacture name ",manufactureNameTf);
+            method.show_popup("Enter manufacture name ",manufactureNameTf, Side.RIGHT);
             return;
         }
 

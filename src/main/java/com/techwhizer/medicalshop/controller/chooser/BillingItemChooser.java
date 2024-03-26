@@ -121,13 +121,7 @@ public class BillingItemChooser implements Initializable {
                 int itemId = rs.getInt("ITEM_ID");
                 String itemName = rs.getString("ITEMS_NAME");
                 String packing = rs.getString("PACKING");
-//                int gstId = rs.getInt("gst_id");
-//                int cGst = rs.getInt("cgst");
-//                int iGst = rs.getInt("igst");
-//                int sGst = rs.getInt("sgst");
-//                int hsn = rs.getInt("hsn_sac");
                 int tabPerStrip = rs.getInt("STRIP_TAB");
-               // String gstName = rs.getString("gstName");
                 String unit = rs.getString("unit");
                 String composition = rs.getString("composition");
                 String tag = rs.getString("tag");
@@ -135,10 +129,12 @@ public class BillingItemChooser implements Initializable {
                 String avlQty = rs.getString("avl_qty_strip");
                 boolean isStockable = rs.getBoolean("is_stockable");
 
-             //   GstModel gm = new GstModel(gstId, hsn, sGst, cGst, iGst, gstName, null);
+                int departmentId = rs.getInt("department_id");
+                String departmentName = rs.getString("department_name");
+
 
                 itemList.add(new ItemChooserModel(itemId, itemName, packing, null, unit, tabPerStrip, composition, tag,
-                        medicineDose,isStockable?avlQty:"∞" ,isStockable));
+                        medicineDose,isStockable?avlQty:"∞" ,isStockable,departmentId,departmentName));
             }
 
             if (!itemList.isEmpty()) {

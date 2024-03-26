@@ -10,6 +10,7 @@ import com.victorlaerte.asynctask.AsyncTask;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
@@ -138,23 +139,23 @@ public class PayDues implements Initializable {
         String paymentMode = paymentModeCom.getSelectionModel().getSelectedItem();
 
         if (paidAmount.isEmpty()) {
-            method.show_popup("Please Enter Received Amount", receivedAmountTF);
+            method.show_popup("Please Enter Received Amount", receivedAmountTF, Side.RIGHT);
             return;
         }
         double paidAmountD = 0, avlDuesD = 0;
         try {
             paidAmountD = Double.parseDouble(paidAmount);
         } catch (NumberFormatException e) {
-            method.show_popup("Enter Valid Amount", receivedAmountTF);
+            method.show_popup("Enter Valid Amount", receivedAmountTF, Side.RIGHT);
             return;
         }
         if (paidAmountD < 1) {
-            method.show_popup("Enter more than 0", receivedAmountTF);
+            method.show_popup("Enter more than 0", receivedAmountTF, Side.RIGHT);
             return;
         }
 
         if (paidAmountD > totalDuesAmount){
-            method.show_popup("You can't pay more then dues amount", receivedAmountTF);
+            method.show_popup("You can't pay more then dues amount", receivedAmountTF, Side.RIGHT);
             return;
         }
 

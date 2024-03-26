@@ -113,7 +113,7 @@
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.spreadsheet.SpreadsheetLayout"/>
 				</reportElement>
 				<textField isBlankWhenNull="true">
-					<reportElement x="62" y="1" width="316" height="15" uuid="9a0602e8-f3b4-458d-8966-b517ab030d5b">
+					<reportElement x="62" y="1" width="316" height="13" uuid="9a0602e8-f3b4-458d-8966-b517ab030d5b">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					</reportElement>
@@ -123,17 +123,18 @@
 					<textFieldExpression><![CDATA[$P{CUSTOMER_NAME}]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement x="62" y="16" width="316" height="15" uuid="92b70777-db66-45cd-a2bd-a6fce8c1fe6b">
+					<reportElement x="62" y="15" width="316" height="15" uuid="92b70777-db66-45cd-a2bd-a6fce8c1fe6b">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 					</reportElement>
-					<textElement verticalAlignment="Middle">
+					<textElement textAlignment="Left" verticalAlignment="Middle">
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{CUSTOMER_PHONE}]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement x="62" y="31" width="316" height="15" uuid="4e97308e-a904-4607-8e94-54952f68a471">
+					<reportElement x="62" y="30" width="316" height="15" uuid="4e97308e-a904-4607-8e94-54952f68a471">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					</reportElement>
@@ -197,11 +198,12 @@
 					<text><![CDATA[REFER BY :]]></text>
 				</staticText>
 				<textField>
-					<reportElement x="450" y="32" width="120" height="15" uuid="e87d4c70-5ae0-4809-85db-9a51d745d327">
+					<reportElement x="450" y="31" width="120" height="15" uuid="e87d4c70-5ae0-4809-85db-9a51d745d327">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					</reportElement>
-					<textElement verticalAlignment="Top">
+					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8" isBold="true"/>
 						<paragraph leftIndent="5"/>
 					</textElement>

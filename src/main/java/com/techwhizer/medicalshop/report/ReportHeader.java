@@ -7,9 +7,11 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.techwhizer.medicalshop.HeaderFooterWithTable;
+import com.techwhizer.medicalshop.ImageLoader;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 public class ReportHeader extends PdfPageEventHelper {
 
@@ -25,7 +27,7 @@ public class ReportHeader extends PdfPageEventHelper {
         header.getDefaultCell().setBorderColor(BaseColor.LIGHT_GRAY);
         header.setWidthPercentage(100);
         float size = 45;
-        String path = "D:\\TechWhizer\\Project\\medico_erp\\src\\main\\resources\\com\\techwhizer\\medicalshop\\img\\company\\gangotri_company_logo.png";
+     //   String path = "D:\\TechWhizer\\Project\\medico_erp\\src\\main\\resources\\com\\techwhizer\\medicalshop\\img\\company\\gangotri_company_logo.png";
 
         BaseColor topRowColor = WebColors.getRGBColor("#cc0052");
         Font topRowFont = FontFactory.getFont(FontFactory.HELVETICA, 18, Font.BOLD, topRowColor);
@@ -38,9 +40,12 @@ public class ReportHeader extends PdfPageEventHelper {
         topCell.setSpaceCharRatio(2f);
         header.addCell(topCell);
 
+        String logoPath = "src/main/resources/com/techwhizer/medicalshop/img/company/gangotri_company_logo.png";
+        String subtitle = "src/main/resources/com/techwhizer/medicalshop/img/company/subtitle.png";
+
         PdfPCell leftCell = new PdfPCell();
         leftCell.setBorder(Rectangle.NO_BORDER);
-        Image leftImage = Image.getInstance(path);
+        Image leftImage = ImageLoader.reportImageLoader(logoPath);
         leftImage.scaleToFit(size, size); // Set the height here
         leftCell.addElement(leftImage);
         leftCell.setPaddingLeft(17);
@@ -62,7 +67,7 @@ public class ReportHeader extends PdfPageEventHelper {
         cell.setBorder(Rectangle.NO_BORDER);
         cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER); // Set horizontal alignment to center
         cell.setVerticalAlignment(PdfPCell.TOP); // Set vertical alignment to middle
-        Image image = Image.getInstance("D:\\TechWhizer\\Project\\medico_erp\\src\\main\\resources\\com\\techwhizer\\medicalshop\\img\\company\\subtitle.png");
+        Image image =ImageLoader.reportImageLoader(subtitle);
         image.scaleToFit(120,120);
         image.setAlignment(Image.MIDDLE); // Set alignment
         cell.addElement(image);
@@ -76,7 +81,7 @@ public class ReportHeader extends PdfPageEventHelper {
 
         PdfPCell rightCell = new PdfPCell();
         rightCell.setBorder(Rectangle.NO_BORDER);
-        Image rightImage = Image.getInstance(path);
+        Image rightImage = ImageLoader.reportImageLoader(logoPath);
         rightImage.scaleToFit(size, size);
         rightCell.addElement(rightImage);
         rightCell.setPaddingRight(30);

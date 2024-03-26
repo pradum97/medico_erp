@@ -14,7 +14,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
+import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
@@ -377,10 +377,10 @@ public class BillingReport implements Initializable {
     public void searchReportBn(ActionEvent event) {
 
         if (null == fromDateP.getValue()) {
-            method.show_popup("SELECT START DATE", fromDateP);
+            method.show_popup("SELECT START DATE", fromDateP, Side.RIGHT);
             return;
         } else if (null == toDateP.getValue()) {
-            method.show_popup("SELECT END DATE", toDateP);
+            method.show_popup("SELECT END DATE", toDateP, Side.RIGHT);
             return;
         }
 

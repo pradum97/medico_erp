@@ -1,7 +1,37 @@
 .body{
     -fx-font-size: 10px;
 }
+.consult_status_cancel .list-cell
+{
+    -fx-background: white;
+    -fx-background-color: #941b3a;
+    -fx-text-fill: white;
+}
 
+.consult_status_pending .list-cell
+{
+    -fx-background: white;
+    -fx-background-color: D9512C;
+    -fx-text-fill: white;
+}
+.consult_status_done .list-cell
+{
+    -fx-background: white;
+    -fx-background-color: #035903;
+    -fx-text-fill: white;
+}
+
+#DateTimePicker_TextField {
+    -fx-background-radius:3 0 0 3
+}
+
+#DateTimePicker_TextField:disabled {
+    -fx-opacity: 1.0;
+}
+
+#DateTimePicker_Button {
+    -fx-background-radius:0 3 3 0;
+}
 
 
 .button {
@@ -160,4 +190,26 @@
 
 .pagination{
     -fx-page-information-visible:false;
+}
+
+
+.tag-bar {
+    -fx-border-color: lightblue;
+    -fx-spacing: 3;
+    -fx-padding: 3;
+    -fx-max-height: 30;
+}
+
+.tag-bar .tag {
+    -fx-background-color: -fx-selection-bar;
+    -fx-border-radius: 5 5 5 5;
+}
+
+.tag-bar .tag {
+    -fx-text-fill: white;
+}
+
+.tag-bar .tag .button{
+    -fx-text-fill: orange;
+    -fx-font-weight: bold;
 }

@@ -147,14 +147,18 @@ public class ItemChooser implements Initializable {
                 count++;
 
                 GstModel gm = new GstModel(gstId, hsn, sGst, cGst, iGst, gstName, null);
+                int departmentId = rs.getInt("department_id");
+                String departmentName = rs.getString("department_name");
 
                 if (status == 1){
                     if (Constant.ITEM_TYPE_PROHIBIT.equalsIgnoreCase(type)) {
                         if (Login.currentRoleName.equalsIgnoreCase("admin")) {
-                            itemList.add(new ItemChooserModel(itemId, itemName, packing, gm, unit, tabPerStrip,composition,tag,medicineDose,avlQty,isStockable));
+                            itemList.add(new ItemChooserModel(itemId, itemName, packing, gm, unit, tabPerStrip,composition,tag,
+                                    medicineDose,avlQty,isStockable,departmentId,departmentName));
                         }
                     } else {
-                        itemList.add(new ItemChooserModel(itemId, itemName, packing, gm, unit, tabPerStrip,composition,tag,medicineDose,avlQty,isStockable));
+                        itemList.add(new ItemChooserModel(itemId, itemName, packing, gm, unit, tabPerStrip,composition,tag,medicineDose,
+                                avlQty,isStockable,departmentId,departmentName));
                     }
                 }else {
                     msg = "All items are disabled.";

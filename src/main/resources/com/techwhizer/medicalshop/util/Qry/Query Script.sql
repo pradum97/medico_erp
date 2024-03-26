@@ -270,7 +270,7 @@ CREATE TABLE TBL_SALE_MAIN
 (
     SALE_MAIN_ID                   SERIAL PRIMARY KEY                  NOT NULL,
     PATIENT_ID                     INTEGER                             NOT NULL,
-    DOCTOR_ID                      INT,
+    REFERRED_BY                      INT,
     SELLER_ID                      INTEGER                             NOT NULL,
     ADDITIONAL_DISCOUNT_AMOUNT     NUMERIC,
     ADDITIONAL_DISCOUNT_PERCENTAGE NUMERIC,
@@ -282,6 +282,7 @@ CREATE TABLE TBL_SALE_MAIN
     BILL_TYPE                      VARCHAR(100)                        NOT NULL,
     sale_date                      timestamp default CURRENT_TIMESTAMP NOT NULL,
     RECEIVED_AMOUNT                NUMERIC,
+    consultation_doctor_id int ,
     FOREIGN KEY (SELLER_ID)
         REFERENCES tbl_users (user_id)
 );
@@ -292,12 +293,10 @@ CREATE TABLE TBL_SALE_ITEMS
     SALE_MAIN_ID                   INTEGER                             NOT NULL,
     ITEM_ID                        INTEGER                             NOT NULL,
     ITEM_NAME                      VARCHAR(200)                        NOT NULL,
-
     PACK                           VARCHAR(200),
     MFR_ID                         INT,
     BATCH                          VARCHAR(200),
     EXPIRY_DATE                    VARCHAR(50),
-
     PURCHASE_RATE                  NUMERIC                             NOT NULL,
     MRP                            NUMERIC   DEFAULT 0                 NOT NULL,
     SALE_RATE                      NUMERIC                             NOT NULL,
@@ -403,7 +402,7 @@ CREATE TABLE TBL_PATIENT
     FIRST_NAME       VARCHAR(100)       NOT NULL,
     PATIENT_CATEGORY VARCHAR(200) DEFAULT 'GENERAL/CASH',
     UHID_NO          VARCHAR(200),
-    admission_number varchar(50),
+    patient_number varchar(50),
     MIDDLE_NAME      VARCHAR(100),
     LAST_NAME        VARCHAR(100),
     GENDER           VARCHAR(10),
@@ -444,6 +443,7 @@ CREATE TABLE patient_consultation
     receipt_num            varchar(100),
     receipt_type           varchar(100),
     remarks                varchar(500),
+    sale_main_id int ,
     consultant_status      VARCHAR(100) DEFAULT 'Pending',
     consultation_date      timestamp    DEFAULT CURRENT_TIMESTAMP,
     CREATED_BY             INT,
@@ -536,6 +536,94 @@ CREATE TABLE TBL_DEPARTMENTS(
     CREATED_BY INT,
     CREATED_DATE timestamp DEFAULT CURRENT_TIMESTAMP
 );
+
+----- From 20-03-2024---------
+
+CREATE TABLE tbl_building
+(
+    building_id   SERIAL PRIMARY KEY,
+    building_name VARCHAR(100) UNIQUE NOT NULL,
+    address varchar(500),
+    status int default 111,
+    created_by int REFERENCES tbl_users(user_id),
+    created_date timestamp default current_timestamp,
+    last_updated_by int REFERENCES tbl_users(user_id),
+    last_updated_date timestamp
+);
+
+CREATE TABLE tbl_floor
+(
+    floor_id     SERIAL PRIMARY KEY,
+    floor_number INT NOT NULL,
+    floor_name varchar(200) NOT NULL,
+    building_id  INT REFERENCES tbl_building (building_id),
+    status int default 1,
+    created_by int REFERENCES tbl_users(user_id),
+    created_date timestamp default current_timestamp,
+    last_updated_by int REFERENCES tbl_users(user_id),
+    last_updated_date timestamp,
+    UNIQUE (floor_number, building_id,floor_name)
+);
+
+CREATE TABLE tbl_ward_facility(
+    ward_facility_id serial primary key ,
+    facility_code varchar(50) NOT NULL,
+    facility_name varchar(200) NOT NULL,
+    status int default 1,
+    created_by int REFERENCES tbl_users(user_id),
+    created_date timestamp default current_timestamp,
+    last_updated_by int REFERENCES tbl_users(user_id),
+    last_updated_date timestamp
+);
+
+CREATE TABLE tbl_wards
+(
+    ward_id   SERIAL PRIMARY KEY,
+    floor_id  INT REFERENCES tbl_floor (floor_id),
+    ward_name VARCHAR(100) NOT NULL,
+    ward_facility_id int REFERENCES tbl_ward_facility(ward_facility_id) ,
+    number_of_beds  INT,
+    status VARCHAR(100) DEFAULT 'Available',
+    is_active int default 1,
+    created_by int REFERENCES tbl_users(user_id),
+    created_date timestamp default current_timestamp,
+    last_updated_by int REFERENCES tbl_users(user_id),
+    last_updated_date timestamp
+);
+
+CREATE TABLE tbl_beds(
+    bed_id SERIAL PRIMARY KEY ,
+    ward_id int NOT NULL,
+    bed_number varchar(60) NOT NULL,
+    bed_name varchar(100) NOT NULL,
+    bed_type varchar(70)NOT NULL,
+    bed_status varchar(50) default 'Available',
+    bed_for varchar(50) default 'Patient',
+    is_active int default 1,
+    created_by int REFERENCES tbl_users(user_id),
+    created_date timestamp default current_timestamp,
+    last_updated_by int REFERENCES tbl_users(user_id),
+    last_updated_date timestamp
+);
+
+CREATE TABLE tbl_bed_history(
+    bed_history_id    SERIAL PRIMARY KEY,
+    bed_id            INT REFERENCES tbl_beds (bed_id),
+    old_ward_id       INT NOT NULL ,
+    old_bed_id        INT NOT NULL,
+    new_ward_id       INT NOT NULL,
+    new_bed_id        INT NOT NULL,
+    reason            TEXT,
+    transferred_by    INT REFERENCES tbl_users(user_id),
+    transfer_date     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_updated_by   int REFERENCES tbl_users(user_id),
+    last_updated_date timestamp
+);
+
+
+-- Bed Type 'General', 'ICU', 'Maternity', 'Pediatric', 'Surgical', 'Other'
+
+
 
 
 

@@ -14,6 +14,7 @@ import com.techwhizer.medicalshop.util.DBConnection;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -116,19 +117,19 @@ public class UpdateProfile implements Initializable {
         Matcher matcher = pattern.matcher(email);
 
         if (first_name.isEmpty()) {
-            method.show_popup("Enter First Name", last_name_f);
+            method.show_popup("Enter First Name", last_name_f, Side.RIGHT);
             return;
 
         } else if (username.isEmpty()) {
-            method.show_popup("Enter Username", username_f);
+            method.show_popup("Enter Username", username_f, Side.RIGHT);
             return;
 
         } else if (isExist("LOWER(username )", username)) {
-            method.show_popup("USERNAME ALREADY EXISTS", username_f);
+            method.show_popup("USERNAME ALREADY EXISTS", username_f, Side.RIGHT);
             return;
 
         } else if (phone.isEmpty()) {
-            method.show_popup("Enter 10-digit Phone Number", phone_f);
+            method.show_popup("Enter 10-digit Phone Number", phone_f, Side.RIGHT);
             return;
 
         }
@@ -146,30 +147,30 @@ public class UpdateProfile implements Initializable {
             customDialog.showAlertBox("Registration Failed ", "Enter 10-digit Phone Number Without Country Code");
             return;
         } else if (isPhoneExist(phoneNum)) {
-            method.show_popup("PHONE NUMBER ALREADY EXISTS", phone_f);
+            method.show_popup("PHONE NUMBER ALREADY EXISTS", phone_f, Side.RIGHT);
             return;
 
         } else if (email.isEmpty()) {
-            method.show_popup("Enter Valid Email", email_f);
+            method.show_popup("Enter Valid Email", email_f, Side.RIGHT);
             return;
 
         } else if (!matcher.matches()) {
-            method.show_popup("Enter Valid Email", email_f);
+            method.show_popup("Enter Valid Email", email_f, Side.RIGHT);
             return;
 
         } else if (isExist("LOWER(email) ", email)) {
-            method.show_popup("EMAIL ALREADY EXISTS", email_f);
+            method.show_popup("EMAIL ALREADY EXISTS", email_f, Side.RIGHT);
             return;
 
         } else if (null == gender_comboBox.getValue()) {
-            method.show_popup("Choose Your Gender", gender_comboBox);
+            method.show_popup("Choose Your Gender", gender_comboBox, Side.RIGHT);
             return;
 
         } else if (null == role_combobox.getValue()) {
-            method.show_popup("Choose role_combobox", role_combobox);
+            method.show_popup("Choose role_combobox", role_combobox, Side.RIGHT);
             return;
         } else if (null == full_address_f || null == full_address || full_address.isEmpty()) {
-            method.show_popup("Enter Full Address", full_address_f);
+            method.show_popup("Enter Full Address", full_address_f, Side.RIGHT);
             return;
         }
 

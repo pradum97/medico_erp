@@ -14,6 +14,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
@@ -169,7 +170,7 @@ public class Users implements Initializable {
                                     getSelectionModel().getSelectedItem();
 
                             if (null == delete_selection) {
-                                method.show_popup("Please Select ", user_table_view);
+                                method.show_popup("Please Select ", user_table_view, Side.RIGHT);
                                 return;
                             }
 
@@ -199,7 +200,7 @@ public class Users implements Initializable {
                                 getSelectionModel().getSelectedItem();
 
                         if (null == edit_selection) {
-                            method.show_popup("Please Select", user_table_view);
+                            method.show_popup("Please Select", user_table_view, Side.RIGHT);
                             return;
                         }
 
@@ -216,7 +217,7 @@ public class Users implements Initializable {
                                 getSelectionModel().getSelectedItem();
 
                         if (null == view_selection) {
-                            method.show_popup("Please Select", user_table_view);
+                            method.show_popup("Please Select", user_table_view, Side.RIGHT);
                             return;
                         }
 

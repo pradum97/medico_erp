@@ -8,6 +8,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Side;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -240,6 +241,28 @@ public class Method extends StaticData {
         }
     }
 
+    public void convertDateFormat_2(DatePicker... date) {
+        for (DatePicker datePicker : date) {
+            datePicker.setConverter(new StringConverter<>() {
+                private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                @Override
+                public String toString(LocalDate localDate) {
+                    if (localDate == null)
+                        return "";
+                    return dateTimeFormatter.format(localDate);
+                }
+
+                @Override
+                public LocalDate fromString(String dateString) {
+                    if (dateString == null || dateString.trim().isEmpty()) {
+                        return null;
+                    }
+                    return LocalDate.parse(dateString, dateTimeFormatter);
+                }
+            });
+        }
+    }
+
     public ObservableList<Role> getRole() {
         Connection connection = null;
         PreparedStatement ps = null;
@@ -273,17 +296,22 @@ public class Method extends StaticData {
         }
     }
 
+    public static void setGlobalZoomout(Scene scene){
+        scene.getRoot().setScaleX(0.92); // Zoom out horizontally
+        scene.getRoot().setScaleY(0.92);
+    }
+
     public void hideElement(Node node) {
         node.setVisible(false);
         node.managedProperty().bind(node.visibleProperty());
     }
 
-    public ContextMenu show_popup(String message, Object textField) {
+    public ContextMenu show_popup(String message, Object textField,Side side) {
 
         ContextMenu form_Validator = new ContextMenu();
         form_Validator.setAutoHide(true);
         form_Validator.getItems().add(new MenuItem(message));
-        form_Validator.show((Node) textField, Side.RIGHT, 10, 0);
+        form_Validator.show((Node) textField, side, 10, 0);
         return form_Validator;
     }
 

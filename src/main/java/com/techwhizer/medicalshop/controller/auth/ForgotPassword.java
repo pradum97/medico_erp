@@ -10,6 +10,7 @@ import com.techwhizer.medicalshop.util.SecurePassword;
 import com.victorlaerte.asynctask.AsyncTask;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
@@ -22,8 +23,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ForgotPassword implements Initializable {
 
@@ -64,13 +63,13 @@ public class ForgotPassword implements Initializable {
 
 
         if (newPassword.isEmpty()) {
-            method.show_popup("Enter New Password", new_password);
+            method.show_popup("Enter New Password", new_password, Side.RIGHT);
             return;
         } else if (con_Password.isEmpty()) {
-            method.show_popup("Enter Confirm Password", confirm_password);
+            method.show_popup("Enter Confirm Password", confirm_password, Side.RIGHT);
             return;
         } else if (!newPassword.equals(con_Password)) {
-            method.show_popup("Confirm Password do not match", confirm_password);
+            method.show_popup("Confirm Password do not match", confirm_password, Side.RIGHT);
             return;
         }
         Connection connection = null;
@@ -116,7 +115,7 @@ public class ForgotPassword implements Initializable {
         String email = email_f.getText();
 
         if (email.isEmpty()) {
-            method.show_popup("Enter Valid Email", email_f);
+            method.show_popup("Enter Valid Email", email_f, Side.RIGHT);
             return;
         }
         Connection connection = null;
@@ -153,7 +152,7 @@ public class ForgotPassword implements Initializable {
         String otpTfText = otpTf.getText();
 
         if (otp.isEmpty()) {
-            method.show_popup("Please enter 6-digit otp", otpTf);
+            method.show_popup("Please enter 6-digit otp", otpTf, Side.RIGHT);
             return;
         }
 

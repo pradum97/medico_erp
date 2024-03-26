@@ -6,6 +6,7 @@ import com.techwhizer.medicalshop.method.StaticData;
 import com.techwhizer.medicalshop.util.DBConnection;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
@@ -58,19 +59,19 @@ public class AddMr implements Initializable {
         String address = addressTf.getText();
 
         if (name.isEmpty()){
-            method.show_popup("Please enter full name of mr",nameTf);
+            method.show_popup("Please enter full name of mr",nameTf, Side.RIGHT);
             return;
         }else if (genderCom.getSelectionModel().isEmpty()){
-            method.show_popup("Please select gender",genderCom);
+            method.show_popup("Please select gender",genderCom, Side.RIGHT);
             return;
         }else if (phone.isEmpty()) {
-            method.show_popup("Please enter 10 digit phone number", phoneTf);
+            method.show_popup("Please enter 10 digit phone number", phoneTf, Side.RIGHT);
             return;
         }else if (phone.length() != 10) {
-            method.show_popup("Please enter 10 digit phone number", phoneTf);
+            method.show_popup("Please enter 10 digit phone number", phoneTf, Side.RIGHT);
             return;
         }else if (address.isEmpty()) {
-            method.show_popup("Please enter address", addressTf);
+            method.show_popup("Please enter address", addressTf, Side.RIGHT);
             return;
         }
 

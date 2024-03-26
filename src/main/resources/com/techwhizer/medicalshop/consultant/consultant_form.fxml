@@ -17,7 +17,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane stylesheets="@../css/main.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.consultant.ConsultantForm">
+<BorderPane stylesheets="@../css/main.css" xmlns="http://javafx.com/javafx/20.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.techwhizer.medicalshop.controller.consultant.ConsultantForm">
    <center>
       <VBox alignment="TOP_CENTER" prefHeight="444.0" prefWidth="700.0" style="-fx-border-color: grey; -fx-border-radius: 3;" BorderPane.alignment="CENTER">
          <children>

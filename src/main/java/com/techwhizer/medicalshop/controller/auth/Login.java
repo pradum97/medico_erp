@@ -16,16 +16,14 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.geometry.VPos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
@@ -63,7 +61,6 @@ public class Login implements Initializable {
         PropertiesLoader propLoader = new PropertiesLoader();
         propRead = propLoader.getReadProp();
         method.hideElement(progressBar);
-
     }
 
     @FXML
@@ -172,10 +169,10 @@ public class Login implements Initializable {
         String password = password_f.getText();
 
         if (inputValue.isEmpty()) {
-            method.show_popup("Please enter valid username", email_f);
+            method.show_popup("Please enter valid username", email_f, Side.RIGHT);
             return;
         } else if (password.isEmpty()) {
-            method.show_popup("Please enter password", password_f);
+            method.show_popup("Please enter password", password_f, Side.RIGHT);
             return;
         }
 

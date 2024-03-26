@@ -24,10 +24,13 @@ public class SaleEntryModel {
     private int mfrId;
     private double amtAsPerMrp,totalRequestQuantity;
     private boolean isStockable;
+    private int departmentId;
+    private String departmentName,departmentCode;
 
     public SaleEntryModel(int itemId,int cartId, int stockId,String productName, double saleRate, String pack, int strip, int pcs, String expiryDate, int discountId, double discount, int gstId,
                           double totalGst, double amount, long hsn, int iGst, int cGst, int sGst, double gstAmount,
-                          double purchaseRate,double mrp,String batch , int mfrId,double amtAsPerMrp,double totalRequestQuantity,boolean isStockable) {
+                          double purchaseRate,double mrp,String batch , int mfrId,double amtAsPerMrp,double totalRequestQuantity,boolean isStockable,
+                          int departmentId,String departmentName,String departmentCode) {
         this.itemId = itemId;
         this.cartId = cartId;
         this.stockId = stockId;
@@ -54,6 +57,33 @@ public class SaleEntryModel {
         this.amtAsPerMrp = amtAsPerMrp;
         this.totalRequestQuantity = totalRequestQuantity;
         this.isStockable = isStockable;
+        this.departmentId = departmentId;
+        this.departmentName = departmentName;
+        this.departmentCode = departmentCode;
+    }
+
+    public String getDepartmentCode() {
+        return departmentCode;
+    }
+
+    public void setDepartmentCode(String departmentCode) {
+        this.departmentCode = departmentCode;
+    }
+
+    public int getDepartmentId() {
+        return departmentId;
+    }
+
+    public void setDepartmentId(int departmentId) {
+        this.departmentId = departmentId;
+    }
+
+    public String getDepartmentName() {
+        return departmentName;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
     }
 
     public boolean isStockable() {

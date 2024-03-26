@@ -6,6 +6,7 @@ import com.techwhizer.medicalshop.util.DBConnection;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
@@ -18,7 +19,6 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Properties;
 import java.util.ResourceBundle;
 
 public class AddDiscount implements Initializable {
@@ -66,10 +66,10 @@ public class AddDiscount implements Initializable {
         String discountName = discountNameC.getText();
 
         if (discountName.isEmpty()) {
-            method.show_popup("Enter Discount Name ", discountNameC);
+            method.show_popup("Enter Discount Name ", discountNameC, Side.RIGHT);
             return;
         } else if (discountTf.isEmpty()) {
-            method.show_popup("Enter Discount ", discountTF);
+            method.show_popup("Enter Discount ", discountTF, Side.RIGHT);
             return;
         }
         int discountD = 0;
@@ -80,7 +80,7 @@ public class AddDiscount implements Initializable {
         }
 
         if (discountD > 100) {
-            method.show_popup("Enter Discount Less Than 100 ", discountTF);
+            method.show_popup("Enter Discount Less Than 100 ", discountTF, Side.RIGHT);
             return;
         }
 

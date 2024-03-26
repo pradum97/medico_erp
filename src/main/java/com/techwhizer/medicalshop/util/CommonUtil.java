@@ -171,11 +171,7 @@ public class CommonUtil {
     public static ObservableList<DoctorModel> getDoctor(DoctorType doctorType) {
         String docType = doctorType.toString().replaceAll("_", " ");
 
-        DoctorModel dmm = new DoctorModel(0, "OTHER");
-
-        ObservableList<DoctorModel> doctorList = doctorType == DoctorType.OUT_SIDE ?
-                FXCollections.observableArrayList(dmm)
-                : FXCollections.observableArrayList();
+        ObservableList<DoctorModel> doctorList = FXCollections.observableArrayList();
 
         Connection connection = null;
         PreparedStatement ps = null;
@@ -189,7 +185,7 @@ public class CommonUtil {
                     coalesce(speciality,'-') as speciality ,doctor_type,
                     coalesce(dr_reg_num,'-') as dr_reg_num,coalesce(qualification,'-') as qualification 
                     ,(TO_CHAR(created_date, 'DD-MM-YYYY')) as created_date FROM tbl_doctor 
-                    where doctor_type = ?
+                    where doctor_type = ?  or doctor_type = 'OTHER'
                     order by doctor_id desc
                     """;
             ps = connection.prepareStatement(query);

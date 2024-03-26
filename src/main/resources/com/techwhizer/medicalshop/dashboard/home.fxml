@@ -64,7 +64,7 @@
                                           <Font name="System Bold" size="12.179104804992676" />
                                        </font>
                                     </Button>
-                                    <Button mnemonicParsing="false" fx:id="refresh_bn" onMouseClicked="#bnRefresh" prefHeight="27.0" prefWidth="52.0" style="-fx-border-color: grey; -fx-border-radius: 3; -fx-background-radius: 3;">
+                                    <Button fx:id="refresh_bn" mnemonicParsing="false" onMouseClicked="#bnRefresh" prefHeight="27.0" prefWidth="52.0" style="-fx-border-color: grey; -fx-border-radius: 3; -fx-background-radius: 3;">
                                        <graphic>
                                           <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
                                              <image>

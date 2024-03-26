@@ -27,6 +27,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class ViewDoctor implements Initializable {
@@ -132,7 +133,7 @@ public class ViewDoctor implements Initializable {
 
             while (rs.next()) {
                 int id = rs.getInt("DOCTOR_ID");
-                String name = "Dr. "+rs.getString("DR_NAME");
+                String name = rs.getString("DR_NAME");
                 String phone = rs.getString("DR_PHONE");
                 String address = rs.getString("DR_ADDRESS");
                 String spec = rs.getString("SPECIALITY");
@@ -140,7 +141,7 @@ public class ViewDoctor implements Initializable {
                 String qly = rs.getString("QUALIFICATION");
                 String date = rs.getString("CREATED_DATE");
                 String docType = rs.getString("doctor_type");
-                doctorList.add(new DoctorModel(id, name, phone,
+                doctorList.add(new DoctorModel(id,  Objects.equals(name, "SELF") ?name:"Dr. "+name, phone,
                         address, reg,spec, qly, date, docType));
             }
 
