@@ -80,7 +80,6 @@ public class DateTimePicker extends HBox implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		System.out.println("dateTime"+dateTime);
 
 		if (dateTime.get() != null) {
 

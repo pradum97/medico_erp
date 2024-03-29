@@ -73,6 +73,9 @@ module com.techwhizer.medicalshop {
     exports com.techwhizer.medicalshop.controller.prescription;
     opens com.techwhizer.medicalshop.controller.prescription to javafx.fxml;
 
+    exports com.techwhizer.medicalshop.controller.prescription.model;
+    opens com.techwhizer.medicalshop.controller.prescription.model to javafx.fxml;
+
     exports com.techwhizer.medicalshop.controller.doctor;
     opens com.techwhizer.medicalshop.controller.doctor to javafx.fxml;
     exports com.techwhizer.medicalshop.mail;

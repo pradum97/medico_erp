@@ -74,7 +74,7 @@ public class GenerateBillNumber {
 
         try {
             connection = new DBConnection().getConnection();
-            ps = connection.prepareStatement("select max(PRESCRIBE_MASTER_MEDICINE_ID) from prescribe_medicine_master");
+            ps = connection.prepareStatement("select max(prescription_master_id) from tbl_prescription_master");
             rs = ps.executeQuery();
             String invoiceNum = null;
 

@@ -22,3 +22,8 @@ alter table tbl_stock add created_date timestamp default current_timestamp;
 
 --ALTER TABLE patient_consultation ADD COLUMN sale_main_id int
 
+--27 March 2024----
+
+--DROP TABLE PRESCRIBE_MEDICINE_MASTER;
+-- DROP TABLE PRESCRIBE_MEDICINE_ITEMS;
+

@@ -22,7 +22,9 @@
 }
 
 #DateTimePicker_TextField {
-    -fx-background-radius:3 0 0 3
+    -fx-background-radius:3 0 0 3;
+    -fx-border-radius:3 0 0 3 ;
+    -fx-border-color: grey;
 }
 
 #DateTimePicker_TextField:disabled {
@@ -31,6 +33,8 @@
 
 #DateTimePicker_Button {
     -fx-background-radius:0 3 3 0;
+    -fx-border-radius:0 3 3 0 ;
+    -fx-border-color: grey;
 }
 
 

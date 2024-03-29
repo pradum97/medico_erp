@@ -293,7 +293,7 @@ public class PatientMain implements Initializable {
                     patientNumHl.setOnAction(actionEvent -> {
                         tableView.getSelectionModel().select(getIndex());
                         PatientModel pm = tableView.getSelectionModel().getSelectedItem();
-                        new PrintPrescription().print(0,0,pm.getPatientId(),patientNumHl,"", pm.getFullName(), false);
+                        new PrintPrescription().print(pm.getPatientId(),0,patientNumHl,true);
                     });
                     HBox managebtn = new HBox(patientNumHl);
                     managebtn.setStyle("-fx-alignment: center-left");

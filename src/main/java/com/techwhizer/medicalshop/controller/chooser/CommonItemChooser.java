@@ -41,7 +41,6 @@ public class CommonItemChooser implements Initializable {
     public TextField searchTf;
     public TableColumn<ItemChooserModel, Integer> colSrNo;
     public TableColumn<ItemChooserModel, String> colProductName;
-    public TableColumn<ItemChooserModel, String> colAvlQty;
     public TableColumn<ItemChooserModel, String> colAction;
     public TableView<ItemChooserModel> tableView;
     public Pagination pagination;
@@ -57,10 +56,14 @@ public class CommonItemChooser implements Initializable {
         customDialog = new CustomDialog();
         dbConnection = new DBConnection();
         tableView.setFixedCellSize(27);
-        var data =( Map<String,Object>) Main.primaryStage.getUserData();
 
-        if (null != data && data instanceof Map<String,Object>){
-            callThread(data);
+        if (null != Main.primaryStage.getUserData()){
+
+            var data =( Map<String,Object>) Main.primaryStage.getUserData();
+
+            if (data instanceof Map<String,Object>){
+                callThread(data);
+            }
         }
 
     }
@@ -245,31 +248,6 @@ public class CommonItemChooser implements Initializable {
     private void setOptionalCell() {
 
         Callback<TableColumn<ItemChooserModel, String>, TableCell<ItemChooserModel, String>>
-                cellQty = (TableColumn<ItemChooserModel, String> param) -> new TableCell<>() {
-            @Override
-            public void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                    setText(null);
-
-                } else {
-
-                    String qtyStr = tableView.getItems().get(getIndex()).getAvailableQuantity();
-                    Label qtyLabel = new Label(qtyStr);
-                    HBox managebtn = new HBox(qtyLabel);
-                    managebtn.setStyle("-fx-alignment:CENTER-LEFT");
-                    HBox.setMargin(qtyLabel, new Insets(0, 0, 0, 5));
-
-                    setGraphic(managebtn);
-                    setText(null);
-
-                }
-            }
-
-        };
-
-        Callback<TableColumn<ItemChooserModel, String>, TableCell<ItemChooserModel, String>>
                 cellFactory = (TableColumn<ItemChooserModel, String> param) -> new TableCell<>() {
             @Override
             public void updateItem(String item, boolean empty) {
@@ -314,7 +292,6 @@ public class CommonItemChooser implements Initializable {
             }
 
         };
-colAvlQty.setCellFactory(cellQty);
         colAction.setCellFactory(cellFactory);
     }
 

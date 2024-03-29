@@ -21,10 +21,7 @@ import java.math.BigDecimal;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.nio.file.Files;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -46,6 +43,20 @@ public class Method extends StaticData {
         pi.setStyle("-fx-progress-color: red");
 
         return pi;
+    }
+
+
+    public static Timestamp getCurrenSqlTimeStamp(){
+       return new Timestamp(System.currentTimeMillis());
+    }
+
+    public static Timestamp getCurrenSqlTimeStampFromLocalDateTime(LocalDateTime localDateTime){
+        return Timestamp.valueOf(localDateTime);
+    }
+
+    public static Timestamp getCurrenSqlTimeStampFromLocalDate(LocalDate localDate){
+        LocalDateTime localDateTime = localDate.atStartOfDay();
+        return Timestamp.valueOf(localDateTime);
     }
 
     public ProgressIndicator getProgressBarWhite(double height , double width){

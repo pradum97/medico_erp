@@ -13,6 +13,7 @@ import com.techwhizer.medicalshop.util.CommonUtil;
 import com.techwhizer.medicalshop.util.DBConnection;
 import com.victorlaerte.asynctask.AsyncTask;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.geometry.Side;
@@ -87,9 +88,22 @@ public class AddPatient implements Initializable {
         Platform.runLater(()->{
 
             submitBn.setText("UPDATE");
-            salutationCom.getSelectionModel().select(CommonUtil.getSalutation(pm.getSalutation_id()).get(0));
+
             genderCom.getSelectionModel().select((pm.getGender()));
             idTypeCom.getSelectionModel().select((pm.getIdType()));
+
+           SalutationModel sm = CommonUtil.getSalutation(pm.getSalutation_id()).get(0);
+//            salutationCom.getItems().add(sm);
+//            salutationCom.getSelectionModel().selectFirst();
+
+
+
+            ObservableList<SalutationModel> l = salutationCom.getItems();
+            ;
+            System.out.println(l.indexOf(sm));
+
+            salutationCom.getSelectionModel().select(3);
+
         });
 
         firstNameTf.setText(pm.getFirstName());
@@ -131,13 +145,6 @@ public class AddPatient implements Initializable {
     private void addNewPatient() {
         Pattern pattern = Pattern.compile("^\\d{10}$");
 
-        int salutationId = 0;
-        if (!salutationCom.getSelectionModel().isEmpty()) {
-
-            salutationId = salutationCom.getSelectionModel()
-                    .getSelectedItem().getSalutationId();
-        }
-
         String firstName = firstNameTf.getText();
         String middleName = middleNameTf.getText();
         String lastName = lastNameTf.getText();
@@ -162,7 +169,10 @@ public class AddPatient implements Initializable {
         String cns = cnsTf.getText();
         String chest = chestTf.getText();
 
-
+        if (salutationCom.getSelectionModel().isEmpty()) {
+            method.show_popup("Please salutation", salutationCom, Side.RIGHT);
+            return;
+        }else
         if (firstName.isEmpty()) {
             method.show_popup("Please enter patient first name", firstNameTf, Side.RIGHT);
             return;
@@ -198,6 +208,8 @@ public class AddPatient implements Initializable {
             }
 
         }
+        int salutationId = salutationCom.getSelectionModel()
+                .getSelectedItem().getSalutationId();
 
         ImageView image = new ImageView(new ImageLoader().load("img/icon/warning_ic.png"));
         image.setFitWidth(45);
@@ -364,7 +376,6 @@ public class AddPatient implements Initializable {
 
             genderCom.setItems(new StaticData().getGender());
             idTypeCom.setItems(CommonUtil.getDocumentType());
-            salutationCom.setItems(CommonUtil.getSalutation(0));
 
             if (Main.primaryStage.getUserData() instanceof PatientModel) {
                 pm = (PatientModel) Main.primaryStage.getUserData();
@@ -372,6 +383,20 @@ public class AddPatient implements Initializable {
                     setData();
                 }
             }
+
+            ObservableList<SalutationModel> salutationList =(CommonUtil.getSalutation(0));
+            salutationCom.setItems(salutationList);
+
+            if (null != pm) {
+
+                SalutationModel sm = CommonUtil.getSalutation(pm.getSalutation_id()).get(0);
+                for (int i = 0; i < salutationList.size(); i++) {
+                    if (salutationList.get(i).getSalutationName().equals(sm.getSalutationName())){
+                        salutationCom.getSelectionModel().select(i);
+                    }
+                }
+            }
+
         }
 
         @Override

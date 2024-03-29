@@ -27,7 +27,7 @@
 
 		<VBox fillWidth="true">
 			<Label style="-fx-font-weight: bold">DATE : </Label>
-			<DatePicker prefWidth="185" fx:id="datePicker"/>
+			<DatePicker style="-fx-border-radius: grey" prefWidth="185" fx:id="datePicker"/>
 		</VBox>
 
 		<VBox>

@@ -16,6 +16,11 @@ public class ItemChooserModel {
     private int department_id;
     private String department_name;
 
+    public ItemChooserModel(int itemId,String itemName){
+        this.itemId = itemId;
+        this.itemName = itemName;
+    }
+
     public ItemChooserModel(int itemId, String itemName, String packing,
                              GstModel discountModel,String unit,int tabPerStrip,
                             String composition, String productTag,String medicineDose,String availableQuantity,

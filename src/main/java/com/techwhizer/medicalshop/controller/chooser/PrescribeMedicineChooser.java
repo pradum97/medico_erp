@@ -206,19 +206,8 @@ public class PrescribeMedicineChooser implements Initializable {
                         method.selectTable(getIndex(), tableView);
                         PrescribeMedicineChooserModel icm = tableView.getSelectionModel().getSelectedItem();
 
-
-
-                        if (isPrint) {
-                            new PrintPrescription().callThread(icm.getPrescribe_master_medicine_id(),
-                                    (int) data.get("patient_id"), selectBn,  (String) data.get("doctorName"),
-                                    "icon",icm.getConsultation_id(), false);
-                        }else {
-                            Main.primaryStage.setUserData(null);
-                            Main.primaryStage.setUserData(icm);
-                            method.closeStage(tableView);
-
-                        }
-
+                        Main.primaryStage.setUserData(icm);
+                        method.closeStage(tableView);
 
                     });
 

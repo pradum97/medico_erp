@@ -1,7 +1,8 @@
 package com.techwhizer.medicalshop.model;
 
-public class PrescribedMedicineModel {
+public class PrescriptionMedicationModel {
 
+    private int medicationId;
     private String medicineName;
     private String medicineTag;
     private String quantity;
@@ -13,10 +14,13 @@ public class PrescribedMedicineModel {
     private String remark;
     private int itemId;
     private boolean isItemExists;
+    private int prescriptionMasterId;
 
-    public PrescribedMedicineModel(String medicineName, String medicineTag, String quantity, String frequency,
-                                   String duration, String times, String composition, String dose, String remark,
-                                   int itemId,boolean isItemExists) {
+
+    public PrescriptionMedicationModel(int medicationId, String medicineName, String medicineTag, String quantity, String frequency,
+                                       String duration, String times, String composition, String dose, String remark,
+                                       int itemId, boolean isItemExists,int prescriptionMasterId) {
+        this.medicationId = medicationId;
         this.medicineName = medicineName;
         this.medicineTag = medicineTag;
         this.quantity = quantity;
@@ -28,6 +32,23 @@ public class PrescribedMedicineModel {
         this.remark = remark;
         this.itemId = itemId;
         this.isItemExists = isItemExists;
+        this.prescriptionMasterId = prescriptionMasterId;
+    }
+
+    public int getPrescriptionMasterId() {
+        return prescriptionMasterId;
+    }
+
+    public void setPrescriptionMasterId(int prescriptionMasterId) {
+        this.prescriptionMasterId = prescriptionMasterId;
+    }
+
+    public int getMedicationId() {
+        return medicationId;
+    }
+
+    public void setMedicationId(int medicationId) {
+        this.medicationId = medicationId;
     }
 
     public int getItemId() {

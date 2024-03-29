@@ -4,10 +4,12 @@ import com.techwhizer.medicalshop.CustomDialog;
 import com.techwhizer.medicalshop.FileLoader;
 import com.techwhizer.medicalshop.ImageLoader;
 import com.techwhizer.medicalshop.InvoiceModel.PaymentChargeModel;
+import com.techwhizer.medicalshop.controller.prescription.EPrescription;
 import com.techwhizer.medicalshop.model.*;
 import com.techwhizer.medicalshop.util.CommonUtil;
 import com.techwhizer.medicalshop.util.DBConnection;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -26,7 +28,6 @@ import java.util.*;
 enum PrintType {
     GST, REGULAR
 }
-
 public class GenerateInvoice {
 
     private FileLoader fileLoader;
@@ -276,9 +277,7 @@ public class GenerateInvoice {
 
     }
 
-    public void prescriptionInvoice(int patientId, String consultDoctorName,
-                                    ObservableList<PrescribedMedicineModel> medicineList,
-                                    String invoiceNum,String precribeDate) {
+    public void prescriptionInvoice( int prescriptionMasterId) {
         ImageView down_iv = new ImageView();
         ImageView print_iv = new ImageView();
 
@@ -291,7 +290,6 @@ public class GenerateInvoice {
         down_iv.setImage(loader.load(rootPath.concat("download_ic.png")));
         print_iv.setImage(loader.load(rootPath.concat("print_ic.png")));
 
-        List<PrescriptionsBillModel> modelList = new ArrayList<>();
         Map<String, Object> param = new HashMap<>();
 
         Connection connection = null;
@@ -301,23 +299,22 @@ public class GenerateInvoice {
 
         try {
             connection = new DBConnection().getConnection();
-            String query = """
-                                       
-                    select trim( concat(COALESCE(ts.name, ''), ' ',
-                    COALESCE(tp.first_name, ''), ' ',
-                    COALESCE(tp.middle_name, ''), ' ',
-                    COALESCE(tp.last_name, '')) )AS name,*
-                    from tbl_patient tp
-                    left join public.tbl_salutation ts on tp.salutation_id = ts.salutation_id
-                    where  patient_id = ?
+            String query = """                
+                    select pv.*,TO_CHAR(tpm.creation_date,'DD-MM-YYYY') AS prescription_date,
+                           tpm.prescription_num,chv.consult_name,tpm.remarks
+                    from tbl_prescription_master tpm
+                    left join patient_v pv on pv.patient_id = tpm.patient_id
+                    left join consultant_history_v chv on chv.consultation_id = tpm.consultation_id
+                     where prescription_master_id = ?
                     """;
 
             ps = connection.prepareStatement(query);
-            ps.setInt(1, patientId);
+            ps.setInt(1, prescriptionMasterId);
             rs = ps.executeQuery();
-            while (rs.next()) {
+            if (rs.next()) {
 
-                String name = rs.getString("name");
+                int patnId = rs.getInt("patient_id");
+                String name = rs.getString("fullname");
                 String phone = rs.getString("phone");
                 String address = rs.getString("address");
 
@@ -334,39 +331,43 @@ public class GenerateInvoice {
                 String cns = rs.getString("cns");
                 String chest = rs.getString("chest");
                 String  uhid_no= rs.getString("uhid_no");
+                String  prescriptionNum= rs.getString("prescription_num");
+                String  prescriptionDate= rs.getString("prescription_date");
+                String  consultName= rs.getString("consult_name");
+                String  remarks= rs.getString("remarks");
                 param.put("gender", String.valueOf(gender.charAt(0)).toUpperCase());
                 param.put("weight", weight);
                 param.put("name", name);
                 param.put("address", address);
-                param.put("date", precribeDate);
+                param.put("date", prescriptionDate);
                 param.put("phone", phone);
-                param.put("invoiceNumber",invoiceNum);
+                param.put("invoiceNumber",prescriptionNum);
                 param.put("uhidNum",uhid_no);
 
                 ConsultationSetupModel csm = CommonUtil.getConsultationSetup();
-
                 param.put("fee_valid_days",csm==null?25:csm.getFee_valid_days());
-
                 String companyLogoPath = "img/company/gangotri_company_logo.png";
-
                 param.put("company_logo1", new ImageLoader().reportLogo(companyLogoPath));
                 param.put("company_logo2", new ImageLoader().reportLogo(companyLogoPath));
-                param.put("doctorName", consultDoctorName);
+                param.put("doctorName", consultName);
                 param.put("watermark", new ImageLoader().reportLogo("img/company/watermark_2.png"));
+                param.put("remarks",remarks == null ?"":remarks);
 
-                modelList.add(new PrescriptionsBillModel(patientId, bp, pulse, spo2, temp, chest, cvs, cns, sugar));
+                PrescriptionsBillModel pbm = new PrescriptionsBillModel(patnId, bp, pulse, spo2, temp, chest, cvs, cns, sugar);
+
+                JRBeanCollectionDataSource patientBean = new JRBeanCollectionDataSource(List.of(pbm));
+                JRBeanCollectionDataSource medicineListBean = new JRBeanCollectionDataSource(EPrescription.getMedication(prescriptionMasterId));
+                JRBeanCollectionDataSource investigationListBean = new JRBeanCollectionDataSource(EPrescription.getInvestigation(prescriptionMasterId));
+                param.put("patientDetails", patientBean);
+                param.put("medicineList", medicineListBean);
+                param.put("investigationListParam", investigationListBean);
+
+                JasperReport jasperReport = JasperCompileManager.compileReport(fileLoader.load(INVOICE_ROOT_PATH + "prescriptions.jrxml"));
+                JasperPrint print = JasperFillManager.fillReport(jasperReport, param, new JREmptyDataSource());
+                JasperViewer viewer = new JasperViewer(print, false);
+                viewer.setZoomRatio(pdfZoomRatio);
+                viewer.setVisible(true);
             }
-
-            JRBeanCollectionDataSource cartBean = new JRBeanCollectionDataSource(modelList);
-            JRBeanCollectionDataSource medicineListBean = new JRBeanCollectionDataSource(medicineList);
-            param.put("patientDetails", cartBean);
-            param.put("medicineList", medicineListBean);
-            JasperReport jasperReport = null;
-            jasperReport = JasperCompileManager.compileReport(fileLoader.load(INVOICE_ROOT_PATH + "prescriptions.jrxml"));
-            JasperPrint print = JasperFillManager.fillReport(jasperReport, param, new JREmptyDataSource());
-            JasperViewer viewer = new JasperViewer(print, false);
-            viewer.setZoomRatio(pdfZoomRatio);
-            viewer.setVisible(true);
 
         } catch (SQLException | JRException e) {
             e.printStackTrace();
@@ -375,6 +376,82 @@ public class GenerateInvoice {
         }
     }
 
+    public void emptyPrescriptionPrint( int patientId) {
+        ImageView down_iv = new ImageView();
+        ImageView print_iv = new ImageView();
+
+        String rootPath = "img/icon/";
+        down_iv.setFitHeight(18);
+        down_iv.setFitWidth(18);
+        print_iv.setFitHeight(18);
+        print_iv.setFitWidth(18);
+        ImageLoader loader = new ImageLoader();
+        down_iv.setImage(loader.load(rootPath.concat("download_ic.png")));
+        print_iv.setImage(loader.load(rootPath.concat("print_ic.png")));
+
+        Map<String, Object> param = new HashMap<>();
+
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        fileLoader = new FileLoader();
+
+        try {
+            connection = new DBConnection().getConnection();
+            String query = """                
+                  select * from patient_v where patient_id = ?
+                    """;
+
+            ps = connection.prepareStatement(query);
+            ps.setInt(1, patientId);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+
+                int patnId = rs.getInt("patient_id");
+                String name = rs.getString("fullname");
+                String phone = rs.getString("phone");
+                String address = rs.getString("address");
+                String gender = rs.getString("gender");
+                String weight = rs.getString("weight");
+                String bp = rs.getString("bp");
+                String pulse = rs.getString("pulse");
+                String sugar = rs.getString("sugar");
+                String spo2 = rs.getString("spo2");
+                String temp = rs.getString("temp");
+                String cvs = rs.getString("cvs");
+                String cns = rs.getString("cns");
+                String chest = rs.getString("chest");
+                String  uhid_no= rs.getString("uhid_no");
+                param.put("gender", String.valueOf(gender.charAt(0)).toUpperCase());
+                param.put("weight", weight);
+                param.put("name", name);
+                param.put("address", address);
+                param.put("date", "");
+                param.put("phone", phone);
+                param.put("invoiceNumber","");
+                param.put("uhidNum",uhid_no);
+
+                param.put("fee_valid_days",0);
+                String companyLogoPath = "img/company/gangotri_company_logo.png";
+                param.put("company_logo1", new ImageLoader().reportLogo(companyLogoPath));
+                param.put("company_logo2", new ImageLoader().reportLogo(companyLogoPath));
+                param.put("doctorName", "");
+                param.put("watermark", new ImageLoader().reportLogo("img/company/watermark_2.png"));
+                PrescriptionsBillModel pbm = new PrescriptionsBillModel(patnId, bp, pulse, spo2, temp, chest, cvs, cns, sugar);
+                param.put("patientDetails", new JRBeanCollectionDataSource(List.of(pbm)));
+                JasperReport jasperReport = JasperCompileManager.compileReport(fileLoader.load(INVOICE_ROOT_PATH + "prescriptions.jrxml"));
+                JasperPrint print = JasperFillManager.fillReport(jasperReport, param, new JREmptyDataSource());
+                JasperViewer viewer = new JasperViewer(print, false);
+                viewer.setZoomRatio(pdfZoomRatio);
+                viewer.setVisible(true);
+            }
+
+        } catch (SQLException | JRException e) {
+            e.printStackTrace();
+        } finally {
+            DBConnection.closeConnection(connection, ps, rs);
+        }
+    }
 
     public void generatePaymentSlip(int patientId, int sourceId, String slipType) {
 
@@ -404,12 +481,6 @@ public class GenerateInvoice {
                 System.out.println(ps);
                 rs = ps.executeQuery();
                 while (rs.next()) {
-
-                    int consultation_id = rs.getInt("consultation_id");
-                    int referred_by_doctor_id = rs.getInt("referred_by_doctor_id");
-                    int consultation_doctor_id = rs.getInt("consultation_doctor_id");
-                    int patient_id = rs.getInt("patient_id");
-
                     String patient_name = rs.getString("patient_name");
 
                     System.out.println(patient_name);
@@ -512,5 +583,7 @@ public class GenerateInvoice {
             DBConnection.closeConnection(connection, ps, rs);
         }
     }
+
+
 
 }

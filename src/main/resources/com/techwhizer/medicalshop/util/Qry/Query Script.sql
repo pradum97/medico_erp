@@ -452,38 +452,6 @@ CREATE TABLE patient_consultation
     LAST_UPDATE_DATE       timestamp    default CURRENT_TIMESTAMP
 );
 
-CREATE TABLE PRESCRIBE_MEDICINE_MASTER
-(
-    PRESCRIBE_MASTER_MEDICINE_ID SERIAL PRIMARY KEY,
-    consultation_id              int,
-    PATIENT_ID                   INT,
-    INVOICE_NUM                  VARCHAR(30),
-    CREATED_BY                   INT,
-    CREATION_DATE                TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)
-;
-
-CREATE TABLE PRESCRIBE_MEDICINE_ITEMS
-(
-    PRESCRIBE_ITEMS_MEDICINE_ID  SERIAL PRIMARY KEY,
-    ITEM_NAME                    VARCHAR(400),
-    ITEM_ID                      INT,
-    PRESCRIBE_MASTER_MEDICINE_ID INT,
-    IS_ITEM_EXISTS_IN_STOCK      bool,
-    COMPOSITION                  VARCHAR(300),
-    TAG                          VARCHAR(200),
-    REMARK                       VARCHAR(1000),
-    QUANTITY                     VARCHAR(100),
-    TIME                         VARCHAR(500),
-    DOSE                         VARCHAR(200),
-    FREQUENCY                    VARCHAR(400),
-    DURATION                     VARCHAR(100),
-    STATUS                       VARCHAR(50) DEFAULT 1,
-    CREATION_DATE                TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
-);
-
-
-
 CREATE TABLE payment_information
 (
     payment_id      SERIAL PRIMARY KEY,
@@ -539,12 +507,65 @@ CREATE TABLE TBL_DEPARTMENTS(
 
 ----- From 20-03-2024---------
 
+CREATE  TABLE TBL_PRESCRIPTION_MASTER
+(
+    PRESCRIPTION_MASTER_ID SERIAL PRIMARY KEY,
+    CONSULTATION_ID              int,
+    PATIENT_ID                   INT,
+    PRESCRIPTION_NUM             VARCHAR(30),
+    IS_FINAL BOOLEAN,
+    CREATED_BY             INT,
+    REMARKS TEXT NULL,
+    STATUS INT DEFAULT 1,
+    CREATION_DATE          timestamp    default CURRENT_TIMESTAMP,
+    UPDATE_BY              INT,
+    LAST_UPDATE_DATE       timestamp
+);
+
+CREATE TABLE TBL_PRESCRIPTION_MEDICATIONS
+(
+    MEDICATION_ID  SERIAL PRIMARY KEY,
+    ITEM_NAME                    VARCHAR(400),
+    ITEM_ID                      INT REFERENCES TBL_ITEMS_MASTER(ITEM_ID),
+    PRESCRIPTION_MASTER_ID INT REFERENCES TBL_PRESCRIPTION_MASTER(PRESCRIPTION_MASTER_ID),
+    IS_ITEM_EXISTS_IN_STOCK      bool,
+    COMPOSITION                  VARCHAR(300),
+    TAG                          VARCHAR(200),
+    REMARK                       VARCHAR(1000),
+    QUANTITY                     VARCHAR(100),
+    TIME                         VARCHAR(500),
+    DOSE                         VARCHAR(200),
+    FREQUENCY                    VARCHAR(400),
+    DURATION                     VARCHAR(100),
+    CREATED_BY             INT,
+    STATUS INT DEFAULT 1,
+    CREATION_DATE          timestamp    default CURRENT_TIMESTAMP,
+    UPDATE_BY              INT,
+    LAST_UPDATE_DATE       timestamp
+);
+
+CREATE TABLE TBL_PRESCRIPTION_INVESTIGATION(
+    INVESTIGATION_ID SERIAL PRIMARY KEY ,
+    ITEM_ID INT REFERENCES TBL_ITEMS_MASTER(ITEM_ID),
+    PRESCRIPTION_MASTER_ID INT REFERENCES TBL_PRESCRIPTION_MASTER(PRESCRIPTION_MASTER_ID),
+    PRESCRIBED_DATE TIMESTAMP,
+    RESULT_DATE TIMESTAMP,
+    RESULT_VALUE TEXT,
+    CREATED_BY             INT,
+    STATUS INT DEFAULT 1,
+    CREATION_DATE          timestamp    default CURRENT_TIMESTAMP,
+    UPDATE_BY              INT,
+    LAST_UPDATE_DATE       timestamp
+);
+
+
+
 CREATE TABLE tbl_building
 (
     building_id   SERIAL PRIMARY KEY,
     building_name VARCHAR(100) UNIQUE NOT NULL,
     address varchar(500),
-    status int default 111,
+    status int default 1,
     created_by int REFERENCES tbl_users(user_id),
     created_date timestamp default current_timestamp,
     last_updated_by int REFERENCES tbl_users(user_id),

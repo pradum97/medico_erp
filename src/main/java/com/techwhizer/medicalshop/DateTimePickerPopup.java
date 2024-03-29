@@ -101,7 +101,7 @@ class DateTimePickerPopup extends VBox implements Initializable {
 				String[] time = localTime.format(DateTimeFormatter.ofPattern("hh:mm a")).split(" ");
 				String[] hourMin = time[0].split(":");
 
-				comHour.getSelectionModel().select(hourMin[0].toUpperCase());
+				comHour.getSelectionModel().select(Objects.equals(hourMin[0], "12") ?"00":hourMin[0].toUpperCase());
 				comMinute.getSelectionModel().select(hourMin[1].toUpperCase());
 
 				String amPm = time[1];
