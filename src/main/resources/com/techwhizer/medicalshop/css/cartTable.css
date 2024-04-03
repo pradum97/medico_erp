@@ -1,3 +1,10 @@
+/*.button,.hyperlink,.label{*/
+/*    -fx-font-size: 10px;*/
+/*}*/
+
+
+
+
 .context-menu {
     -fx-background-color: red;
     -fx-border-color: red;
@@ -28,9 +35,10 @@
 }
 
 .table-view .column-header .label {
-    -fx-padding: 0.5em;
+    -fx-padding: 0.4em;
     -fx-text-fill: black;
     -fx-alignment: center-left;
+    -fx-font-size: 9px;
 }
 
 .table-view .table-cell{
@@ -39,10 +47,10 @@
     -fx-border-color: transparent -fx-table-cell-border-color -fx-table-cell-border-color transparent;
     -fx-text-alignment: center;
     -fx-table-cell-border-color:transparent;
-    -fx-cell-size: 2.0em; /* 24 */
+    -fx-cell-size: 1.3em; /* 24 */
     -fx-text-fill: black;
     -fx-font-family: Arial;
-    -fx-font-size: 12;
+    -fx-font-size: 10;
 }
 
 .table-column {

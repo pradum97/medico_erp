@@ -3,13 +3,12 @@ package com.techwhizer.medicalshop.controller.chooser;
 import com.techwhizer.medicalshop.CustomDialog;
 import com.techwhizer.medicalshop.ImageLoader;
 import com.techwhizer.medicalshop.Main;
-import com.techwhizer.medicalshop.controller.Constant;
-import com.techwhizer.medicalshop.controller.auth.Login;
-import com.techwhizer.medicalshop.controller.dashboard.StockReport;
 import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.model.GstModel;
 import com.techwhizer.medicalshop.model.chooserModel.ItemChooserModel;
 import com.techwhizer.medicalshop.util.DBConnection;
+import com.techwhizer.medicalshop.util.ItemChooserType;
+import com.techwhizer.medicalshop.util.TableViewConfig;
 import com.victorlaerte.asynctask.AsyncTask;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -22,7 +21,6 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -32,17 +30,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
 public class ItemChooser implements Initializable {
     public ProgressIndicator progressBar;
-    private int rowsPerPage = 100;
     public TextField searchTf;
     public TableColumn<ItemChooserModel, Integer> colSrNo;
     public TableColumn<ItemChooserModel, String> colProductName;
-    public TableColumn<ItemChooserModel, String> colAvlQty;
     public TableColumn<ItemChooserModel, String> colAction;
     public TableView<ItemChooserModel> tableView;
     public Pagination pagination;
@@ -58,28 +53,46 @@ public class ItemChooser implements Initializable {
         customDialog = new CustomDialog();
         dbConnection = new DBConnection();
         tableView.setFixedCellSize(27);
-        callThread();
+
+        if (null != Main.primaryStage.getUserData()) {
+
+            if (null != Main.primaryStage.getUserData()) {
+                var data = (Map<String, Object>) Main.primaryStage.getUserData();
+                callThread(data);
+//                if (data.get("default_list") instanceof ObservableList) {
+//                    itemList = (ObservableList<ItemChooserModel>) data.get("default_list");
+//                    pagination.setVisible(true);
+//                    search_Item();
+//                } else {
+//                    callThread(data);
+//                }
+            }
+        }
     }
 
-    private void callThread() {
-        MyAsyncTask myAsyncTask = new MyAsyncTask();
+    private void callThread(Map<String, Object> data) {
+        MyAsyncTask myAsyncTask = new MyAsyncTask(data);
         myAsyncTask.setDaemon(false);
         myAsyncTask.execute();
     }
 
     private class MyAsyncTask extends AsyncTask<String, Integer, Boolean> {
-        private String msg;
+        Map<String, Object> data;
+
+        public MyAsyncTask(Map<String, Object> data) {
+            this.data = data;
+        }
 
         @Override
         public void onPreExecute() {
             //Background Thread will start
             method.hideElement(tableView);
-            msg = "";
+
         }
 
         @Override
         public Boolean doInBackground(String... params) {
-            msg = getItems();
+            getItems(data);
             return true;
         }
 
@@ -87,7 +100,6 @@ public class ItemChooser implements Initializable {
         public void onPostExecute(Boolean success) {
             tableView.setVisible(true);
             method.hideElement(progressBar);
-            tableView.setPlaceholder(new Label(msg));
         }
         @Override
         public void progressCallback(Integer... params) {
@@ -95,12 +107,14 @@ public class ItemChooser implements Initializable {
         }
     }
 
-    private String getItems() {
+    private void getItems(Map<String, Object> data) {
 
         if (null != itemList) {
             itemList.clear();
         }
-       String msg ;
+
+        ItemChooserType chooserType = (ItemChooserType) data.get("item_chooser_type");
+
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -108,13 +122,16 @@ public class ItemChooser implements Initializable {
         try {
             connection = dbConnection.getConnection();
 
-            String qry = """
-                    select * from available_quantity_v where avl_qty_pcs > 0
-                    """;
+            String whereCondition = "";
+            switch (chooserType) {
+                case INVESTIGATION ->
+                        whereCondition = " where is_stockable = false and department_code not in ('Medicine','Consultation','Hardware','Electricals','Furniture','Director_101','Drugs_Store','Computer_Hardware') ";
+                case PURCHASE -> whereCondition = " where is_stockable = true order by item_id desc ";
+            }
+
+            String qry = "select distinct * from item_chooser_v " + whereCondition;
             ps = connection.prepareStatement(qry);
             rs = ps.executeQuery();
-
-            int count = 0;
 
             while (rs.next()) {
 
@@ -127,29 +144,19 @@ public class ItemChooser implements Initializable {
                 int sGst = rs.getInt("sgst");
                 int hsn = rs.getInt("hsn_sac");
                 int tabPerStrip = rs.getInt("STRIP_TAB");
-                int status = rs.getInt("status");
                 String gstName = rs.getString("gstName");
-                String type = rs.getString("type");
                 String unit = rs.getString("unit");
                 String composition = rs.getString("composition");
                 String tag = rs.getString("tag");
                 String medicineDose = rs.getString("dose");
-                String avlQty = rs.getString("avl_qty_strip");
-                count++;
+                boolean isStockable = rs.getBoolean("is_stockable");
 
                 GstModel gm = new GstModel(gstId, hsn, sGst, cGst, iGst, gstName, null);
+                int departmentId = rs.getInt("department_id");
+                String departmentName = rs.getString("department_name");
 
-                if (status == 1){
-                    if (Constant.ITEM_TYPE_PROHIBIT.equalsIgnoreCase(type)) {
-                        if (Login.currentRoleName.equalsIgnoreCase("admin")) {
-                            itemList.add(new ItemChooserModel(itemId, itemName, packing, gm, unit, tabPerStrip,composition,tag,medicineDose,avlQty));
-                        }
-                    } else {
-                        itemList.add(new ItemChooserModel(itemId, itemName, packing, gm, unit, tabPerStrip,composition,tag,medicineDose,avlQty));
-                    }
-                }else {
-                    msg = "All items are disabled.";
-                }
+                itemList.add(new ItemChooserModel(itemId, itemName, packing, gm, unit, tabPerStrip, composition, tag, medicineDose,
+                        isStockable, departmentId, departmentName));
             }
 
             if (!itemList.isEmpty()) {
@@ -157,22 +164,14 @@ public class ItemChooser implements Initializable {
                 search_Item();
             }
 
-            if (count > 0) {
-
-                msg = "";
-            } else {
-
-                msg = "Item not available";
-            }
-
+            Platform.runLater(() -> tableView.setPlaceholder(new Label("Item not available")));
 
         } catch (SQLException e) {
-            msg = "Something went wrong ";
             throw new RuntimeException(e);
         } finally {
             DBConnection.closeConnection(connection, ps, rs);
         }
-        return msg;
+
     }
 
     private void search_Item() {
@@ -191,23 +190,25 @@ public class ItemChooser implements Initializable {
 
                 if (products.getItemName().toLowerCase().contains(lowerCaseFilter)) {
                     return true;
+                }  else if (products.getProductTag().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
                 } else return String.valueOf(products.getPacking()).toLowerCase().contains(lowerCaseFilter);
             });
 
-            changeTableView(pagination.getCurrentPageIndex(), rowsPerPage);
+            changeTableView(pagination.getCurrentPageIndex(), TableViewConfig.POPUP_ROW_PER_PAGE);
         });
 
         pagination.setCurrentPageIndex(0);
-        changeTableView(0, rowsPerPage);
+        changeTableView(0, TableViewConfig.POPUP_ROW_PER_PAGE);
         pagination.currentPageIndexProperty().addListener(
                 (observable1, oldValue1, newValue1) -> {
-                    changeTableView(newValue1.intValue(), rowsPerPage);
+                    changeTableView(newValue1.intValue(), TableViewConfig.POPUP_ROW_PER_PAGE);
                 });
     }
 
     private void changeTableView(int index, int limit) {
 
-        int totalPage = (int) (Math.ceil(filteredData.size() * 1.0 / rowsPerPage));
+        int totalPage = (int) (Math.ceil(filteredData.size() * 1.0 / TableViewConfig.POPUP_ROW_PER_PAGE));
         Platform.runLater(() -> pagination.setPageCount(totalPage));
 
         colSrNo.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(
@@ -227,44 +228,6 @@ public class ItemChooser implements Initializable {
     }
 
     private void setOptionalCell() {
-
-        Callback<TableColumn<ItemChooserModel, String>, TableCell<ItemChooserModel, String>>
-                cellQty = (TableColumn<ItemChooserModel, String> param) -> new TableCell<>() {
-            @Override
-            public void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                    setText(null);
-
-                } else {
-
-                    String qtyStr = tableView.getItems().get(getIndex()).getAvailableQuantity();
-                    int qty = qtyStr == null ? 0 : Integer.parseInt(qtyStr.split("-")[0]);
-
-                    Label qtyLabel = new Label(qtyStr);
-
-                    if (qty > 0 && qty < StockReport.lowQuantity) {
-                        qtyLabel.setStyle("-fx-text-fill: white;-fx-font-weight: bold;-fx-background-color: #ff9933;" +
-                                "-fx-padding: 0px 3px 0px 3px;-fx-background-radius: 3px");
-                    } else if (qty == 0) {
-                        qtyLabel.setStyle("-fx-text-fill: white;-fx-font-weight: bold;-fx-background-color: red;" +
-                                "-fx-padding: 0px 3px 0px 3px;-fx-background-radius: 3px");
-                    } else {
-                        qtyLabel.setStyle("-fx-text-fill: black;-fx-font-weight:bold;-fx-background-color: inherit");
-                    }
-
-                    HBox managebtn = new HBox(qtyLabel);
-                    managebtn.setStyle("-fx-alignment:CENTER-LEFT");
-                    HBox.setMargin(qtyLabel, new Insets(0, 0, 0, 5));
-
-                    setGraphic(managebtn);
-                    setText(null);
-
-                }
-            }
-
-        };
 
         Callback<TableColumn<ItemChooserModel, String>, TableCell<ItemChooserModel, String>>
                 cellFactory = (TableColumn<ItemChooserModel, String> param) -> new TableCell<>() {
@@ -311,15 +274,6 @@ public class ItemChooser implements Initializable {
             }
 
         };
-colAvlQty.setCellFactory(cellQty);
         colAction.setCellFactory(cellFactory);
-    }
-
-    public void addProductBnClick(MouseEvent actionEvent) {
-
-        customDialog.showFxmlDialog2("product/addProduct.fxml", "Add new product");
-        searchTf.setText("");
-        callThread();
-
     }
 }

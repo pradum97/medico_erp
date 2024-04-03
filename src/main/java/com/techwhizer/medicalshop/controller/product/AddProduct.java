@@ -3,10 +3,13 @@ package com.techwhizer.medicalshop.controller.product;
 import com.techwhizer.medicalshop.CustomDialog;
 import com.techwhizer.medicalshop.Main;
 import com.techwhizer.medicalshop.controller.auth.Login;
+import com.techwhizer.medicalshop.controller.common.model.DepartmentModel;
+import com.techwhizer.medicalshop.method.GenerateBillNumber;
 import com.techwhizer.medicalshop.method.GetTax;
 import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.method.StaticData;
 import com.techwhizer.medicalshop.model.*;
+import com.techwhizer.medicalshop.util.CommonUtil;
 import com.techwhizer.medicalshop.util.DBConnection;
 import com.victorlaerte.asynctask.AsyncTask;
 import javafx.application.Platform;
@@ -14,18 +17,17 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -38,7 +40,7 @@ public class AddProduct implements Initializable {
     public ComboBox<String> narcoticCom;
     public ComboBox<String> itemTypeCom;
     public ComboBox<DiscountModel> discountCom;
-    public TextField packingTf, stripTabTf;
+    public TextField stripTabTf;
     public ComboBox<String> unitCom;
     public ProgressIndicator progressBar;
     public Label mrL;
@@ -47,6 +49,11 @@ public class AddProduct implements Initializable {
     public TextField compositionTf;
     public TextField productTag;
     public TextField medicineDoseTf;
+    public HBox radioGroupHB;
+    public HBox mrpContainerHB;
+    public TextField mrpTf;
+    public VBox stockableContaier;
+    public ComboBox<DepartmentModel> departmentCom;
     private Method method;
     public Label stripTabLabel;
     public VBox stripTabContainer;
@@ -61,6 +68,7 @@ public class AddProduct implements Initializable {
     private CompanyModel companyModel;
     private MrModel mrModel;
     private ManufacturerModal manufacturerModal;
+    boolean isStockableItem;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -71,9 +79,41 @@ public class AddProduct implements Initializable {
         method.hideElement(progressBar);
         stripTabContainer.setDisable(true);
         callInitializeThread();
-
         selectionChooser();
+        setRadioGroup();
 
+        Platform.runLater(() -> {
+            Stage stage = (Stage) stripTabLabel.getScene().getWindow();
+            stage.setMaximized(true);
+        });
+
+    }
+
+    private void setRadioGroup() {
+
+        ToggleGroup group = new ToggleGroup();
+        RadioButton yesRB = new RadioButton("YES");
+        RadioButton noRb = new RadioButton("NO");
+
+        yesRB.setToggleGroup(group);
+        noRb.setToggleGroup(group);
+
+        radioGroupHB.getChildren().addAll(yesRB, noRb);
+
+        group.selectedToggleProperty().addListener((observableValue, toggle, t1) -> {
+            isStockableItem = yesRB.isSelected();
+
+            if (isStockableItem) {
+                stockableContaier.setVisible(true);
+                method.hideElement(mrpContainerHB);
+            } else {
+                mrpContainerHB.setVisible(true);
+                method.hideElement(stockableContaier);
+            }
+
+        });
+        isStockableItem = true;
+        yesRB.setSelected(true);
     }
 
     private void selectionChooser() {
@@ -119,6 +159,7 @@ public class AddProduct implements Initializable {
 
         @Override
         public Boolean doInBackground(String... params) {
+            departmentCom.setItems(CommonUtil.getDepartmentsList());
             setData();
             getGst();
 
@@ -140,7 +181,6 @@ public class AddProduct implements Initializable {
     }
 
     private void comboBoxConfig() {
-
         unitCom.valueProperty().addListener((observableValue, s, newValue) -> {
             stripTabTf.setText("");
             if (newValue.equalsIgnoreCase("STRIP")) {
@@ -150,13 +190,10 @@ public class AddProduct implements Initializable {
                 stripTabLabel.setText("");
                 stripTabContainer.setDisable(true);
             }
-
         });
     }
 
     private class SubmitDataTask extends AsyncTask<String, Integer, Boolean> {
-
-        private Map<String, Object> status;
         private ItemsModel itemsModel;
 
         public SubmitDataTask(ItemsModel itemsModel) {
@@ -171,35 +208,13 @@ public class AddProduct implements Initializable {
 
         @Override
         public Boolean doInBackground(String... params) {
-            status = uploadData(itemsModel);
-            return (boolean) status.get("is_success");
+            uploadData(itemsModel);
+            return true;
         }
 
         @Override
         public void onPostExecute(Boolean success) {
-            submitButton.setVisible(true);
-            method.hideElement(progressBar);
 
-            if (success) {
-                productNameTf.setText("");
-                packingTf.setText("");
-                stripTabTf.setText("");
-                compositionTf.setText("");
-                productTag.setText("");
-                discountCom.getSelectionModel().clearSelection();
-                companyModel = null;
-                manufacturerModal = null;
-                mrModel = null;
-                companyNameL.setText("Click to choose company");
-                mfrL.setText("Click to choose mfr");
-                mrL.setText("Click to choose mr");
-
-            }
-
-            Platform.runLater(() -> {
-                customDialog.showAlertBox("", (String) status.get("message"));
-                // clearAllBn some filed
-            });
         }
 
         @Override
@@ -208,23 +223,33 @@ public class AddProduct implements Initializable {
         }
     }
 
-    private Map<String, Object> uploadData(ItemsModel im) {
+    private void uploadData(ItemsModel im) {
         Map<String, Object> map = new HashMap<>();
 
         Connection connection = null;
         PreparedStatement ps = null;
+        ResultSet rs = null;
 
         try {
             connection = dbConnection.getConnection();
-            String qry = "INSERT INTO TBL_ITEMS_MASTER(ITEMS_NAME, UNIT, PACKING, COMPANY_ID, mfr_id, DISCOUNT_ID, mr_id, GST_ID,\n" +
-                    "                             TYPE, NARCOTIC, ITEM_TYPE, STATUS,created_by,STRIP_TAB,composition,tag,dose)\n" +
-                    "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            connection.setAutoCommit(false);
+            String qry = """
+                    INSERT INTO TBL_ITEMS_MASTER(ITEMS_NAME, UNIT, PACKING, COMPANY_ID, mfr_id, DISCOUNT_ID, mr_id, GST_ID,
+                                                 TYPE, NARCOTIC, ITEM_TYPE, STATUS,created_by,STRIP_TAB,composition,tag,dose,
+                                                 is_stockable,department_code)
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""";
 
-            ps = connection.prepareStatement(qry);
+            ps = connection.prepareStatement(qry, new String[]{"item_id"});
 
             ps.setString(1, im.getProductName());
-            ps.setString(2, im.getUnit());
-            ps.setString(3, im.getPacking());
+            ps.setString(2, im.getUnit() == null || im.getUnit().isEmpty()?"PCS":im.getUnit() );
+
+            if (im.getPacking() == null || im.getPacking().isEmpty()){
+                ps.setString(3, "1x1");
+            }else {
+                ps.setString(3, im.getPacking());
+            }
+
 
             if (null == companyModel) {
                 ps.setNull(4, Types.NULL);
@@ -260,25 +285,168 @@ public class AddProduct implements Initializable {
             ps.setString(15, im.getProductComposition());
             ps.setString(16, im.getProductTag());
             ps.setString(17, im.getMedicineDose());
+            ps.setBoolean(18, isStockableItem);
+            ps.setString(19, im.getDepartmentCode());
 
             int res = ps.executeUpdate();
             if (res > 0) {
-                map.put("is_success", true);
-                map.put("message", "Item successfully created.");
-            } else {
-                map.put("is_success", true);
-                map.put("message", "Item not created. Please try again.");
+                rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    int itemId = rs.getInt(1);
+
+                    if (isStockableItem){
+                        Connection finalConnection = connection;
+                        PreparedStatement finalPs = ps;
+                        ResultSet finalRs = rs;
+                        Platform.runLater(()->{
+                            try {
+                                onSuccess(finalConnection, finalPs, finalRs);
+                            } catch (SQLException e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
+                    }else {
+                        addItemToStock(itemId,im.getMrp(),connection,ps,rs);
+
+                    }
+
+
+                }else {
+
+                    DBConnection.rollBack(connection);
+                    customDialog.showAlertBox("Error", "Something went wrong. Please try again");
+                }
+
+            }
+
+        } catch (SQLException e) {
+            System.out.println("item master-"+e.getMessage());
+            Platform.runLater(() -> {
+                submitButton.setVisible(true);
+                method.hideElement(progressBar);
+            });
+            throw new RuntimeException(e);
+        }finally {
+        }
+    }
+
+    private void addItemToStock(int itemId, double mrp, Connection connection, PreparedStatement ps, ResultSet rs) {
+
+        String billNum = new GenerateBillNumber().generatePurchaseBillNum();
+
+        try {
+            String purMainQry = "INSERT INTO TBL_PURCHASE_MAIN(DEALER_ID, BILL_NUM, DEALER_BILL_NUM, BILL_DATE,created_by)VALUES (?,?,?,?,?)";
+            ps = connection.prepareStatement(purMainQry, new String[]{"purchase_main_id"});
+            ps.setNull(1, 0);
+            ps.setString(2, billNum);
+            ps.setNull(3, Types.NULL);
+            ps.setString(4, method.getCurrentDate());
+            ps.setInt(5, Login.currentlyLogin_Id);
+            int res = ps.executeUpdate();
+
+            if (res > 0) {
+                rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    int purMainId = rs.getInt(1);
+                    ps = null;
+                    rs = null;
+                    res = 0;
+
+                    String purItemsQry = "INSERT INTO TBL_PURCHASE_ITEMS(purchase_main_id, item_id, batch, expiry_date, lot_number, quantity, quantity_unit,purchase_rate,mrp,sale_price,created_by) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+
+                    ps = connection.prepareStatement(purItemsQry, new String[]{"purchase_items_id"});
+                    ps.setInt(1, purMainId);
+                    ps.setInt(2, itemId);
+                    ps.setNull(3, Types.NULL);
+                    ps.setString(4, "01/2050");
+                    ps.setNull(5, Types.NULL);
+                    ps.setInt(6, 0);
+                    ps.setString(7, "PCS");
+                    ps.setDouble(8, mrp);
+                    ps.setDouble(9, mrp);
+                    ps.setDouble(10, mrp);
+                    ps.setInt(11, Login.currentlyLogin_Id);
+                    res = ps.executeUpdate();
+
+                    if (res > 0) {
+                        rs = ps.getGeneratedKeys();
+                        if (rs.next()) {
+
+                            int purchaseItemId = rs.getInt(1);
+                            ps = null;
+                            rs = null;
+                            res = 0;
+
+                            String stockQryInsertQry = "INSERT INTO TBL_STOCK(ITEM_ID, PURCHASE_MAIN_ID, PURCHASE_ITEMS_ID, QUANTITY," + " QUANTITY_UNIT,UPDATE_DATE,created_by)VALUES(?,?,?,?,?,?,?)";
+                            ps = connection.prepareStatement(stockQryInsertQry);
+                            ps.setInt(1, itemId);
+                            ps.setInt(2, purMainId);
+                            ps.setInt(3, purchaseItemId);
+                            ps.setInt(4, 1);
+                            ps.setString(5, "PCS");
+                            ps.setString(6, method.getCurrentDate());
+                            ps.setInt(7, Login.currentlyLogin_Id);
+
+                            res = ps.executeUpdate();
+
+                            if (res > 0) {
+
+                                PreparedStatement finalPs = ps;
+                                ResultSet finalRs = rs;
+                                Platform.runLater(()->{
+                                    try {
+                                        onSuccess(connection, finalPs, finalRs);
+                                    } catch (SQLException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                });
+
+                            } else {
+                                DBConnection.rollBack(connection);
+                                customDialog.showAlertBox("Error", "Something went wrong. Please try again");
+                            }
+                        }
+                    }
+                }
             }
         } catch (SQLException e) {
-            map.put("is_success", true);
-            map.put("message", "An error occurred while creating the product");
-            submitButton.setVisible(true);
-            method.hideElement(progressBar);
-            throw new RuntimeException(e);
-        } finally {
-            DBConnection.closeConnection(connection, ps, null);
+            System.out.println("item master-"+e.getMessage()); System.out.println("item master-"+e.getMessage());
+            Platform.runLater(() -> {
+                submitButton.setVisible(true);
+                method.hideElement(progressBar);
+            });
+            DBConnection.rollBack(connection);
+            customDialog.showAlertBox("Error", "Something went wrong. Please try again");
         }
-        return map;
+
+
+    }
+
+    private void onSuccess(Connection connection,PreparedStatement ps, ResultSet rs) throws SQLException {
+
+        connection.commit();
+
+        submitButton.setVisible(true);
+        productNameTf.setText("");
+        stripTabTf.setText("");
+        compositionTf.setText("");
+        productTag.setText("");
+        mrpTf.setText("");
+        discountCom.getSelectionModel().clearSelection();
+        departmentCom.getSelectionModel().clearSelection();
+        companyModel = null;
+        manufacturerModal = null;
+        mrModel = null;
+        companyNameL.setText("Click to choose company");
+        mfrL.setText("Click to choose mfr");
+        mrL.setText("Click to choose mr");
+        method.hideElement(progressBar);
+
+        Platform.runLater(() -> {
+            customDialog.showAlertBox("", "Item successfully created.");
+        });
+
+        DBConnection.closeConnection(connection, ps, rs);
     }
 
     private void setData() {
@@ -335,54 +503,77 @@ public class AddProduct implements Initializable {
     private void submit() {
         String productName = productNameTf.getText();
 
-        String packing = packingTf.getText();
         String stripTab = stripTabTf.getText();
         String composition = compositionTf.getText();
         String tag = productTag.getText();
         String medicineDose = medicineDoseTf.getText();
+        String mrp = mrpTf.getText();
+
+
 
         long stripTabL = 0;
-        double purchaseMrpD = 0, mrpD = 0, saleRateD = 0;
+        double mrpD = 0;
 
         if (productName.isEmpty()) {
-            method.show_popup("Please enter product name", productNameTf);
-            return;
-        } else if (composition.isEmpty()) {
-            method.show_popup("Please enter product composition.", compositionTf);
-            return;
-        } else if (medicineDose.isEmpty()) {
-            method.show_popup("Please enter medicine dose", medicineDoseTf);
+            method.show_popup("Please enter product name", productNameTf, Side.RIGHT);
             return;
         } else if (tag.isEmpty()) {
-            method.show_popup("Please enter product tag", productTag);
+            method.show_popup("Please enter product tag", productTag, Side.RIGHT);
             return;
-        }else if (unitCom.getSelectionModel().isEmpty()) {
-            method.show_popup("Please select unit", unitCom);
+        } else if (departmentCom.getSelectionModel().isEmpty()) {
+            method.show_popup("Please select item department", departmentCom, Side.RIGHT);
             return;
-        } else if (unitCom.getSelectionModel().getSelectedItem().equals("STRIP")) {
-            if (stripTab.isEmpty()) {
-                method.show_popup("Please enter tab per strip", stripTabTf);
+        }
+
+        if (isStockableItem) {
+            if (composition.isEmpty()) {
+                method.show_popup("Please enter product composition.", compositionTf, Side.RIGHT);
                 return;
+            } else if (medicineDose.isEmpty()) {
+                method.show_popup("Please enter medicine dose", medicineDoseTf, Side.RIGHT);
+                return;
+            }  else if (unitCom.getSelectionModel().isEmpty()) {
+                method.show_popup("Please select unit", unitCom, Side.RIGHT);
+                return;
+            } else if (unitCom.getSelectionModel().getSelectedItem().equals("STRIP")) {
+                if (stripTab.isEmpty()) {
+                    method.show_popup("Please enter tab per strip", stripTabTf, Side.RIGHT);
+                    return;
+                }
+                try {
+                    stripTabL = Long.parseLong(stripTab);
+                } catch (NumberFormatException e) {
+                    method.show_popup("Please enter number only", stripTabTf, Side.RIGHT);
+                    return;
+                }
             }
-            try {
-                stripTabL = Long.parseLong(stripTab);
-            } catch (NumberFormatException e) {
-                method.show_popup("Please enter number only", stripTabTf);
+        } else {
+
+            if (mrp.isEmpty()) {
+                method.show_popup("Please enter item mrp", mrpTf, Side.RIGHT);
                 return;
+            }else {
+
+                try {
+                    mrpD = Double.parseDouble(mrp);
+                } catch (NumberFormatException e) {
+                    method.show_popup("Please enter valid mrp", mrpTf, Side.RIGHT);
+                    return;
+                }
+
             }
         }
 
-        if (packing.isEmpty()) {
-            method.show_popup("Please enter packing", packingTf);
-            return;
-        } else if (hsnCom.getSelectionModel().isEmpty()) {
-            method.show_popup("Please select hsn code", hsnCom);
+
+        if (hsnCom.getSelectionModel().isEmpty()) {
+            method.show_popup("Please select hsn code", hsnCom, Side.RIGHT);
             return;
         }
 
         String type = typeCom.getSelectionModel().getSelectedItem();
         String narcotic = narcoticCom.getSelectionModel().getSelectedItem();
         String itemType = itemTypeCom.getSelectionModel().getSelectedItem();
+        String departmentCode = departmentCom.getSelectionModel().getSelectedItem().getDepartmentCode();
         int status = 0;
 
         String unit = unitCom.getSelectionModel().getSelectedItem();
@@ -393,9 +584,8 @@ public class AddProduct implements Initializable {
             discountId = discountCom.getSelectionModel().getSelectedItem().getDiscount_id();
         }
 
-        ItemsModel itemsModel = new ItemsModel(productName, unit, packing, discountId, gstId,
-                purchaseMrpD, mrpD, saleRateD, type, narcotic, itemType, status, stripTabL,composition,tag,medicineDose);
-
+        ItemsModel itemsModel = new ItemsModel(productName, unit, null, discountId, gstId, mrpD, mrpD,
+                mrpD, type, narcotic, itemType, status, stripTabL, composition, tag, medicineDose, isStockableItem,departmentCode);
 
         SubmitDataTask task = new SubmitDataTask(itemsModel);
         task.setDaemon(false);

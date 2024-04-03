@@ -16,6 +16,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.stage.Stage;
 
 import java.net.URL;
 import java.sql.Connection;
@@ -29,7 +30,7 @@ import java.util.ResourceBundle;
 public class MrMain implements Initializable {
     public ProgressIndicator progressBar;
     public TableColumn<MrModel,String> colGender;
-    private int rowsPerPage = 10;
+    private int rowsPerPage = 100;
     public TextField searchTf;
     public TableView<MrModel> tableView;
     public TableColumn<MrModel,Integer> colSrNo;
@@ -52,8 +53,12 @@ public class MrMain implements Initializable {
         method = new Method();
         dbConnection = new DBConnection();
         customDialog = new CustomDialog();
-       // tableView.setDisable(true);
+        tableView.setFixedCellSize(28);
         callThread();
+        Platform.runLater(()->{
+            Stage stage = (Stage) searchTf.getScene().getWindow();
+            stage.setMaximized(true);
+        });
     }
 
     private void callThread() {

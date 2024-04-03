@@ -36,7 +36,7 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 
 public class PatientMain implements Initializable {
-    private int rowsPerPage = 50;
+    private int rowsPerPage = 60;
     public TableView<PatientModel> tableView;
     public TableColumn<PatientModel, Integer> colSrNo;
     public TableColumn<PatientModel, String> colName;
@@ -157,14 +157,14 @@ public class PatientMain implements Initializable {
                 String chest = rs.getString("chest");
                 String creationDate = rs.getString("creation_date");
                 String lastUpdate = rs.getString("last_update");
-                String admission_number = rs.getString("admission_number");
+                String patient_number = rs.getString("patient_number");
                 String uhidNum = rs.getString("uhid_no");
 
 
 
                 PatientModel pm = new PatientModel(patient_id,salutation_id,created_by,last_update_by,salutation_name,first_name,
                         middle_name,last_name,fullName,gender,age,address,dob,phone,idType,idNum,guardianName,weight,bp,pulse,
-                        sugar,spo2,temp,cvs,cns,chest,creationDate,lastUpdate,admission_number,uhidNum);
+                        sugar,spo2,temp,cvs,cns,chest,creationDate,lastUpdate,patient_number,uhidNum);
                 patientList.add(pm);
             }
             if (null != patientList) {
@@ -183,9 +183,12 @@ public class PatientMain implements Initializable {
                }
            });
         } catch (SQLException e) {
+
+            System.out.println(e.getMessage());
+
             Platform.runLater(()->{
 
-                tableView.setPlaceholder(new Label("An error occurred while fetching the item"));
+                tableView.setPlaceholder(new Label("An error occurred while fetching patient details"));
             });
 
         } finally {
@@ -280,19 +283,19 @@ public class PatientMain implements Initializable {
 
                 } else {
 
-                    Hyperlink admNumHl = new Hyperlink(tableView.getItems().get(getIndex()).getAdmissionNumber());
+                    Hyperlink patientNumHl = new Hyperlink(tableView.getItems().get(getIndex()).getPatientNumber());
 
-                    admNumHl.setStyle("-fx-background-color: transparent; -fx-text-fill: blue;" +
-                            "-fx-border-color: transparent;-fx-font-size: 12;-fx-alignment: center-left");
+                    patientNumHl.setStyle("-fx-background-color: transparent; -fx-text-fill: blue;" +
+                            "-fx-border-color: transparent;-fx-font-size: 10;-fx-alignment: center-left");
 
-                    admNumHl.setMinWidth(125);
+                    patientNumHl.setMinWidth(125);
 
-                    admNumHl.setOnAction(actionEvent -> {
+                    patientNumHl.setOnAction(actionEvent -> {
                         tableView.getSelectionModel().select(getIndex());
                         PatientModel pm = tableView.getSelectionModel().getSelectedItem();
-                        new PrintPrescription().print(0,0,pm.getPatientId(),admNumHl,"", pm.getFullName(), false);
+                        new PrintPrescription().print(pm.getPatientId(),0,patientNumHl,true);
                     });
-                    HBox managebtn = new HBox(admNumHl);
+                    HBox managebtn = new HBox(patientNumHl);
                     managebtn.setStyle("-fx-alignment: center-left");
                     setGraphic(managebtn);
                     setText(null);

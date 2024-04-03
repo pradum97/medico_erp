@@ -1,5 +1,7 @@
 package com.techwhizer.medicalshop.model;
 
+import java.util.Objects;
+
 public class DoctorModel {
 
     private int doctorId;
@@ -24,7 +26,7 @@ public class DoctorModel {
         this.qualification = qualification;
         this.createdDate = createdDate;
         this.doctorType = doctorType;
-        drFullName = "Dr. "+drName;
+        drFullName = Objects.equals(drName, "SELF") ?drName:"Dr. "+drName;
     }
 
     public DoctorModel(int doctorId, String drName) {

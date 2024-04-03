@@ -24,6 +24,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.net.URL;
@@ -32,6 +33,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,6 +65,13 @@ public class AllDealer implements Initializable {
         dbConnection = new DBConnection();
         customDialog = new CustomDialog();
         callThread();
+
+        tableView.setColumnResizePolicy((param) -> true );
+        Platform.runLater(() -> customResize(tableView));
+        Platform.runLater(()->{
+            Stage stage = (Stage) searchTf.getScene().getWindow();
+            stage.setMaximized(true);
+        });
     }
 
     private void callThread() {
@@ -113,6 +122,21 @@ public class AllDealer implements Initializable {
 
         }
     }
+    public void customResize(TableView<?> view) {
+
+        AtomicLong width = new AtomicLong();
+        view.getColumns().forEach(col -> {
+            width.addAndGet((long) col.getWidth());
+        });
+        double tableWidth = view.getWidth();
+
+        if (tableWidth > width.get()) {
+            view.getColumns().forEach(col -> {
+                col.setPrefWidth(col.getWidth()+((tableWidth-width.get())/view.getColumns().size()));
+            });
+        }
+    }
+
 
     private Map<String, Object> getDealer() {
         Map<String, Object> map = new HashMap<>();

@@ -9,13 +9,14 @@ module com.techwhizer.medicalshop {
     requires org.apache.httpcomponents.httpmime;
     requires org.apache.httpcomponents.httpclient;
     requires java.base;
-    requires jasperreports;
     requires java.mail;
+    requires jasperreports;
     opens com.techwhizer.medicalshop to javafx.fxml;
     exports com.techwhizer.medicalshop;
     requires java.naming;
     requires org.apache.poi.ooxml;
     requires org.apache.poi.poi;
+    requires itextpdf;
 
 
     opens com.techwhizer.medicalshop.controller to javafx.fxml;
@@ -25,7 +26,7 @@ module com.techwhizer.medicalshop {
 
     opens com.techwhizer.medicalshop.InvoiceModel to javafx.fxml;
     exports com.techwhizer.medicalshop.InvoiceModel;
-
+    opens com.techwhizer.medicalshop.reports to javafx.fxml;
 
     opens com.techwhizer.medicalshop.method to javafx.fxml;
     exports com.techwhizer.medicalshop.method;
@@ -72,6 +73,9 @@ module com.techwhizer.medicalshop {
     exports com.techwhizer.medicalshop.controller.prescription;
     opens com.techwhizer.medicalshop.controller.prescription to javafx.fxml;
 
+    exports com.techwhizer.medicalshop.controller.prescription.model;
+    opens com.techwhizer.medicalshop.controller.prescription.model to javafx.fxml;
+
     exports com.techwhizer.medicalshop.controller.doctor;
     opens com.techwhizer.medicalshop.controller.doctor to javafx.fxml;
     exports com.techwhizer.medicalshop.mail;
@@ -80,6 +84,24 @@ module com.techwhizer.medicalshop {
     opens com.techwhizer.medicalshop.controller.patient to javafx.fxml;
     exports com.techwhizer.medicalshop.controller.consultant;
     opens com.techwhizer.medicalshop.controller.consultant to javafx.fxml;
+
+    exports com.techwhizer.medicalshop.controller.product.purchase.model;
+    opens com.techwhizer.medicalshop.controller.product.purchase.model to javafx.fxml;
+    exports com.techwhizer.medicalshop.controller.dues;
+    opens com.techwhizer.medicalshop.controller.dues to javafx.fxml;
+
+    exports com.techwhizer.medicalshop.controller.dues.model;
+    opens com.techwhizer.medicalshop.controller.dues.model to javafx.fxml;
+
+    exports com.techwhizer.medicalshop.controller.common.model;
+    opens com.techwhizer.medicalshop.controller.common.model to javafx.fxml;
+
+    exports com.techwhizer.medicalshop.controller.investigation.model;
+    opens com.techwhizer.medicalshop.controller.investigation.model to javafx.fxml;
+    exports com.techwhizer.medicalshop.report;
+    opens com.techwhizer.medicalshop.report to javafx.fxml;
+    exports com.techwhizer.medicalshop.controller.reports;
+    opens com.techwhizer.medicalshop.controller.reports to javafx.fxml;
 
 
 }

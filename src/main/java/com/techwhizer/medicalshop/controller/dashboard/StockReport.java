@@ -40,8 +40,8 @@ public class StockReport implements Initializable {
     public ComboBox<String> filterCom;
     public Button excelExportBn;
     public ComboBox<DealerModel> comDealerList;
-    int rowsPerPage = 60;
-   public static int lowQuantity = 15, expiryLeftDays = 60;
+    int rowsPerPage = 50;
+    public static int lowQuantity = 15, expiryLeftDays = 60;
 
     public TextField searchTf;
     public TableView<StockModel> tableView;
@@ -62,7 +62,7 @@ public class StockReport implements Initializable {
     private CustomDialog customDialog;
     private ObservableList<StockModel> itemList = FXCollections.observableArrayList();
     private ObservableList<String> filterList =
-            FXCollections.observableArrayList("All", "Out Of Stock", "Expired Medicine",
+            FXCollections.observableArrayList("In Stock", "Out Of Stock", "Expired Medicine",
                     "Low Quantity", "Expiring Soon");
 
     private ObservableList<DealerModel> dealerList =
@@ -73,14 +73,12 @@ public class StockReport implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         method = new Method();
         customDialog = new CustomDialog();
-//        colAction.setVisible(false);
         tableView.setFixedCellSize(28.0);
-
         filterCom.setItems(filterList);
         filterCom.getSelectionModel().select(0);
 
         Map<String, Object> data = new HashMap<>();
-        data.put("filter_type", "All");
+        data.put("filter_type", "In Stock");
         data.put("type", "start");
         data.put("dealer_id", 0);
         callThread(data);
@@ -94,7 +92,7 @@ public class StockReport implements Initializable {
     public void refresh(ActionEvent event) {
         searchTf.setText("");
         Map<String, Object> data = new HashMap<>();
-        data.put("filter_type", "All");
+        data.put("filter_type", "In Stock");
         data.put("type", "start");
         data.put("dealer_id", 0);
         callThread(data);
@@ -191,7 +189,7 @@ public class StockReport implements Initializable {
 
     private void getStock(Map<String, Object> data) {
         itemList.clear();
-        String filterType = "All";
+        String filterType = "In Stock";
 
         if (data != null) {
 
@@ -209,7 +207,7 @@ public class StockReport implements Initializable {
 
             String order_by = """
                                         
-                     order by  expiry_date, quantity asc 
+                     order by  expiry_date, quantity asc
                                         
                     """;
 
@@ -219,41 +217,45 @@ public class StockReport implements Initializable {
 
             String whereCondition = "";
 
-            if (Objects.equals(filterType, "Expired Medicine")) {
-                whereCondition = """
+            switch (filterType){
+
+                case "Expired Medicine"->{
+                    whereCondition = """
                           where TO_DATE(concat(EXTRACT(DAY FROM (date_trunc('MONTH', concat(split_part(expiry_date, '/', 2), '-',
                                                                                           split_part(expiry_date, '/', 1), '-', '01')::date) +
                                                                INTERVAL '1 MONTH' - INTERVAL '1 day')),'/',expiry_date),'dd/MM/yyyy') <= now() 
                         """ ;
-            } else if (Objects.equals(filterType, "Low Quantity")) {
-                whereCondition = """
-                          where cast(split_part(full_quantity,'-',1) as int) < ?
+                }
+                case "Low Quantity"->{
+                    whereCondition = """
+                          where cast(split_part(full_quantity,'-',1) as int) < ? and is_expired = false and quantity > 0
                         """;
-            } else if (Objects.equals(filterType, "Expiring Soon")) {
-                whereCondition = """
+                }
+                case "Expiring Soon"->{
+                    whereCondition = """
                           where expiry_days_left < ?
                         """;
-            } else {
-
-                whereCondition = """
-                          where quantity = case when ? = 'Out Of Stock' then 0 else quantity end
+                }
+                case "Out Of Stock"->{
+                    whereCondition = """
+                          where quantity < 1 and is_expired = false
                                            
                         """ ;
-
+                }
+                default -> whereCondition = """
+                          where quantity > 0 and is_expired = false 
+                        """ ;
             }
+
 
             String finalQry = qry + " " + whereCondition+" and dealer_id = case when "+dealerId+" > 0 then "+dealerId+" else dealer_id  end"+ order_by;
 
             System.out.println(finalQry);
 
             ps = connection.prepareStatement(finalQry);
-
-            if (Objects.equals(filterType, "Out Of Stock") || Objects.equals(filterType, "All")) {
-                ps.setString(1, filterType);
-            } else if (Objects.equals(filterType, "Low Quantity")) {
-                ps.setInt(1, lowQuantity);
-            } else if (Objects.equals(filterType, "Expiring Soon")) {
-                ps.setInt(1, expiryLeftDays);
+            switch (filterType){
+                case "Low Quantity"-> ps.setInt(1, lowQuantity);
+                case "Expiring Soon"-> ps.setInt(1, expiryLeftDays);
             }
 
             rs = ps.executeQuery();
@@ -445,7 +447,7 @@ public class StockReport implements Initializable {
 
     private void getDealer() {
 
-            dealerList.clear();
+          Platform.runLater(()->{  dealerList.clear();});
 
 
         Connection connection = null;

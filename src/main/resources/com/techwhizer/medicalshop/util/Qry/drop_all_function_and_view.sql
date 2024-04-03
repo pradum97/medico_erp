@@ -1,0 +1,20 @@
+-- drop function if exists public.convert_expiry_date(varchar) cascade;
+--
+-- drop function if exists public.get_received_amount(integer) cascade;
+--
+-- drop function if exists public.get_remaining_dues(integer) cascade;
+--
+-- drop function if exists public.tab_to_strip(integer, integer, varchar) cascade;
+--
+-- drop function if exists public.tab_to_strip(numeric, numeric, varchar) cascade;
+--
+-- drop view if exists public.consultant_history_v cascade;
+--
+-- drop view if exists public.dues_v cascade;
+--
+-- drop view if exists public.patient_v cascade;
+--
+-- drop view if exists public.print_consultant_slip_v cascade;
+--
+-- drop view if exists public.stock_v cascade;
+--

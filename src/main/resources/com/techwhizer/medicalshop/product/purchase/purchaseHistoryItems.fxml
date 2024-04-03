@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.techwhizer.medicalshop.controller.product.purchase.PurchaseHistoryItems">
+   <top>
+      <VBox>
+         <children>
+            <HBox alignment="CENTER">
+               <children>
+                  <Label text="Purchase Items">
+                     <font>
+                        <Font name="Arial Black" size="14.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
+            <Separator prefWidth="200.0" />
+            <HBox alignment="CENTER_RIGHT" spacing="20.0">
+               <children>
+                  <HBox alignment="CENTER_LEFT" spacing="60.0" HBox.hgrow="ALWAYS">
+                     <padding>
+                        <Insets left="30.0" />
+                     </padding>
+                     <children>
+                        <HBox spacing="2.0">
+                           <children>
+                              <Label text="Dealer Name : " textFill="#2a10bd">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="dealerNameL">
+                                 <font>
+                                    <Font name="System Bold" size="12.179104804992676" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </HBox>
+                        <HBox layoutX="40.0" layoutY="10.0" spacing="2.0">
+                           <children>
+                              <Label text="Dealer Address : " textFill="#2a10bd">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="dealerAddressL">
+                                 <font>
+                                    <Font name="System Bold" size="12.179104804992676" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </HBox>
+                     </children>
+                  </HBox>
+               </children>
+            </HBox>
+         </children>
+         <padding>
+            <Insets left="10.0" right="10.0" />
+         </padding>
+      </VBox>
+   </top>
+   <center>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <TableView fx:id="tableview" fixedCellSize="27.0" VBox.vgrow="ALWAYS">
+              <columns>
+                <TableColumn fx:id="colSrNum" maxWidth="50.0" minWidth="50.0" prefWidth="-1.0" text="SR #" />
+                <TableColumn fx:id="colItemName" maxWidth="300.0" minWidth="250.0" prefWidth="75.0" text="Item Name" />
+                  <TableColumn fx:id="colQuantity" maxWidth="120.0" minWidth="110.0" prefWidth="122.5074462890625" text="Quantity" />
+                  <TableColumn fx:id="colPurchaseRate" maxWidth="90.0" minWidth="90.0" prefWidth="122.5074462890625" text="Pur. Rate" />
+                  <TableColumn fx:id="colMrp" maxWidth="90.0" minWidth="90.0" prefWidth="122.5074462890625" text="MRP" />
+                  <TableColumn fx:id="colSaleRate" maxWidth="90.0" minWidth="90.0" prefWidth="122.5074462890625" text="Sale Rate" />
+                  <TableColumn fx:id="colBatch" maxWidth="125.0" minWidth="115.0" prefWidth="122.5074462890625" text="Batch" />
+                  <TableColumn fx:id="colExpiryDate" maxWidth="90.0" minWidth="90.0" prefWidth="122.5074462890625" text="Expiry Date" />
+                  <TableColumn fx:id="colLotNum" maxWidth="125.0" minWidth="120.0" prefWidth="122.5074462890625" text="Lot #" />
+              </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
+            </TableView>
+         </children>
+         <BorderPane.margin>
+            <Insets top="10.0" />
+         </BorderPane.margin>
+      </VBox>
+   </center>
+</BorderPane>

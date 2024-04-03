@@ -12,6 +12,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -28,7 +29,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 public class ViewCompany implements Initializable {
-    private int rowsPerPage = 8;
+    private int rowsPerPage = 200;
     public TextField companyAddressTf;
     public TextField companyNameTF;
     public TableColumn<CompanyModel , String> colAddress;
@@ -48,6 +49,8 @@ public class ViewCompany implements Initializable {
         method = new Method();
         dbConnection = new DBConnection();
         customDialog = new CustomDialog();
+
+        tableView.setFixedCellSize(28);
 
         callThread();
     }
@@ -187,10 +190,10 @@ public class ViewCompany implements Initializable {
         String cAddress = companyAddressTf.getText();
 
         if (cName.isEmpty()){
-            method.show_popup("Enter company name",companyNameTF);
+            method.show_popup("Enter Company name",companyNameTF, Side.RIGHT);
             return;
         }else  if (cAddress.isEmpty()){
-            method.show_popup("Enter company addressTf",companyAddressTf);
+            method.show_popup("Enter Company Address",companyAddressTf, Side.RIGHT);
             return;
         }
 

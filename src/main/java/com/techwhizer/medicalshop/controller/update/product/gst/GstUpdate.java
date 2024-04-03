@@ -8,6 +8,7 @@ import com.techwhizer.medicalshop.PropertiesLoader;
 import com.techwhizer.medicalshop.util.DBConnection;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -91,22 +92,22 @@ public class GstUpdate implements Initializable {
         }
 
         if (hsn_sacS.isEmpty()) {
-            method.show_popup("Enter HSN / SAC", hsn_sacTf);
+            method.show_popup("Enter HSN / SAC", hsn_sacTf, Side.RIGHT);
             return;
         }else if (isHsnCodeExist(hsn_sac)){
-            method.show_popup("HSN Code Already Exists", hsn_sacTf);
+            method.show_popup("HSN Code Already Exists", hsn_sacTf, Side.RIGHT);
             return;
         }else if (sgst.isEmpty()) {
-            method.show_popup("Enter sgst", sgstTF);
+            method.show_popup("Enter sgst", sgstTF, Side.RIGHT);
             return;
         } else if (cgst.isEmpty()) {
-            method.show_popup("Enter cgst", cgstTF);
+            method.show_popup("Enter cgst", cgstTF, Side.RIGHT);
             return;
         } else if (igst.isEmpty()) {
-            method.show_popup("Enter igst", igstTF);
+            method.show_popup("Enter igst", igstTF, Side.RIGHT);
             return;
         }else if (gstName.isEmpty()) {
-            method.show_popup("Enter Gst Name", gstNameTF);
+            method.show_popup("Enter Gst Name", gstNameTF, Side.RIGHT);
             return;
         }
 

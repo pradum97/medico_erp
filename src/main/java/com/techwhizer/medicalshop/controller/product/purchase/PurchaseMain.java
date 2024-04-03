@@ -3,10 +3,13 @@ package com.techwhizer.medicalshop.controller.product.purchase;
 import com.techwhizer.medicalshop.CustomDialog;
 import com.techwhizer.medicalshop.ImageLoader;
 import com.techwhizer.medicalshop.Main;
+import com.techwhizer.medicalshop.controller.auth.Login;
 import com.techwhizer.medicalshop.method.GenerateBillNumber;
 import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.model.DealerModel;
+import com.techwhizer.medicalshop.model.GstModel;
 import com.techwhizer.medicalshop.model.PurchaseItemsTemp;
+import com.techwhizer.medicalshop.model.chooserModel.ItemChooserModel;
 import com.techwhizer.medicalshop.util.DBConnection;
 import com.victorlaerte.asynctask.AsyncTask;
 import javafx.application.Platform;
@@ -16,6 +19,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
@@ -67,8 +71,13 @@ public class PurchaseMain implements Initializable {
         customDialog = new CustomDialog();
         dbConnection = new DBConnection();
         method.hideElement(progressBar);
-
+        callThread("INIT");
         setData();
+
+        Platform.runLater(()->{
+            Stage stage = (Stage) submitButton.getScene().getWindow();
+            stage.setMaximized(true);
+        });
     }
 
     private void setData() {
@@ -80,6 +89,7 @@ public class PurchaseMain implements Initializable {
     }
 
     public void addPurchaseItem(ActionEvent actionEvent) {
+
         customDialog.showFxmlDialog2("product/purchase/addPurchaseItems.fxml","ADD PURCHASE ITEM");
 
         if (Main.primaryStage.getUserData() instanceof PurchaseItemsTemp pit){
@@ -180,44 +190,53 @@ public class PurchaseMain implements Initializable {
     public void submitButtonClick(ActionEvent event) {
 
         if (null == dealerModel) {
-            method.show_popup("Please select dealer", dealerNameL);
+            method.show_popup("Please select dealer", dealerNameL, Side.RIGHT);
             return;
-        } else if (itemList.size() < 1) {
+        } else if (itemList.isEmpty()) {
             customDialog.showAlertBox("Items not found", "Please enter item");
             return;
         }
 
-        MyAsyncTask myAsyncTask = new MyAsyncTask();
-        myAsyncTask.setDaemon(false);
-        myAsyncTask.execute();
+      callThread("SAVE");
 
     }
 
+    private void callThread(String type){
+
+        MyAsyncTask myAsyncTask = new MyAsyncTask(type);
+        myAsyncTask.setDaemon(false);
+        myAsyncTask.execute();
+    }
+
     private class MyAsyncTask extends AsyncTask<String, Integer, Boolean> {
-        private String msg;
+        String type;
+
+        public MyAsyncTask(String type) {
+            this.type = type;
+        }
 
         @Override
         public void onPreExecute() {
-            msg = "";
             method.hideElement(buttonContainer);
             progressBar.setVisible(true);
+            tableView.setPlaceholder(method.getProgressBarRed(40,40));
 
         }
 
         @Override
         public Boolean doInBackground(String... params) {
-            uploadData();
-            return false;
+            if (type.equals("SAVE")) {
+                uploadData();
+            }
 
+            return false;
         }
 
         @Override
         public void onPostExecute(Boolean success) {
             method.hideElement(progressBar);
             buttonContainer.setVisible(true);
-            if (!success) {
-
-            }
+            tableView.setPlaceholder(new Label("Item Not Found."));
         }
 
         @Override
@@ -238,12 +257,13 @@ public class PurchaseMain implements Initializable {
         try {
             connection = dbConnection.getConnection();
             connection.setAutoCommit(false);
-            String purMainQry = "INSERT INTO TBL_PURCHASE_MAIN(DEALER_ID, BILL_NUM, DEALER_BILL_NUM, BILL_DATE)VALUES (?,?,?,?)";
+            String purMainQry = "INSERT INTO TBL_PURCHASE_MAIN(DEALER_ID, BILL_NUM, DEALER_BILL_NUM, BILL_DATE,created_by)VALUES (?,?,?,?,?)";
             ps = connection.prepareStatement(purMainQry, new String[]{"purchase_main_id"});
             ps.setInt(1, dealerModel.getDealerId());
             ps.setString(2, billNum);
             ps.setString(3, dealerBillNumTf.getText());
             ps.setString(4, billDate);
+            ps.setInt(5, Login.currentlyLogin_Id);
             int res = ps.executeUpdate();
 
             if (res > 0) {
@@ -254,8 +274,8 @@ public class PurchaseMain implements Initializable {
                     rs = null;
 
                     String purItemsQry = "INSERT INTO TBL_PURCHASE_ITEMS(purchase_main_id, item_id, batch," +
-                            " expiry_date, lot_number, quantity, quantity_unit,purchase_rate,mrp,sale_price)" +
-                            " VALUES (?,?,?,?,?,?,?,?,?,?)";
+                            " expiry_date, lot_number, quantity, quantity_unit,purchase_rate,mrp,sale_price,created_by)" +
+                            " VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
                     String itemUpdateQry = "UPDATE TBL_ITEMS_MASTER SET UNIT = ?,STRIP_TAB= ?,PACKING = ? WHERE ITEM_ID = ?";
 
@@ -294,6 +314,7 @@ public class PurchaseMain implements Initializable {
                         ps.setDouble(8, pt.getPurchasePrice());
                         ps.setDouble(9, pt.getMrp());
                         ps.setDouble(10, pt.getSalePrice());
+                        ps.setInt(11, Login.currentlyLogin_Id);
                         int resPItems = ps.executeUpdate();
                         if (resPItems > 0) {
                             rsPItem = ps.getGeneratedKeys();
@@ -306,32 +327,32 @@ public class PurchaseMain implements Initializable {
                                 psItemMasterUpdate.setInt(4, pt.getItemId());
                                 psItemMasterUpdate.executeUpdate();
 
+//                                int stockId = method.isBatchAvailableInStock(pt.getBatch());
+//                                if (stockId > 0) {
+//                                    String stockQryUpdateQry = "UPDATE TBL_STOCK SET PURCHASE_MAIN_ID=?, PURCHASE_ITEMS_ID=?,QUANTITY = QUANTITY+?,\n" +
+//                                            "QUANTITY_UNIT=?,UPDATE_DATE= ? WHERE stock_id = ?";
+//                                    psStock = connection.prepareStatement(stockQryUpdateQry);
+//                                    psStock.setInt(1, purMainId);
+//                                    psStock.setInt(2, purchaseItemId);
+//                                    psStock.setInt(3, noOfPcs);
+//                                    psStock.setString(4, qtyUnit);
+//                                    psStock.setString(5, method.getCurrentDate());
+//                                    psStock.setInt(6, stockId);
+//
+//                                } else {
+//
+//                                }
 
-                                if (method.isBatchAvailableInStock(pt.getBatch())) {
-                                    String stockQryUpdateQry = "UPDATE TBL_STOCK SET PURCHASE_MAIN_ID=?, PURCHASE_ITEMS_ID=?,QUANTITY = QUANTITY+?,\n" +
-                                            "QUANTITY_UNIT=?,UPDATE_DATE= ? WHERE item_id = ?";
-                                    psStock = connection.prepareStatement(stockQryUpdateQry);
-
-                                    psStock.setInt(1, purMainId);
-                                    psStock.setInt(2, purchaseItemId);
-                                    psStock.setInt(3, noOfPcs);
-                                    psStock.setString(4, qtyUnit);
-                                    psStock.setString(5, method.getCurrentDate());
-                                    psStock.setInt(6, pt.getItemId());
-
-                                } else {
-                                    String stockQryInsertQry = "INSERT INTO TBL_STOCK(ITEM_ID, PURCHASE_MAIN_ID, PURCHASE_ITEMS_ID, QUANTITY," +
-                                            " QUANTITY_UNIT,UPDATE_DATE)VALUES(?,?,?,?,?,?)";
-                                    psStock = connection.prepareStatement(stockQryInsertQry);
-                                    psStock.setInt(1, pt.getItemId());
-                                    psStock.setInt(2, purMainId);
-                                    psStock.setInt(3, purchaseItemId);
-                                    psStock.setInt(4, noOfPcs);
-                                    psStock.setString(5, qtyUnit);
-                                    psStock.setString(6, method.getCurrentDate());
-
-                                }
-
+                                String stockQryInsertQry = "INSERT INTO TBL_STOCK(ITEM_ID, PURCHASE_MAIN_ID, PURCHASE_ITEMS_ID, QUANTITY," +
+                                        " QUANTITY_UNIT,UPDATE_DATE,created_by)VALUES(?,?,?,?,?,?,?)";
+                                psStock = connection.prepareStatement(stockQryInsertQry);
+                                psStock.setInt(1, pt.getItemId());
+                                psStock.setInt(2, purMainId);
+                                psStock.setInt(3, purchaseItemId);
+                                psStock.setInt(4, noOfPcs);
+                                psStock.setString(5, qtyUnit);
+                                psStock.setString(6, method.getCurrentDate());
+                                psStock.setInt(7, Login.currentlyLogin_Id);
                                     psStock.executeUpdate();
                                     count++;
                                 }

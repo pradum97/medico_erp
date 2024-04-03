@@ -12,21 +12,21 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.product.mr.MrMain">
+<BorderPane prefWidth="800.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.product.mr.MrMain">
     <top>
         <HBox alignment="CENTER_RIGHT" spacing="30.0" BorderPane.alignment="CENTER">
             <children>
-                <TextField fx:id="searchTf" prefHeight="35.0" prefWidth="282.0" promptText="Enter mr name" style="-fx-border-color: grey; -fx-border-radius: 20; -fx-background-radius: 20;" />
-                <Button graphicTextGap="10.0" layoutX="1107.0" layoutY="20.0" mnemonicParsing="false" onAction="#refresh" prefHeight="35.0" prefWidth="47.0" style="-fx-border-color: grey; -fx-border-radius: 3; -fx-background-radius: 3;">
+                <TextField fx:id="searchTf" prefHeight="27.0" prefWidth="282.0" promptText="Enter mr name" style="-fx-border-color: grey; -fx-border-radius: 20; -fx-background-radius: 20;" />
+                <Button graphicTextGap="10.0" layoutX="1107.0" layoutY="20.0" minHeight="27.0" mnemonicParsing="false" onAction="#refresh" prefHeight="27.0" prefWidth="47.0" style="-fx-border-color: grey; -fx-border-radius: 3; -fx-background-radius: 3;">
                     <graphic>
-                        <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="20.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
                             <image>
                                 <Image url="@../../img/icon/refresh_ic_red.png" />
                             </image>
                         </ImageView>
                     </graphic>
                 </Button>
-                <Button graphicTextGap="10.0" mnemonicParsing="false" onAction="#addMr" prefHeight="35.0" prefWidth="134.0" style="-fx-border-color: grey; -fx-border-radius: 3; -fx-background-radius: 3;" text="ADD MR">
+                <Button graphicTextGap="10.0" minHeight="27.0" mnemonicParsing="false" onAction="#addMr" prefHeight="27.0" prefWidth="99.0" style="-fx-border-color: grey; -fx-border-radius: 3; -fx-background-radius: 3;" text="ADD MR">
                     <graphic>
                         <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                             <image>
@@ -49,14 +49,14 @@
             <children>
                 <TableView fx:id="tableView" editable="true" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colSrNo" prefWidth="75.0" text="SL #" />
+                        <TableColumn fx:id="colSrNo" maxWidth="50.0" minWidth="50.0" prefWidth="75.0" text="SL #" />
                         <TableColumn fx:id="colName" minWidth="200.0" prefWidth="-1.0" text="NAME" />
-                        <TableColumn fx:id="colGender" minWidth="90.0" prefWidth="-1.0" text="GENDER" />
-                        <TableColumn fx:id="colPhone" maxWidth="175.20001220703125" minWidth="130.0" prefWidth="175.20001220703125" text="PHONE" />
-                        <TableColumn fx:id="colEmail" minWidth="200.0" prefWidth="-1.0" text="EMAIL" />
-                        <TableColumn fx:id="colCompany" minWidth="200.0" prefWidth="-1.0" text="COMPANY" />
-                        <TableColumn fx:id="colAddress" minWidth="250.0" prefWidth="250.0" text="ADDRESS" />
+                        <TableColumn fx:id="colGender" maxWidth="80.0" minWidth="80.0" prefWidth="-1.0" text="GENDER" />
+                        <TableColumn fx:id="colPhone" maxWidth="130.0" minWidth="125.0" prefWidth="90.0" text="PHONE" />
+                        <TableColumn fx:id="colEmail" maxWidth="200.0" minWidth="200.0" prefWidth="-1.0" text="EMAIL" />
+                        <TableColumn fx:id="colAddress" maxWidth="300.0" minWidth="250.0" prefWidth="250.0" text="ADDRESS" />
                         <TableColumn fx:id="colDate" minWidth="150.0" prefWidth="-1.0" text="DATE" />
+                        <TableColumn fx:id="colCompany" maxWidth="300.0" minWidth="300.0" prefWidth="-1.0" text="COMPANY" />
                     </columns>
                 </TableView>
             </children>

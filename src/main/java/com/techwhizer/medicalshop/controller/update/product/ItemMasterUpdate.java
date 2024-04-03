@@ -2,10 +2,13 @@ package com.techwhizer.medicalshop.controller.update.product;
 
 import com.techwhizer.medicalshop.CustomDialog;
 import com.techwhizer.medicalshop.Main;
+import com.techwhizer.medicalshop.controller.auth.Login;
+import com.techwhizer.medicalshop.controller.common.model.DepartmentModel;
 import com.techwhizer.medicalshop.method.GetTax;
 import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.method.StaticData;
 import com.techwhizer.medicalshop.model.*;
+import com.techwhizer.medicalshop.util.CommonUtil;
 import com.techwhizer.medicalshop.util.DBConnection;
 import com.victorlaerte.asynctask.AsyncTask;
 import javafx.application.Platform;
@@ -14,20 +17,17 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.HashMap;
-import java.util.Map;
+import java.sql.*;
 import java.util.ResourceBundle;
 
 public class ItemMasterUpdate implements Initializable {
@@ -39,7 +39,7 @@ public class ItemMasterUpdate implements Initializable {
     public ComboBox<String> itemTypeCom;
     public ComboBox<String> statusCom;
     public ComboBox<DiscountModel> discountCom;
-    public TextField packingTf, stripTabTf;
+    public TextField  stripTabTf;
     public ComboBox<String> unitCom;
     public ProgressIndicator progressBar;
     public Label mrL;
@@ -50,6 +50,10 @@ public class ItemMasterUpdate implements Initializable {
     public TextField compositionTf;
     public TextField productTag;
     public TextField medicineDoseTf;
+    public HBox mrpContainer;
+    public TextField mrpTf;
+    public VBox stockableContaier;
+    public ComboBox<DepartmentModel> departmentCom;
     private Method method;
     public Label stripTabLabel;
     public VBox stripTabContainer;
@@ -65,6 +69,7 @@ public class ItemMasterUpdate implements Initializable {
     private MrModel mrModel;
     private ManufacturerModal manufacturerModal;
     private ItemsModel icm;
+    private int purchaseItemId = 0;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -76,10 +81,19 @@ public class ItemMasterUpdate implements Initializable {
         stripTabContainer.setDisable(true);
         mainContainer.setDisable(true);
 
-        callInitializeThread();
 
-        if (Main.primaryStage.getUserData() instanceof ItemsModel icm) {
-            this.icm = icm;
+
+        if (Main.primaryStage.getUserData() instanceof ItemsModel itemsModel) {
+            icm = itemsModel;
+            if (icm.isStockable()){
+                stockableContaier.setVisible(true);
+                method.hideElement(mrpContainer);
+            }else {
+                mrpContainer.setVisible(true);
+                method.hideElement(stockableContaier);
+                getMrp(icm.getItemId());
+            }
+            callInitializeThread();
         } else {
             customDialog.showAlertBox("", "Something went wrong...");
             return;
@@ -147,11 +161,17 @@ public class ItemMasterUpdate implements Initializable {
 
         @Override
         public void onPreExecute() {
-            comboBoxConfig();
+           if (icm.isStockable()){
+               comboBoxConfig();
+           }
         }
 
         @Override
         public Boolean doInBackground(String... params) {
+            if (!icm.isStockable()){
+                getMrp(icm.getItemId());
+            }
+
             getGst();
             Platform.runLater(ItemMasterUpdate.this::setComboBoxData);
             return true;
@@ -181,7 +201,11 @@ public class ItemMasterUpdate implements Initializable {
             discountCom.setItems((ObservableList<DiscountModel>) method.getDiscount().get("data"));
         }
 
+        DepartmentModel departmentModel = CommonUtil.getDepartment(icm.getDepartmentCode());
 
+        departmentCom.getItems().add(departmentModel);
+        departmentCom.getSelectionModel().selectFirst();
+       departmentCom.getItems().addAll(CommonUtil.getDepartmentsList());
 
         setData(icm);
         if (icm.getMr_id() > 0) {
@@ -223,8 +247,6 @@ public class ItemMasterUpdate implements Initializable {
     }
 
     private class UpdateDataTask extends AsyncTask<String, Integer, Boolean> {
-
-        private Map<String, Object> status;
         private ItemsModel itemsModel;
 
         public UpdateDataTask(ItemsModel itemsModel) {
@@ -239,27 +261,14 @@ public class ItemMasterUpdate implements Initializable {
 
         @Override
         public Boolean doInBackground(String... params) {
-            status = uploadData(itemsModel);
-            return (boolean) status.get("is_success");
+            uploadData(itemsModel);
+            return true;
         }
 
         @Override
         public void onPostExecute(Boolean success) {
             updateButton.setVisible(true);
             method.hideElement(progressBar);
-
-            if (success) {
-                Stage stage = (Stage) updateButton.getScene().getWindow();
-                if (null != stage && stage.isShowing()) {
-                    stage.close();
-                }
-
-            }
-
-            Platform.runLater(() -> {
-                customDialog.showAlertBox("", (String) status.get("message"));
-                // clearAllBn some filed
-            });
         }
 
         @Override
@@ -268,21 +277,23 @@ public class ItemMasterUpdate implements Initializable {
         }
     }
 
-    private Map<String, Object> uploadData(ItemsModel im) {
-        Map<String, Object> map = new HashMap<>();
+    private void uploadData(ItemsModel im) {
+
         Connection connection = null;
         PreparedStatement ps = null;
 
         try {
             connection = dbConnection.getConnection();
+            connection.setAutoCommit(false);
             String qry = "UPDATE TBL_ITEMS_MASTER SET ITEMS_NAME = ?, UNIT= ?, PACKING= ?, COMPANY_ID= ?, mfr_id= ?, DISCOUNT_ID= ?, mr_id= ?, GST_ID= ?,\n" +
-                    "                             TYPE= ?, NARCOTIC= ?, ITEM_TYPE= ?, STATUS= ? ,STRIP_TAB= ?,composition=?,tag=?,dose = ? WHERE item_id = ?";
+                    "                             TYPE= ?, NARCOTIC= ?, ITEM_TYPE= ?, STATUS= ? ,STRIP_TAB= ?," +
+                    "composition=?,tag=?,dose = ?,department_code = ? WHERE item_id = ?";
 
             ps = connection.prepareStatement(qry);
 
             ps.setString(1, im.getProductName());
             ps.setString(2, im.getUnit());
-            ps.setString(3, im.getPacking());
+            ps.setString(3, "1X1");
 
             if (null == companyModel) {
                 ps.setNull(4, Types.NULL);
@@ -317,36 +328,72 @@ public class ItemMasterUpdate implements Initializable {
             ps.setString(14, im.getProductComposition());
             ps.setString(15, im.getProductTag());
             ps.setString(16, im.getMedicineDose());
-            ps.setInt(17, icm.getItemId());
+            ps.setString(17, im.getDepartmentCode());
+            ps.setInt(18, icm.getItemId());
 
             int res = ps.executeUpdate();
             if (res > 0) {
-                map.put("is_success", true);
-                map.put("message", "Item successfully updated.");
+
+                if (icm.isStockable()){
+                    connection.commit();
+                    success();
+                }else {
+                    res = 0;
+                    ps = null;
+
+                    String mrpUpdateQry = "update tbl_purchase_items set purchase_rate = ? , mrp = ?, sale_price = ?,updated_by=?  where purchase_items_id = ?";
+                    ps = connection.prepareStatement(mrpUpdateQry);
+
+                    ps.setDouble(1,im.getPurchaseMrp());
+                    ps.setDouble(2,im.getMrp());
+                    ps.setDouble(3,im.getSaleRate());
+                    ps.setInt(4, Login.currentlyLogin_Id);
+                    ps.setInt(5,purchaseItemId);
+                    res = ps.executeUpdate();
+
+                    if (res> 0){
+                        connection.commit();
+                        success();
+                    }else {
+                        customDialog.showAlertBox("Failed","Item not updated. Please try again.");
+                    }
+                }
+
             } else {
-                map.put("is_success", true);
-                map.put("message", "Item not updated. Please try again.");
+                customDialog.showAlertBox("Failed","Item not updated. Please try again.");
             }
         } catch (SQLException e) {
-            map.put("is_success", true);
-            map.put("message", "An error occurred while creating the product");
+            customDialog.showAlertBox("Error","An error occurred while creating the product");
+
             updateButton.setVisible(true);
             method.hideElement(progressBar);
             throw new RuntimeException(e);
         } finally {
             DBConnection.closeConnection(connection, ps, null);
         }
-        return map;
+    }
+
+    private void success() {
+       Platform.runLater(()->{
+           customDialog.showAlertBox("Success","Item successfully updated.");
+           Stage stage = (Stage) updateButton.getScene().getWindow();
+           if (null != stage && stage.isShowing()) {
+               Main.primaryStage.setUserData(true);
+               stage.close();
+           }
+       });
     }
 
     private void setData(ItemsModel icm) {
 
         productNameTf.setText(icm.getProductName());
-        packingTf.setText(icm.getPacking());
-        compositionTf.setText(icm.getProductComposition());
-        productTag.setText(icm.getProductTag());
-        medicineDoseTf.setText(icm.getMedicineDose());
 
+        if (icm.isStockable()){
+            compositionTf.setText(icm.getProductComposition());
+            medicineDoseTf.setText(icm.getMedicineDose());
+        }
+
+        productTag.setText(icm.getProductTag());
         typeCom.setItems(typeList);
         typeCom.getSelectionModel().select(icm.getType());
         narcoticCom.setItems(narcoticList);
@@ -363,22 +410,11 @@ public class ItemMasterUpdate implements Initializable {
 
         }
         statusCom.getSelectionModel().select(status);
-        if (method.isItemAvailableInStock(icm.getItemId())) {
-            String stockUnit = method.getStockUnit(icm.getItemId());
 
-            if (stockUnit.equalsIgnoreCase("TAB") || stockUnit.equalsIgnoreCase("STRIP")) {
-                unitCom.setItems(staticData.tabUnit);
-                unitCom.getSelectionModel().select(icm.getUnit());
-            } else {
-                unitCom.setItems(staticData.pcsUnit);
-                unitCom.getSelectionModel().select("PCS");
-            }
+        unitCom.setItems(staticData.getUnit());
+        unitCom.getSelectionModel().select(icm.getUnit());
+        unitCom.getSelectionModel().select(icm.getUnit());
 
-
-        } else {
-            unitCom.setItems(staticData.getUnit());
-            unitCom.getSelectionModel().select(icm.getUnit());
-        }
     }
 
     public void updateBn(ActionEvent actionEvent) {
@@ -406,55 +442,79 @@ public class ItemMasterUpdate implements Initializable {
     private void update() {
 
         String productName = productNameTf.getText();
-
-        String packing = packingTf.getText();
         String stripTab = stripTabTf.getText();
         String composition = compositionTf.getText();
         String tag = productTag.getText();
         String medicineDose = medicineDoseTf.getText();
+        String mrp = mrpTf.getText();
+
 
         long stripTabL = 0;
-        double purchaseMrpD = 0, mrpD = 0, saleRateD = 0;
+        double mrpD = 0;
 
         if (productName.isEmpty()) {
-            method.show_popup("Please enter product name", productNameTf);
-            return;
-        }else if (composition.isEmpty()) {
-            method.show_popup("Please enter product composition.", compositionTf);
-            return;
-        }  else if (medicineDose.isEmpty()) {
-            method.show_popup("Please enter medicine dose", medicineDoseTf);
+            method.show_popup("Please enter product name", productNameTf, Side.RIGHT);
             return;
         } else if (tag.isEmpty()) {
-            method.show_popup("Please enter product tag", productTag);
+            method.show_popup("Please enter product tag", productTag, Side.RIGHT);
             return;
-        } else if (unitCom.getSelectionModel().isEmpty()) {
-            method.show_popup("Please select unit", unitCom);
+        } else if (departmentCom.getSelectionModel().isEmpty()) {
+            method.show_popup("Please select item department", departmentCom, Side.RIGHT);
             return;
-        } else if (unitCom.getSelectionModel().getSelectedItem().equals("STRIP")) {
-            if (stripTab.isEmpty()) {
-                method.show_popup("Please enter tab per strip", stripTabTf);
+        }
+
+
+        if (icm.isStockable()){
+
+            if (composition.isEmpty()) {
+                method.show_popup("Please enter product composition.", compositionTf, Side.RIGHT);
                 return;
+            }  else if (medicineDose.isEmpty()) {
+                method.show_popup("Please enter medicine dose", medicineDoseTf, Side.RIGHT);
+                return;
+            }  else if (unitCom.getSelectionModel().isEmpty()) {
+                method.show_popup("Please select unit", unitCom, Side.RIGHT);
+                return;
+            } else if (unitCom.getSelectionModel().getSelectedItem().equals("STRIP")) {
+                if (stripTab.isEmpty()) {
+                    method.show_popup("Please enter tab per strip", stripTabTf, Side.RIGHT);
+                    return;
+                }
+                try {
+                    stripTabL = Long.parseLong(stripTab);
+                } catch (NumberFormatException e) {
+                    method.show_popup("Please enter number only", stripTabTf, Side.RIGHT);
+                    return;
+                }
             }
-            try {
-                stripTabL = Long.parseLong(stripTab);
-            } catch (NumberFormatException e) {
-                method.show_popup("Please enter number only", stripTabTf);
+        } else {
+
+            if (mrp.isEmpty()) {
+                method.show_popup("Please enter item mrp", mrpTf, Side.RIGHT);
                 return;
+            }else {
+
+                try {
+                    mrpD = Double.parseDouble(mrp);
+                } catch (NumberFormatException e) {
+                    method.show_popup("Please enter valid mrp", mrpTf, Side.RIGHT);
+                    return;
+                }
+
             }
         }
 
-        if (packing.isEmpty()) {
-            method.show_popup("Please enter packing", packingTf);
-            return;
-        } else if (hsnCom.getSelectionModel().isEmpty()) {
-            method.show_popup("Please select hsn code", hsnCom);
+
+        if (hsnCom.getSelectionModel().isEmpty()) {
+            method.show_popup("Please select hsn code", hsnCom, Side.RIGHT);
             return;
         }
 
         String type = typeCom.getSelectionModel().getSelectedItem();
         String narcotic = narcoticCom.getSelectionModel().getSelectedItem();
         String itemType = itemTypeCom.getSelectionModel().getSelectedItem();
+        String departmentCode = departmentCom.getSelectionModel().getSelectedItem().getDepartmentCode();
+
         int status = 0;
         switch (statusCom.getSelectionModel().getSelectedItem()) {
             case "CONTINUE" -> status = 1;
@@ -469,12 +529,39 @@ public class ItemMasterUpdate implements Initializable {
             discountId = discountCom.getSelectionModel().getSelectedItem().getDiscount_id();
         }
 
-        ItemsModel itemsModel = new ItemsModel(productName, unit, packing, discountId, gstId,
-                purchaseMrpD, mrpD, saleRateD, type, narcotic, itemType, status, stripTabL,composition,tag,medicineDose);
 
+        ItemsModel itemsModel = new ItemsModel(productName, unit, null, discountId, gstId,
+                mrpD, mrpD, mrpD, type, narcotic, itemType, status, stripTabL,composition,tag,medicineDose,icm.isStockable(),departmentCode);
 
         UpdateDataTask task = new UpdateDataTask(itemsModel);
         task.setDaemon(false);
         task.execute();
+    }
+
+    private void getMrp (int itemId){
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try{
+            connection = new DBConnection().getConnection();
+            String qry = "select mrp,purchase_items_id from stock_v where item_id = ? order by 1 desc limit 1";
+            ps = connection.prepareStatement(qry);
+            ps.setInt(1,itemId);
+            rs = ps.executeQuery();
+
+            if (rs.next()){
+
+                double mrp = rs.getDouble("mrp");
+                purchaseItemId = rs.getInt("purchase_items_id");
+                mrpTf.setText(String.valueOf(mrp));
+            }
+
+        }catch (SQLException ignored){
+
+        }finally {
+            DBConnection.closeConnection(connection,ps,rs);
+        }
+
     }
 }

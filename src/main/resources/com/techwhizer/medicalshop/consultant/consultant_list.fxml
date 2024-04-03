@@ -13,9 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane stylesheets="@../css/main.css" xmlns="http://javafx.com/javafx/20.0.1"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.techwhizer.medicalshop.controller.consultant.ConsultantList">
+<BorderPane stylesheets="@../css/main.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.consultant.ConsultantList">
    <top>
       <VBox BorderPane.alignment="CENTER">
          <children>
@@ -29,7 +27,7 @@
                </children>
             </HBox>
             <Separator prefWidth="200.0" />
-            <HBox alignment="CENTER_RIGHT" fillHeight="false" prefHeight="62.0" prefWidth="600.0" spacing="50.0">
+            <HBox alignment="CENTER_RIGHT" fillHeight="false" prefHeight="43.0" prefWidth="600.0" spacing="50.0">
                <children>
                   <HBox alignment="CENTER" spacing="5.0">
                      <children>
@@ -63,7 +61,7 @@
    <bottom>
       <HBox BorderPane.alignment="CENTER">
          <children>
-            <Pagination fx:id="pagination" HBox.hgrow="ALWAYS" />
+            <Pagination fx:id="pagination" minHeight="32.0" prefHeight="30.0" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
    </bottom>
@@ -74,10 +72,12 @@
               <columns>
                 <TableColumn fx:id="colSrNum" editable="false" maxWidth="60.0" minWidth="60.0" prefWidth="-1.0" sortable="false" text="SR  #" />
                 <TableColumn fx:id="colPatientName" editable="false" maxWidth="230.0" minWidth="190.0" prefWidth="-1.0" sortable="false" text="Patient Name" />
-                  <TableColumn fx:id="colConsultDate" editable="false" maxWidth="160.0" minWidth="150.0" prefWidth="-1.0" sortable="false" text="Consult Date" />
-                  <TableColumn fx:id="colReferredBy" editable="false" maxWidth="250.0" minWidth="240.0" prefWidth="-1.0" sortable="false" text="Referred By" />
-                  <TableColumn fx:id="colConsultDoctorName" editable="false" maxWidth="250.0" minWidth="230.0" prefWidth="-1.0" sortable="false" text="Consult Doctor Name" />
-                  <TableColumn fx:id="colStatus" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="-1.0" sortable="false" text="Status" />
+                  <TableColumn fx:id="colConsultDate" editable="false" maxWidth="110.0" minWidth="110.0" prefWidth="-1.0" sortable="false" text="Booking Date" />
+                  <TableColumn fx:id="colReceiptNum" editable="false" maxWidth="90.0" minWidth="90.0" prefWidth="-1.0" sortable="false" text="Receipt #" />
+                  <TableColumn fx:id="colReferredBy" editable="false" maxWidth="140.0" minWidth="70.0" prefWidth="-1.0" sortable="false" text="Referred By" />
+                  <TableColumn fx:id="colConsultDoctorName" editable="false" maxWidth="200.0" minWidth="200.0" prefWidth="-1.0" sortable="false" text="Consult Doctor Name" />
+                  <TableColumn fx:id="colStatus" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="-1.0" sortable="false" text="Status" visible="false" />
+                  <TableColumn fx:id="colRemarks" editable="false" maxWidth="180.0" minWidth="90.0" prefWidth="-1.0" sortable="false" text="Remarks" />
                   <TableColumn fx:id="colAction" editable="false" maxWidth="1.7976931348623157E308" minWidth="120.0" sortable="false" text="Action" />
               </columns>
                <columnResizePolicy>

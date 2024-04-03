@@ -1,22 +1,27 @@
 package com.techwhizer.medicalshop.util;
 
+import com.techwhizer.medicalshop.CustomDialog;
+import com.techwhizer.medicalshop.controller.common.model.DepartmentModel;
+import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.model.ConsultationSetupModel;
 import com.techwhizer.medicalshop.model.DoctorModel;
 import com.techwhizer.medicalshop.model.SalutationModel;
 import com.techwhizer.medicalshop.util.type.DoctorType;
+import com.victorlaerte.asynctask.AsyncTask;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 public class CommonUtil {
+
 
     private static final String DATE_PATTERN = "dd/MM/yyyy";
 
@@ -89,6 +94,74 @@ public class CommonUtil {
 
     }
 
+    public static ObservableList<DepartmentModel> getDepartmentsList(){
+
+       ObservableList<DepartmentModel> departmentList = FXCollections.observableArrayList();
+
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+
+            connection = new DBConnection().getConnection();
+
+            String query = """
+                    select * from tbl_departments order by department_name asc
+                    """;
+            ps = connection.prepareStatement(query);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                int departmentId = rs.getInt("department_id");
+                String departmentName = rs.getString("department_name");
+                String departmentCode = rs.getString("department_code");
+                departmentList.add(new DepartmentModel(departmentId,departmentName,departmentCode));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBConnection.closeConnection(connection, ps, rs);
+        }
+
+        return departmentList;
+    }
+
+
+    public static DepartmentModel getDepartment(String departmentCode){
+
+        DepartmentModel departmentModel = new  DepartmentModel();
+
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+
+            connection = new DBConnection().getConnection();
+
+            String query = """
+                    select * from tbl_departments where department_code = ? limit 1
+                    """;
+            ps = connection.prepareStatement(query);
+            ps.setString(1,departmentCode);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                int departmentId = rs.getInt("department_id");
+                String departmentName = rs.getString("department_name");
+                String deptCode = rs.getString("department_code");
+               departmentModel = new DepartmentModel(departmentId,departmentName,deptCode);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBConnection.closeConnection(connection, ps, rs);
+        }
+
+        return departmentModel;
+    }
+
     public static ObservableList<String> getPaymentMethod(){
 
         return FXCollections.observableArrayList(
@@ -102,11 +175,7 @@ public class CommonUtil {
     public static ObservableList<DoctorModel> getDoctor(DoctorType doctorType) {
         String docType = doctorType.toString().replaceAll("_", " ");
 
-        DoctorModel dmm = new DoctorModel(0, "OTHER");
-
-        ObservableList<DoctorModel> doctorList = doctorType == DoctorType.OUT_SIDE ?
-                FXCollections.observableArrayList(dmm)
-                : FXCollections.observableArrayList();
+        ObservableList<DoctorModel> doctorList = FXCollections.observableArrayList();
 
         Connection connection = null;
         PreparedStatement ps = null;
@@ -120,7 +189,7 @@ public class CommonUtil {
                     coalesce(speciality,'-') as speciality ,doctor_type,
                     coalesce(dr_reg_num,'-') as dr_reg_num,coalesce(qualification,'-') as qualification 
                     ,(TO_CHAR(created_date, 'DD-MM-YYYY')) as created_date FROM tbl_doctor 
-                    where doctor_type = ?
+                    where doctor_type = ?  or doctor_type = 'OTHER'
                     order by doctor_id desc
                     """;
             ps = connection.prepareStatement(query);
@@ -190,5 +259,71 @@ public class CommonUtil {
             DBConnection.closeConnection(connection, ps, rs);
         }
         return salutationList;
+    }
+
+    public static class HardRefresh extends AsyncTask<String, Integer, Boolean> {
+        Button button;
+        boolean isMessageShow;
+
+        public HardRefresh(Button button, boolean isMessageShow) {
+            this.button = button;
+            this.isMessageShow = isMessageShow;
+        }
+
+        @Override
+        public void onPreExecute() {
+
+            if (null != button){
+                button.setGraphic(new Method().getProgressBarWhite(25,25));
+                button.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+            }
+        }
+
+        @Override
+        public Boolean doInBackground(String... params) {
+            refreshMaterializedViews(isMessageShow);
+            return false;
+        }
+
+        private void refreshMaterializedViews(boolean isMessageShow) {
+            Connection connection = null;
+            PreparedStatement ps = null;
+
+            try{
+                connection = new DBConnection().getConnection();
+                String qry = "select refresh_all_materialized_views_concurrently()";
+
+                ps = connection.prepareStatement(qry);
+              boolean isSuccess = ps.execute();
+
+              if(isMessageShow){
+                  if(isSuccess){
+                      new CustomDialog().showAlertBox("Success","Successfully Refreshed.");
+                  }else {
+                      new CustomDialog().showAlertBox("Failed","Refresh Failed. Please try again!");
+                  }
+              }
+            } catch (SQLException e) {
+                if(isMessageShow){
+                    new CustomDialog().showAlertBox("Error","Something went wrong.");
+                }
+                throw new RuntimeException(e);
+            }finally {
+                DBConnection.closeConnection(connection,ps,null);
+            }
+
+        }
+        @Override
+        public void onPostExecute(Boolean success) {
+            if (null != button){
+                button.setGraphic(null);
+                button.setContentDisplay(ContentDisplay.TEXT_ONLY);
+            }
+        }
+
+        @Override
+        public void progressCallback(Integer... params) {
+
+        }
     }
 }

@@ -77,7 +77,7 @@
                       <columns>
                           <TableColumn fx:id="colSrNo" editable="false" minWidth="50.0" sortable="false" text="SL #" />
 <!--                                <TableColumn visible="false" fx:id="colAction" minWidth="90.0" prefWidth="90.0" text="#" />-->
-                          <TableColumn fx:id="colProductName" editable="false" minWidth="230.0" sortable="false" text="PRODUCT NAME" />
+                          <TableColumn fx:id="colProductName" editable="false" minWidth="230.0" sortable="false" text="ITEM NAME" />
                           <TableColumn fx:id="colPack" editable="false" minWidth="130.0" sortable="false" text="PACK" />
                           <TableColumn fx:id="colQty" editable="false" maxWidth="200.0" minWidth="180.0" sortable="false" text="QTY" />
                   <TableColumn fx:id="colBatch" editable="false" maxWidth="130.0" minWidth="130.0" prefWidth="-1.0" sortable="false" text="BATCH" />

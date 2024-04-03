@@ -13,6 +13,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -29,7 +30,7 @@ import java.util.ResourceBundle;
 public class ManufactureMain implements Initializable {
     public TextField searchTf;
     public TableColumn<ManufacturerModal,String> colCreatedDate;
-    private int rowsPerPage = 8;
+    private int rowsPerPage = 200;
     public TextField manufactureNameTf;
     public TableView<ManufacturerModal> tableView;
     public TableColumn<ManufacturerModal,Integer> colSrNo;
@@ -45,7 +46,7 @@ public class ManufactureMain implements Initializable {
         method = new Method();
         dbConnection = new DBConnection();
         customDialog = new CustomDialog();
-
+        tableView.setFixedCellSize(28);
         callThread();
         manufactureNameTf.setFocusTraversable(false);
     }
@@ -63,7 +64,7 @@ public class ManufactureMain implements Initializable {
         String manufactureName = manufactureNameTf.getText();
 
         if (manufactureName.isEmpty()){
-            method.show_popup("Enter manufacture name ",manufactureNameTf);
+            method.show_popup("Enter manufacture name ",manufactureNameTf, Side.RIGHT);
             return;
         }
 

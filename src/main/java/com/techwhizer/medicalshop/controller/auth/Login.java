@@ -6,6 +6,7 @@ import com.techwhizer.medicalshop.PropertiesLoader;
 import com.techwhizer.medicalshop.method.GetUserProfile;
 import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.model.UserDetails;
+import com.techwhizer.medicalshop.util.CommonUtil;
 import com.techwhizer.medicalshop.util.DBConnection;
 import com.techwhizer.medicalshop.util.SecurePassword;
 import com.victorlaerte.asynctask.AsyncTask;
@@ -16,16 +17,14 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.geometry.VPos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
@@ -63,7 +62,6 @@ public class Login implements Initializable {
         PropertiesLoader propLoader = new PropertiesLoader();
         propRead = propLoader.getReadProp();
         method.hideElement(progressBar);
-
     }
 
     @FXML
@@ -76,6 +74,7 @@ public class Login implements Initializable {
     }
 
     private Map<String, Object> getProfileDetails(ResultSet rs, PreparedStatement ps) throws SQLException {
+       new CommonUtil.HardRefresh(null,false).execute();
         return openDashboard(rs, ps);
         // return  getLicenseData(rs , ps);
     }
@@ -172,10 +171,10 @@ public class Login implements Initializable {
         String password = password_f.getText();
 
         if (inputValue.isEmpty()) {
-            method.show_popup("Please enter valid username", email_f);
+            method.show_popup("Please enter valid username", email_f, Side.RIGHT);
             return;
         } else if (password.isEmpty()) {
-            method.show_popup("Please enter password", password_f);
+            method.show_popup("Please enter password", password_f, Side.RIGHT);
             return;
         }
 

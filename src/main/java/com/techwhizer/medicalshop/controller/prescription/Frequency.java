@@ -9,6 +9,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -41,7 +42,7 @@ public class Frequency implements Initializable
         String freq = frequencyTf.getText();
 
         if (freq.isEmpty()){
-            method.show_popup("Please enter frequency value",frequencyTf);
+            method.show_popup("Please enter frequency value",frequencyTf, Side.RIGHT);
             return;
         }
 

@@ -45,7 +45,7 @@
                                                         <Insets bottom="10.0" />
                                                     </VBox.margin>
                                                 </VBox>
-                                                <VBox fx:id="mainContainer" alignment="CENTER" spacing="10.0" VBox.vgrow="ALWAYS">
+                                                <VBox fx:id="mainContainer" alignment="CENTER" spacing="5.0" VBox.vgrow="ALWAYS">
                                                     <children>
                                                         <VBox spacing="1.0">
                                                             <children>
@@ -66,45 +66,7 @@
                                                         </VBox>
                                           <HBox spacing="10.0">
                                              <children>
-                                                <VBox prefHeight="58.0" prefWidth="414.0" spacing="1.0">
-                                                   <children>
-                                                      <Label text="COMPOSITION *">
-                                                         <font>
-                                                            <Font name="Arial Black" size="10.0" />
-                                                         </font>
-                                                         <VBox.margin>
-                                                            <Insets left="3.0" />
-                                                         </VBox.margin>
-                                                      </Label>
-                                                      <HBox>
-                                                         <children>
-                                                            <TextField fx:id="compositionTf" minHeight="30.0" onKeyPressed="#enterKeyPress" prefHeight="30.0" prefWidth="294.0" promptText="Enter medicine composition" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
-                                                         </children>
-                                                      </HBox>
-                                                   </children>
-                                                </VBox>
-                                                <VBox prefHeight="58.0" prefWidth="206.0" spacing="1.0">
-                                                   <children>
-                                                      <Label text="DOSE :">
-                                                         <font>
-                                                            <Font name="Arial Black" size="10.0" />
-                                                         </font>
-                                                         <VBox.margin>
-                                                            <Insets left="3.0" />
-                                                         </VBox.margin>
-                                                      </Label>
-                                                      <HBox>
-                                                         <children>
-                                                            <TextField fx:id="medicineDoseTf" minHeight="30.0" onKeyPressed="#enterKeyPress" prefHeight="30.0" prefWidth="294.0" promptText="Enter medicine dose" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
-                                                         </children>
-                                                      </HBox>
-                                                   </children>
-                                                </VBox>
-                                             </children>
-                                          </HBox>
-                                                        <HBox fillHeight="false" layoutX="30.0" layoutY="167.0" spacing="10.0">
-                                                            <children>
-                                                <VBox prefHeight="58.0" spacing="2.0">
+                                                <VBox prefHeight="42.0" prefWidth="334.0" HBox.hgrow="ALWAYS">
                                                    <children>
                                                       <Label text="PRODUCT TAG :">
                                                          <font>
@@ -116,148 +78,201 @@
                                                       </Label>
                                                       <HBox>
                                                          <children>
-                                                            <TextField fx:id="productTag" minHeight="30.0" onKeyPressed="#enterKeyPress" prefHeight="30.0" prefWidth="210.0" promptText="Enter product tag" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
+                                                            <TextField fx:id="productTag" minHeight="27.0" onKeyPressed="#enterKeyPress" prefHeight="27.0" prefWidth="192.0" promptText="Enter product tag" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
                                                          </children>
                                                       </HBox>
                                                    </children>
                                                 </VBox>
-                                                                <HBox alignment="CENTER">
-                                                                    <children>
-                                                                        <HBox>
-                                                                            <children>
-                                                                                <VBox spacing="2.0">
-                                                                                    <children>
-                                                                                        <Label text="UNIT *  : ">
-                                                                                            <font>
-                                                                                                <Font name="Arial Black" size="10.0" />
-                                                                                            </font>
-                                                                                            <VBox.margin>
-                                                                                                <Insets left="3.0" />
-                                                                                            </VBox.margin>
-                                                                                        </Label>
-                                                                                        <HBox alignment="BOTTOM_CENTER">
-                                                                                            <children>
-                                                                                                <ComboBox fx:id="unitCom" minHeight="30.0" onKeyPressed="#enterKeyPress" prefHeight="30.0" prefWidth="150.0" promptText="Select unit" style="-fx-border-color: grey; -fx-border-radius: 3 0 0 3;" />
-                                                                                            </children>
-                                                                                        </HBox>
-                                                                                    </children>
-                                                                                </VBox>
-                                                                                <VBox fx:id="stripTabContainer">
-                                                                                    <children>
-                                                                                        <Label fx:id="stripTabLabel">
-                                                                                            <font>
-                                                                                                <Font name="Arial" size="12.0" />
-                                                                                            </font>
-                                                                                        </Label>
-                                                                                        <TextField fx:id="stripTabTf" alignment="CENTER" minHeight="30.0" minWidth="70.0" prefHeight="30.0" prefWidth="100.0" promptText="tab per strip" style="-fx-border-color: grey; -fx-border-radius: 0 3 3 0;">
-                                                                                            <VBox.margin>
-                                                                                                <Insets top="2.0" />
-                                                                                            </VBox.margin>
-                                                                                        </TextField>
-                                                                                    </children>
-                                                                                </VBox>
-                                                                            </children>
-                                                                        </HBox>
-                                                                    </children>
-                                                                </HBox>
-                                                                <VBox prefHeight="58.0" prefWidth="150.0" spacing="2.0">
-                                                                    <children>
-                                                                        <Label text="PACKING * :">
-                                                                            <font>
-                                                                                <Font name="Arial Black" size="10.0" />
-                                                                            </font>
-                                                                            <VBox.margin>
-                                                                                <Insets left="3.0" />
-                                                                            </VBox.margin>
-                                                                        </Label>
-                                                                        <HBox>
-                                                                            <children>
-                                                                                <TextField fx:id="packingTf" alignment="CENTER" minHeight="30.0" onKeyPressed="#enterKeyPress" prefHeight="30.0" prefWidth="160.0" promptText="Enter packing" style="-fx-border-color: grey                                                                                 ; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
-                                                                            </children>
-                                                                        </HBox>
-                                                                    </children>
-                                                                </VBox>
-                                                            </children>
-                                                        </HBox>
-                                                        <HBox spacing="30.0">
-                                                            <children>
-                                                                <VBox prefWidth="300.0" spacing="2.0">
-                                                                    <children>
-                                                                        <Label text="COMPANY  : ">
-                                                                            <font>
-                                                                                <Font name="Arial Black" size="10.0" />
-                                                                            </font>
-                                                                            <VBox.margin>
-                                                                                <Insets left="3.0" />
-                                                                            </VBox.margin>
-                                                                        </Label>
-                                                                        <HBox alignment="CENTER" prefWidth="281.0">
+                                                <VBox prefWidth="250.0">
+                                                   <children>
+                                                      <Label text="DEPARTMENT *">
+                                                         <font>
+                                                            <Font name="Arial Black" size="10.0" />
+                                                         </font>
+                                                         <VBox.margin>
+                                                            <Insets />
+                                                         </VBox.margin>
+                                                      </Label>
+                                                      <HBox>
                                                          <children>
-                                                                              <Label fx:id="companyNameL" alignment="CENTER" minHeight="30.0" minWidth="260.0" onMouseClicked="#chooseCompany" prefHeight="30.0" prefWidth="305.0" style="-fx-border-color: grey; -fx-border-radius: 3; -fx-cursor: hand;" text="Click to select company" textAlignment="CENTER">
-                                                                                  <font>
-                                                                                      <Font size="13.0" />
-                                                                                  </font>
-                                                                                  <padding>
-                                                                                      <Insets left="5.0" />
-                                                                                  </padding>
+                                                            <ComboBox fx:id="departmentCom" minHeight="27.0" onKeyPressed="#enterKeyPress" prefHeight="27.0" prefWidth="373.0" promptText="Select Department" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS">
                                                                <HBox.margin>
                                                                   <Insets />
                                                                </HBox.margin>
-                                                                              </Label>
-                                                         </children></HBox>
-                                                                    </children>
-                                                                </VBox>
-                                                                <VBox prefWidth="300.0" spacing="2.0">
-                                                                    <children>
-                                                                        <Label text="MFR : ">
-                                                                            <font>
-                                                                                <Font name="Arial Black" size="10.0" />
-                                                                            </font>
-                                                                            <VBox.margin>
-                                                                                <Insets left="3.0" />
-                                                                            </VBox.margin>
-                                                                        </Label>
-                                                                        <HBox alignment="CENTER" prefWidth="281.0" VBox.vgrow="ALWAYS">
+                                                            </ComboBox>
+                                                         </children>
+                                                      </HBox>
+                                                   </children>
+                                                </VBox>
+                                             </children>
+                                          </HBox>
+                                          <HBox fx:id="mrpContainer">
+                                             <children>
+                                                <VBox HBox.hgrow="ALWAYS">
+                                                   <children>
+                                                      <Label text="MRP :">
+                                                         <font>
+                                                            <Font name="Arial Black" size="10.0" />
+                                                         </font>
+                                                      </Label>
+                                                      <TextField fx:id="mrpTf" minHeight="27.0" onKeyPressed="#enterKeyPress" prefHeight="27.0" prefWidth="294.0" promptText="Enter MRP" style="-fx-border-color: grey; -fx-border-radius: 3;" />
+                                                   </children>
+                                                </VBox>
+                                             </children>
+                                          </HBox>
+                                          <VBox fx:id="stockableContaier" spacing="10.0">
+                                             <children>
+                                                <HBox spacing="10.0">
+                                                   <children>
+                                                      <VBox prefWidth="417.0" HBox.hgrow="ALWAYS">
                                                          <children>
-                                                                              <Label fx:id="mfrL" alignment="CENTER" minHeight="30.0" minWidth="261.0" onMouseClicked="#chooseMfr" prefHeight="30.0" prefWidth="334.0" style="-fx-border-color: grey; -fx-border-radius: 3; -fx-cursor: hand;" text="Click to select mfr" textAlignment="CENTER">
-                                                                                  <font>
-                                                                                      <Font size="13.0" />
-                                                                                  </font>
-                                                                                  <padding>
-                                                                                      <Insets left="5.0" />
-                                                                                  </padding>
-                                                                              </Label>
-                                                         </children></HBox>
-                                                                    </children>
-                                                                </VBox>
-                                                            </children>
-                                                        </HBox>
-                                                        <HBox alignment="CENTER" fillHeight="false" spacing="15.0">
+                                                            <Label text="COMPOSITION *">
+                                                               <font>
+                                                                  <Font name="Arial Black" size="10.0" />
+                                                               </font>
+                                                               <VBox.margin>
+                                                                  <Insets left="3.0" />
+                                                               </VBox.margin>
+                                                            </Label>
+                                                            <HBox>
+                                                               <children>
+                                                                  <TextField fx:id="compositionTf" minHeight="27.0" onKeyPressed="#enterKeyPress" prefHeight="27.0" prefWidth="294.0" promptText="Enter medicine composition" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
+                                                               </children>
+                                                            </HBox>
+                                                         </children>
+                                                      </VBox>
+                                                   </children>
+                                                </HBox>
+                                                <HBox fillHeight="false" spacing="10.0">
+                                                   <children>
+                                                      <VBox prefHeight="42.0" prefWidth="303.0">
+                                                         <children>
+                                                            <Label text="DOSE :">
+                                                               <font>
+                                                                  <Font name="Arial Black" size="10.0" />
+                                                               </font>
+                                                               <VBox.margin>
+                                                                  <Insets left="3.0" />
+                                                               </VBox.margin>
+                                                            </Label>
+                                                            <HBox>
+                                                               <children>
+                                                                  <TextField fx:id="medicineDoseTf" minHeight="27.0" onKeyPressed="#enterKeyPress" prefHeight="27.0" prefWidth="294.0" promptText="Enter medicine dose" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
+                                                               </children>
+                                                            </HBox>
+                                                         </children>
+                                                      </VBox>
+                                                      <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
+                                                         <children>
+                                                            <HBox HBox.hgrow="ALWAYS">
+                                                               <children>
+                                                                  <VBox>
+                                                                     <children>
+                                                                        <Label text="UNIT *  : ">
+                                                                           <font>
+                                                                              <Font name="Arial Black" size="10.0" />
+                                                                           </font>
+                                                                           <VBox.margin>
+                                                                              <Insets left="3.0" />
+                                                                           </VBox.margin>
+                                                                        </Label>
+                                                                        <HBox alignment="BOTTOM_CENTER">
+                                                                           <children>
+                                                                              <ComboBox fx:id="unitCom" minHeight="27.0" onKeyPressed="#enterKeyPress" prefHeight="27.0" prefWidth="150.0" promptText="Select unit" style="-fx-border-color: grey; -fx-border-radius: 3 0 0 3;" />
+                                                                           </children>
+                                                                        </HBox>
+                                                                     </children>
+                                                                  </VBox>
+                                                                  <VBox fx:id="stripTabContainer" HBox.hgrow="ALWAYS">
+                                                                     <children>
+                                                                        <Label fx:id="stripTabLabel">
+                                                                           <font>
+                                                                              <Font name="Arial" size="12.0" />
+                                                                           </font>
+                                                                        </Label>
+                                                                        <TextField fx:id="stripTabTf" alignment="CENTER" minHeight="27.0" minWidth="70.0" prefHeight="27.0" prefWidth="100.0" promptText="tab per strip" style="-fx-border-color: grey; -fx-border-radius: 0 3 3 0;">
+                                                                           <VBox.margin>
+                                                                              <Insets />
+                                                                           </VBox.margin>
+                                                                        </TextField>
+                                                                     </children>
+                                                                  </VBox>
+                                                               </children>
+                                                            </HBox>
+                                                         </children>
+                                                      </HBox>
+                                                   </children>
+                                                </HBox>
+                                             </children>
+                                          </VBox>
+                                          <HBox spacing="10.0">
+                                             <children>
+                                                <VBox HBox.hgrow="ALWAYS">
+                                                   <children>
+                                                      <Label text="MANUFACTURERS : ">
+                                                         <font>
+                                                            <Font name="Arial Black" size="10.0" />
+                                                         </font>
+                                                         <VBox.margin>
+                                                            <Insets left="3.0" />
+                                                         </VBox.margin>
+                                                      </Label>
+                                                      <Label fx:id="mfrL" alignment="CENTER" minHeight="27.0" minWidth="323.0" onMouseClicked="#chooseMfr" prefHeight="27.0" prefWidth="610.0" style="-fx-border-color: grey; -fx-border-radius: 3; -fx-cursor: hand; -fx-font-size: 11;" text="SELECT MANUFACTURER" textAlignment="CENTER">
+                                                         <font>
+                                                            <Font size="11.0" />
+                                                         </font>
+                                                      </Label>
+                                                   </children>
+                                                </VBox>
+                                             </children>
+                                          </HBox>
+                                          <HBox prefWidth="200.0" spacing="10.0">
+                                             <children>
+                                                <VBox prefWidth="150.0" HBox.hgrow="ALWAYS">
+                                                   <children>
+                                                      <Label text="MEDICAL REPRESENTATIVE ( MR ) :">
+                                                         <font>
+                                                            <Font name="Arial Black" size="10.0" />
+                                                         </font>
+                                                         <VBox.margin>
+                                                            <Insets left="3.0" />
+                                                         </VBox.margin>
+                                                      </Label>
+                                                      <Label fx:id="mrL" alignment="CENTER" minHeight="27.0" minWidth="260.0" onMouseClicked="#chooseMr" prefHeight="27.0" prefWidth="617.0" style="-fx-border-color: grey; -fx-border-radius: 3; -fx-cursor: hand; -fx-font-size: 11;" text="SELECT MEDICAL REPRESENTATIVE" textAlignment="CENTER">
+                                                         <font>
+                                                            <Font size="11.0" />
+                                                         </font>
+                                                         <padding>
+                                                            <Insets left="5.0" />
+                                                         </padding>
+                                                      </Label>
+                                                   </children>
+                                                </VBox>
+                                                <VBox prefWidth="300.0" HBox.hgrow="ALWAYS">
+                                                   <children>
+                                                      <Label text="COMPANY  : ">
+                                                         <font>
+                                                            <Font name="Arial Black" size="10.0" />
+                                                         </font>
+                                                         <VBox.margin>
+                                                            <Insets left="3.0" />
+                                                         </VBox.margin>
+                                                      </Label>
+                                                      <Label fx:id="companyNameL" alignment="CENTER" minHeight="27.0" minWidth="260.0" onMouseClicked="#chooseCompany" prefHeight="27.0" prefWidth="320.0" style="-fx-border-color: grey; -fx-border-radius: 3; -fx-cursor: hand; -fx-font-size: 11;" text="SELECT COMPANY" textAlignment="CENTER">
+                                                         <font>
+                                                            <Font size="11.0" />
+                                                         </font>
+                                                         <padding>
+                                                            <Insets left="5.0" />
+                                                         </padding>
+                                                      </Label>
+                                                   </children>
+                                                </VBox>
+                                             </children>
+                                          </HBox>
+                                                        <HBox alignment="CENTER" fillHeight="false" spacing="5.0">
                                                             <children>
-                                                                <VBox prefWidth="270.0" spacing="2.0">
-                                                                    <children>
-                                                                        <Label text="MR : ">
-                                                                            <font>
-                                                                                <Font name="Arial Black" size="10.0" />
-                                                                            </font>
-                                                                            <VBox.margin>
-                                                                                <Insets left="3.0" />
-                                                                            </VBox.margin>
-                                                                        </Label>
-                                                                        <HBox alignment="CENTER" prefWidth="281.0" VBox.vgrow="ALWAYS">
-                                                         <children>
-                                                                              <Label fx:id="mrL" alignment="CENTER" minHeight="30.0" minWidth="260.0" onMouseClicked="#chooseMr" prefHeight="30.0" style="-fx-border-color: grey; -fx-border-radius: 3; -fx-cursor: hand;" text="Click to select mr" textAlignment="CENTER">
-                                                                                  <font>
-                                                                                      <Font size="13.0" />
-                                                                                  </font>
-                                                                                  <padding>
-                                                                                      <Insets left="5.0" />
-                                                                                  </padding>
-                                                                              </Label>
-                                                         </children></HBox>
-                                                                    </children>
-                                                                </VBox>
-                                                                <VBox prefWidth="200.0" spacing="2.0">
+                                                                <VBox>
                                                                     <children>
                                                                         <Label text="HSN CODE * :">
                                                                             <font>
@@ -269,7 +284,7 @@
                                                                         </Label>
                                                                         <HBox alignment="CENTER">
                                                                             <children>
-                                                                                <ComboBox fx:id="hsnCom" minHeight="30.0" onKeyPressed="#enterKeyPress" prefHeight="30.0" prefWidth="200.0" promptText="Select HSN" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS">
+                                                                                <ComboBox fx:id="hsnCom" minHeight="27.0" onKeyPressed="#enterKeyPress" prefHeight="27.0" prefWidth="200.0" promptText="Select HSN" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS">
                                                                                     <HBox.margin>
                                                                                         <Insets />
                                                                                     </HBox.margin>
@@ -278,7 +293,7 @@
                                                                         </HBox>
                                                                     </children>
                                                                 </VBox>
-                                                                <VBox layoutX="176.0" layoutY="10.0" prefWidth="130.0" spacing="2.0">
+                                                                <VBox layoutX="176.0" layoutY="10.0" HBox.hgrow="ALWAYS">
                                                                     <children>
                                                                         <Label text="DISCOUNT  : ">
                                                                             <font>
@@ -288,18 +303,35 @@
                                                                                 <Insets left="3.0" />
                                                                             </VBox.margin>
                                                                         </Label>
-                                                                        <HBox alignment="CENTER" prefWidth="281.0">
+                                                                        <HBox alignment="CENTER">
                                                                             <children>
-                                                                                <ComboBox fx:id="discountCom" minHeight="30.0" onKeyPressed="#enterKeyPress" prefHeight="30.0" prefWidth="295.0" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
+                                                                                <ComboBox fx:id="discountCom" minHeight="27.0" onKeyPressed="#enterKeyPress" prefHeight="27.0" prefWidth="200.0" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
+                                                                            </children>
+                                                                        </HBox>
+                                                                    </children>
+                                                                </VBox>
+                                                                <VBox HBox.hgrow="ALWAYS">
+                                                                    <children>
+                                                                        <Label text="TYPE  : ">
+                                                                            <font>
+                                                                                <Font name="Arial Black" size="10.0" />
+                                                                            </font>
+                                                                            <VBox.margin>
+                                                                                <Insets left="3.0" />
+                                                                            </VBox.margin>
+                                                                        </Label>
+                                                                        <HBox>
+                                                                            <children>
+                                                                                <ComboBox fx:id="typeCom" minHeight="27.0" onKeyPressed="#enterKeyPress" prefHeight="27.0" prefWidth="200.0" promptText="Select type" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
                                                                             </children>
                                                                         </HBox>
                                                                     </children>
                                                                 </VBox>
                                                             </children>
                                                         </HBox>
-                                                        <HBox alignment="CENTER" layoutX="30.0" layoutY="99.0" spacing="20.0">
+                                                        <HBox alignment="CENTER" layoutX="30.0" layoutY="99.0" spacing="5.0">
                                                             <children>
-                                                                <VBox spacing="2.0">
+                                                                <VBox HBox.hgrow="ALWAYS">
                                                                     <children>
                                                                         <Label text="NARCOTIC  : ">
                                                                             <font>
@@ -311,12 +343,12 @@
                                                                         </Label>
                                                                         <HBox prefHeight="35.0">
                                                                             <children>
-                                                                                <ComboBox fx:id="narcoticCom" minHeight="30.0" onKeyPressed="#enterKeyPress" prefHeight="30.0" prefWidth="140.0" promptText="Select narcotic" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
+                                                                                <ComboBox fx:id="narcoticCom" minHeight="27.0" onKeyPressed="#enterKeyPress" prefHeight="27.0" prefWidth="200.0" promptText="Select narcotic" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
                                                                             </children>
                                                                         </HBox>
                                                                     </children>
                                                                 </VBox>
-                                                                <VBox layoutX="10.0" layoutY="10.0" spacing="2.0">
+                                                                <VBox layoutX="10.0" layoutY="10.0" HBox.hgrow="ALWAYS">
                                                                     <children>
                                                                         <Label text="ITEM TYPE  : ">
                                                                             <font>
@@ -326,10 +358,10 @@
                                                                                 <Insets left="3.0" />
                                                                             </VBox.margin>
                                                                         </Label>
-                                                                        <ComboBox fx:id="itemTypeCom" minHeight="30.0" onKeyPressed="#enterKeyPress" prefHeight="30.0" prefWidth="142.0" promptText="Select item type" style="-fx-border-color: grey; -fx-border-radius: 3;" />
+                                                                        <ComboBox fx:id="itemTypeCom" minHeight="27.0" onKeyPressed="#enterKeyPress" prefHeight="27.0" prefWidth="200.0" promptText="Select item type" style="-fx-border-color: grey; -fx-border-radius: 3;" />
                                                                     </children>
                                                                 </VBox>
-                                                                <VBox layoutX="10.0" layoutY="10.0" spacing="2.0">
+                                                                <VBox layoutX="10.0" layoutY="10.0" HBox.hgrow="ALWAYS">
                                                                     <children>
                                                                         <Label text="STATUS : ">
                                                                             <font>
@@ -341,24 +373,7 @@
                                                                         </Label>
                                                                         <HBox>
                                                                             <children>
-                                                                                <ComboBox fx:id="statusCom" minHeight="30.0" onKeyPressed="#enterKeyPress" prefHeight="30.0" prefWidth="140.0" promptText="Select status" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
-                                                                            </children>
-                                                                        </HBox>
-                                                                    </children>
-                                                                </VBox>
-                                                                <VBox spacing="2.0">
-                                                                    <children>
-                                                                        <Label text="TYPE  : ">
-                                                                            <font>
-                                                                                <Font name="Arial Black" size="10.0" />
-                                                                            </font>
-                                                                            <VBox.margin>
-                                                                                <Insets left="3.0" />
-                                                                            </VBox.margin>
-                                                                        </Label>
-                                                                        <HBox prefHeight="35.0">
-                                                                            <children>
-                                                                                <ComboBox fx:id="typeCom" minHeight="30.0" onKeyPressed="#enterKeyPress" prefHeight="30.0" prefWidth="143.0" promptText="Select type" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
+                                                                                <ComboBox fx:id="statusCom" minHeight="27.0" onKeyPressed="#enterKeyPress" prefHeight="27.0" prefWidth="200.0" promptText="Select status" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
                                                                             </children>
                                                                         </HBox>
                                                                     </children>
@@ -367,16 +382,16 @@
                                                         </HBox>
                                                         <HBox alignment="CENTER" spacing="100.0">
                                                             <children>
-                                                                <Button layoutX="10.0" layoutY="22.0" minHeight="30.0" minWidth="130.0" mnemonicParsing="false" onAction="#closeBn" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: RED; -fx-text-fill: WHITE; -fx-cursor: hand; -fx-background-radius: 20;" text="CANCEL">
+                                                                <Button layoutX="10.0" layoutY="22.0" minHeight="25.0" minWidth="130.0" mnemonicParsing="false" onAction="#closeBn" prefHeight="25.0" prefWidth="120.0" style="-fx-background-color: RED; -fx-text-fill: WHITE; -fx-cursor: hand; -fx-background-radius: 20;" text="CANCEL">
                                                                     <font>
-                                                                        <Font name="Arial Bold" size="13.0" />
+                                                                        <Font name="Arial Bold" size="11.0" />
                                                                     </font>
                                                                 </Button>
                                                                 <HBox alignment="CENTER">
                                                                     <children>
-                                                                        <Button fx:id="updateButton" minHeight="30.0" minWidth="150.0" mnemonicParsing="false" onAction="#updateBn" prefHeight="30.0" prefWidth="140.0" style="-fx-background-color: #008080; -fx-text-fill: WHITE; -fx-cursor: hand; -fx-background-radius: 20;" text="UPDATE">
+                                                                        <Button fx:id="updateButton" minHeight="25.0" minWidth="150.0" mnemonicParsing="false" onAction="#updateBn" prefHeight="25.0" prefWidth="140.0" style="-fx-background-color: #008080; -fx-text-fill: WHITE; -fx-cursor: hand; -fx-background-radius: 20;" text="UPDATE">
                                                                             <font>
-                                                                                <Font name="Arial Bold" size="13.0" />
+                                                                                <Font name="Arial Bold" size="11.0" />
                                                                             </font>
                                                                         </Button>
                                                                         <ProgressIndicator fx:id="progressBar" prefHeight="35.0" prefWidth="35.0" />
@@ -384,7 +399,7 @@
                                                                 </HBox>
                                                             </children>
                                                             <VBox.margin>
-                                                                <Insets top="25.0" />
+                                                                <Insets top="10.0" />
                                                             </VBox.margin>
                                                         </HBox>
                                                     </children>

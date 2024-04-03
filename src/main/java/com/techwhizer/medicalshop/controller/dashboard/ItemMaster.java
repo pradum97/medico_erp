@@ -40,6 +40,7 @@ public class ItemMaster implements Initializable {
     public Label createdDate;
     public Label statusL;
     public Button refresh_bn;
+    public HBox itemDetailsContainer;
     int rowsPerPage = 30;
 
     public TextField searchTf;
@@ -50,6 +51,7 @@ public class ItemMaster implements Initializable {
     public TableColumn<ItemsModel, String> colUnit;
     public TableColumn<ItemsModel, String> colHsn;
     public TableColumn<ItemsModel, String> colDiscount;
+    public TableColumn<ItemsModel, String> colDepartment;
     public TableColumn<ItemsModel, String> colAction;
     public TableColumn<ItemsModel, String> colStripTab;
     public TableColumn<ItemsModel, String> colMfr;
@@ -77,6 +79,8 @@ public class ItemMaster implements Initializable {
         setToolTip(colMfr);
         setToolTip(mrName);
         setToolTip(colCompany);
+
+        method.hideElement(itemDetailsContainer);
 
     }
 
@@ -107,7 +111,7 @@ public class ItemMaster implements Initializable {
     }
 
     public void refresh(ActionEvent event) {
-
+        searchTf.setText("");
         callThread();
     }
 
@@ -137,7 +141,7 @@ public class ItemMaster implements Initializable {
         public void onPostExecute(Boolean success) {
             refresh_bn.setDisable(false);
             tableView.setPlaceholder(new Label("Not Available"));
-            if (itemList.size() > 0) {
+            if (!itemList.isEmpty()) {
                 pagination.setVisible(true);
                 search_Item();
             }
@@ -151,9 +155,8 @@ public class ItemMaster implements Initializable {
 
     private void getAllProduct() {
 
-        if (null != itemList) {
-            itemList.clear();
-        }
+        itemList.clear();
+        searchTf.setText("");
 
         Connection connection = null;
         PreparedStatement ps = null;
@@ -167,13 +170,15 @@ public class ItemMaster implements Initializable {
                     "       tim.mfr_id ,coalesce( tml.manufacturer_name,'-') as manufacturer_name,tim.discount_id,\n" +
                     "       coalesce(td.discount,0) as discount, tim.mr_id,coalesce(t.name,'-') as mr_name, tim.gst_id,coalesce(tpt.gstname,'-')as gstname,\n" +
                     "       coalesce(tpt.igst,0)as igst,coalesce(tpt.sgst,0) as sgst,coalesce(tpt.cgst,0) as cgst,\n" +
-                    "      tim.type,tim.narcotic,tim.item_type,tim.status,(TO_CHAR(tim.created_date, 'DD-MM-YYYY')) as created_date ,tim.strip_tab,\n" +
-                    "      tpt.hsn_sac as hsn,tim.composition,tim.tag from tbl_items_master tim\n" +
+                    "      tim.type,tim.narcotic,dep.department_code,department_name,tim.item_type,tim.status,(TO_CHAR(tim.created_date, 'DD-MM-YYYY')) as created_date ,tim.strip_tab,\n" +
+                    "      tpt.hsn_sac as hsn,tim.composition,tim.tag, tim.is_stockable from tbl_items_master tim\n" +
                     "left join tbl_company tc on tim.company_id = tc.company_id\n" +
                     "left join tbl_manufacturer_list tml on tml.mfr_id = tim.mfr_id\n" +
                     "left join tbl_mr_list t on t.mr_id = tim.mr_id\n" +
                     "left join tbl_product_tax tpt on tpt.tax_id = tim.gst_id\n" +
+                    "left join tbl_departments dep on dep.department_code = tim.department_code "+
                     "left join tbl_discount td on tim.discount_id = td.discount_id order by item_id desc";
+
             ps = connection.prepareStatement(qry);
             rs = ps.executeQuery();
 
@@ -208,12 +213,15 @@ public class ItemMaster implements Initializable {
                 if (tabPerStrip > 0) {
                     fullUnit.concat("-" + (tabPerStrip));
                 }
+                boolean isStockable = rs.getBoolean("is_stockable");
+                String departmentName = rs.getString("department_name");
+                String departmentCode = rs.getString("department_code");
 
                 ItemsModel im = new ItemsModel(itemID, method.rec(productName), method.rec(unit), method.rec(packing),
                         companyId, companyName, mfrId, discountId, discount,
                         mrId, mrName, manufacturerName, gstId, cGst, sGst, iGst, type,
                         narcotic, itemType, status, createdDate, tabPerStrip, hsn,
-                        method.rec(fullUnit),composition,tag,dose);
+                        method.rec(fullUnit), composition, tag, dose, isStockable,departmentName,departmentCode);
                 itemList.add(im);
 
             }
@@ -243,6 +251,8 @@ public class ItemMaster implements Initializable {
                 if (products.getProductName().toLowerCase().contains(lowerCaseFilter)) {
                     return true;
                 } else if (products.getMfrName().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                } else if (products.getProductTag().toLowerCase().contains(lowerCaseFilter)) {
                     return true;
                 } else if (products.getPacking().toLowerCase().contains(lowerCaseFilter)) {
                     return true;
@@ -311,7 +321,7 @@ public class ItemMaster implements Initializable {
         colMfr.setCellValueFactory(new PropertyValueFactory<>("mfrName"));
         mrName.setCellValueFactory(new PropertyValueFactory<>("mrName"));
         colCompany.setCellValueFactory(new PropertyValueFactory<>("companyName"));
-
+        colDepartment.setCellValueFactory(new PropertyValueFactory<>("departmentName"));
         if (Login.currentRoleName.equalsIgnoreCase("admin")) {
             setOptionalCell();
         }
@@ -358,7 +368,14 @@ public class ItemMaster implements Initializable {
                             tableView.getSelectionModel().clearSelection();
                         }
                         customDialog.showFxmlDialog2("update/product/itemMasterUpdate.fxml", "UPDATE MASTER");
-                        callThread();
+
+                        if(Main.primaryStage.getUserData() instanceof Boolean isUpdated){
+                            if(isUpdated){
+                                callThread();
+                            }
+                        }
+
+
                     });
 
 

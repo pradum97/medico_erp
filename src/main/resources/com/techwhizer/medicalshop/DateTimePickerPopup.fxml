@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.SpinnerValueFactory?>
+<?import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory?>
+<fx:root
+		type="VBox" style="-fx-background-color:#f4f4f4;-fx-padding: 5;-fx-border-color: grey;-fx-border-radius: 3"
+		fillWidth="true" spacing="5" xmlns:fx="http://javafx.com/fxml">
+
+
+
+		<VBox fillWidth="true">
+			<Label style="-fx-font-weight: bold">DATE : </Label>
+			<DatePicker style="-fx-border-radius: grey" prefWidth="185" fx:id="datePicker"/>
+		</VBox>
+
+		<VBox>
+			<Label style="-fx-font-weight: bold">TIME : </Label>
+			<HBox>
+
+				<ComboBox id="comHour" style="-fx-border-color: grey;-fx-border-radius: 3 0 0 3" minWidth="50" minHeight="26" prefHeight="26"  fx:id="comHour">
+					<items>
+						<FXCollections fx:factory="observableArrayList">
+							<String fx:value="00"/>
+							<String fx:value="01"/>
+							<String fx:value="02"/>
+							<String fx:value="03"/>
+							<String fx:value="04"/>
+							<String fx:value="05"/>
+							<String fx:value="06"/>
+							<String fx:value="07"/>
+							<String fx:value="08"/>
+							<String fx:value="09"/>
+							<String fx:value="10"/>
+							<String fx:value="11"/>
+						</FXCollections>
+					</items>
+				</ComboBox>
+
+				<ComboBox style="-fx-border-color: grey;-fx-border-radius: 0" minWidth="50" minHeight="26" prefHeight="26"  fx:id="comMinute">
+				</ComboBox>
+
+				<ComboBox style="-fx-border-color: grey;-fx-border-radius: 0 3 3 0" minWidth="50" minHeight="26" prefHeight="26" fx:id="comAmPm">
+					<items>
+						<FXCollections fx:factory="observableArrayList">
+							<String fx:value="AM"/>
+							<String fx:value="PM"/>
+						</FXCollections>
+					</items>
+				</ComboBox>
+
+			</HBox>
+
+		</VBox>
+
+	<BorderPane >
+		<padding>
+			<Insets bottom="5" left="5" right="5" top="5"/>
+		</padding>
+		<center>
+			<Button text="OK" onAction="#handleOkButtonAction">
+				<graphic>
+					<ImageView>
+						<image>
+							<Image url="@img/icon/check.png"/>
+						</image>
+					</ImageView>
+				</graphic>
+			</Button>
+		</center>
+	</BorderPane>
+</fx:root>

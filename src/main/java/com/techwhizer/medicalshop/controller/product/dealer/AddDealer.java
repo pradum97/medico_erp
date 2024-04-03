@@ -6,6 +6,7 @@ import com.techwhizer.medicalshop.method.StaticData;
 import com.techwhizer.medicalshop.util.DBConnection;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -60,14 +61,14 @@ public class AddDealer implements Initializable {
         Matcher matcher = pattern.matcher(sEmail);
 
         if (sName.isEmpty()) {
-            method.show_popup("Enter Dealer Full Name", sNameTf);
+            method.show_popup("Enter Dealer Full Name", sNameTf, Side.RIGHT);
             return;
         }else if (sAddress.isEmpty()) {
-            method.show_popup("Enter Dealer Address", sAddressTf);
+            method.show_popup("Enter Dealer Address", sAddressTf, Side.RIGHT);
             return;
         }else if (!sEmail.isEmpty()) {
             if (!matcher.matches()) {
-                method.show_popup("Enter Valid Email", sEmailTf);
+                method.show_popup("Enter Valid Email", sEmailTf, Side.RIGHT);
                 return;
             }
         }

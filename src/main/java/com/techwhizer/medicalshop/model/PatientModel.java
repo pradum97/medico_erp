@@ -21,13 +21,13 @@ public class PatientModel {
     private String cvs;
     private String cns;
     private String chest;
-    private String creationDate,lastDateUpdate, admissionNumber,uhidNum;
+    private String creationDate,lastDateUpdate, patientNumber,uhidNum;
 
     public PatientModel(int patientId, int salutation_id, int createdBy, int lastUpdateBy, String salutationName,String firstName, String middleName,
                         String lastName,String fullName, String gender, String age, String address, String dateOfBirth,
                         String phone, String idType, String idNumber, String guardianName,  String weight, String bp, String pulse,
                         String sugar, String spo2, String temp, String cvs, String cns, String chest, String creationDate,
-                        String lastDateUpdate,String admissionNumber,String uhidNum) {
+                        String lastDateUpdate,String patientNumber,String uhidNum) {
         this.patientId = patientId;
         this.salutation_id = salutation_id;
         this.createdBy = createdBy;
@@ -56,7 +56,7 @@ public class PatientModel {
         this.chest = chest;
         this.creationDate = creationDate;
         this.lastDateUpdate = lastDateUpdate;
-        this.admissionNumber = admissionNumber;
+        this.patientNumber = patientNumber;
         this.uhidNum = uhidNum;
     }
 
@@ -68,12 +68,12 @@ public class PatientModel {
         this.uhidNum = uhidNum;
     }
 
-    public String getAdmissionNumber() {
-        return admissionNumber;
+    public String getPatientNumber() {
+        return patientNumber;
     }
 
-    public void setAdmissionNumber(String admissionNumber) {
-        this.admissionNumber = admissionNumber;
+    public void setPatientNumber(String patientNumber) {
+        this.patientNumber = patientNumber;
     }
 
     public String getFullName() {

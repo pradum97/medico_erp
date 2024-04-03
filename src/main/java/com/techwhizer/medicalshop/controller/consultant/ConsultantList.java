@@ -1,5 +1,8 @@
 package com.techwhizer.medicalshop.controller.consultant;
 
+import com.techwhizer.medicalshop.CustomDialog;
+import com.techwhizer.medicalshop.ImageLoader;
+import com.techwhizer.medicalshop.Main;
 import com.techwhizer.medicalshop.controller.auth.Login;
 import com.techwhizer.medicalshop.method.GenerateInvoice;
 import com.techwhizer.medicalshop.method.Method;
@@ -14,9 +17,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.util.Callback;
 
@@ -27,6 +35,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class ConsultantList implements Initializable {
@@ -41,10 +50,12 @@ public class ConsultantList implements Initializable {
     public TableColumn<ConsultantModel, String> colConsultDoctorName;
     public TableColumn<ConsultantModel, String> colStatus;
     public TableColumn<ConsultantModel, String> colAction;
+    public TableColumn<ConsultantModel, String> colReceiptNum;
+    public TableColumn<ConsultantModel, String> colRemarks;
     public TableView<ConsultantModel> tableview;
 
     private ObservableList<ConsultantModel> consultList = FXCollections.observableArrayList();
-    private ObservableList<String> consultStatusList = FXCollections.observableArrayList("All","Pending","Done");
+    private ObservableList<String> consultStatusList = FXCollections.observableArrayList("All","Pending","Done","Cancelled");
     private FilteredList<ConsultantModel> filteredData;
     static private int rowsPerPage = 20;
 
@@ -206,7 +217,7 @@ public class ConsultantList implements Initializable {
                 String patient_name = rs.getString("patient_name");
 
 
-                String consult_date = rs.getString("consult_date");
+                String consult_date = rs.getString("consult_date_time");
                 String referred_by_name = rs.getString("referred_by_name");
                 String consult_name = rs.getString("consult_name");
                 String consultant_status = rs.getString("consultant_status");
@@ -219,8 +230,6 @@ public class ConsultantList implements Initializable {
                 String age = rs.getString("age");
                 String gender = rs.getString("gender");
                 String address = rs.getString("address");
-
-
 
                 ConsultantModel cm = new ConsultantModel(consultation_id, referred_by_doctor_id,patient_id, consultation_doctor_id, patient_name,
                         consult_date, referred_by_name, consult_name, consultant_status,receipt_num,receipt_type,remarks,description,guardian_name,gender,age,address);
@@ -287,6 +296,8 @@ public class ConsultantList implements Initializable {
         colConsultDate.setCellValueFactory(new PropertyValueFactory<>("consult_date"));
         colReferredBy.setCellValueFactory(new PropertyValueFactory<>("referred_by_name"));
         colConsultDoctorName.setCellValueFactory(new PropertyValueFactory<>("consult_name"));
+        colReceiptNum.setCellValueFactory(new PropertyValueFactory<>("receiptNum"));
+        colRemarks.setCellValueFactory(new PropertyValueFactory<>("remarks"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("consultant_status"));
 
         setOptionalCell();
@@ -315,25 +326,41 @@ public class ConsultantList implements Initializable {
 
                 } else {
 
-                    Hyperlink print = new Hyperlink("Print");
+                    String status = tableview.getItems().get(getIndex()).getConsultant_status();
+                    ComboBox<String> statusCom = new ComboBox<>(FXCollections.observableArrayList("Pending","Done","Cancelled"));
+                    statusCom.setMinHeight(24);
+                    statusCom.setPrefHeight(24);
+                    statusCom.setPrefWidth(110);
+                    statusCom.getSelectionModel().select(status);
 
-                    print.setStyle("-fx-background-color: transparent; -fx-text-fill: blue;" +
-                            "-fx-border-color: transparent;-fx-font-size: 12;-fx-alignment: center-left");
+                    switch (status){
+                        case "Pending"->statusCom.getStyleClass().add("consult_status_pending");
+                        case "Done"->statusCom.getStyleClass().add("consult_status_done");
+                        case "Cancelled"-> statusCom.getStyleClass().add("consult_status_cancel");
+                        }
 
-                    print.setMinWidth(90);
-
-                    print.setOnAction(actionEvent -> {
-                        tableview.getSelectionModel().select(getIndex());
+                    statusCom.getSelectionModel().selectedItemProperty().addListener((observableValue, oldStatus, newStatus) -> {
+                        new Method().selectTable(getIndex(),tableview);
                         ConsultantModel cm = tableview.getSelectionModel().getSelectedItem();
-
-                        Map<String,Object> map = new HashMap<>();
-                        map.put("patient_id",cm.getPatient_id());
-                        map.put("consult_id",cm.getConsultation_id());
-                        map.put("button",print);
-                       callThread("PRINT",map);
-
+                        updateConsultStatus(cm,oldStatus,newStatus,statusCom);
                     });
-                    HBox managebtn = new HBox(print);
+
+                    ImageView ivPresc = new ImageView(new ImageLoader().load("img/menu_icon/prescription_icon.png"));
+                    ivPresc.setFitHeight(25);
+                    ivPresc.setFitWidth(25);
+                    ivPresc.setStyle("-fx-cursor: hand ;");
+
+                    ivPresc.setOnMouseClicked(mouseEvent -> {
+                        new Method().selectTable(getIndex(),tableview);
+                        ConsultantModel cm = tableview.getSelectionModel().getSelectedItem();
+                        Main.primaryStage.setUserData(cm);
+                        new CustomDialog().showFxmlFullDialog("prescription/ePrescription.fxml","E-Prescription");
+                    });
+
+
+                    HBox managebtn = new HBox(statusCom,ivPresc);
+                    HBox.setMargin(statusCom, new Insets(4, 0, 0, 0));
+                    HBox.setMargin(ivPresc, new Insets(15, 0, 15, 10));
                     managebtn.setStyle("-fx-alignment: center-left");
                     setGraphic(managebtn);
                     setText(null);
@@ -343,5 +370,41 @@ public class ConsultantList implements Initializable {
         };
 
         colAction.setCellFactory(cellEdit);
+    }
+
+    private void updateConsultStatus(ConsultantModel cm, String oldStatus,
+                                     String newStatus, ComboBox<String> statusCom) {
+        Connection connection = null;
+        PreparedStatement ps = null;
+
+        try{
+            connection = new DBConnection().getConnection();
+
+            String qry = """
+                    UPDATE patient_consultation set consultant_status = ? where consultation_id = ?
+                    """;
+            ps = connection.prepareStatement(qry);
+
+            ps.setString(1,newStatus);
+            ps.setInt(2,cm.getConsultation_id());
+
+            int res = ps.executeUpdate();
+
+            if (res > 0){
+                cm.setConsultant_status(newStatus);
+            }else {
+                cm.setConsultant_status(oldStatus);
+            }
+
+            tableview.refresh();
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }finally {
+            DBConnection.closeConnection(connection,ps,null);
+        }
+
+
     }
 }

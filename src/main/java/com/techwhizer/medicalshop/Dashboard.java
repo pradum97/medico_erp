@@ -4,6 +4,7 @@ import com.techwhizer.medicalshop.controller.auth.Login;
 import com.techwhizer.medicalshop.method.GetUserProfile;
 import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.model.UserDetails;
+import com.techwhizer.medicalshop.util.CommonUtil;
 import com.techwhizer.medicalshop.util.DBConnection;
 import com.techwhizer.medicalshop.util.RoleKey;
 import javafx.event.ActionEvent;
@@ -34,23 +35,20 @@ public class Dashboard implements Initializable {
     public BorderPane main_container;
     public StackPane contentArea;
     public Label fullName;
+    @FXML
+    public Button hardRefreshBn;
     public ImageView userImage;
     public Label userRole;
     public Hyperlink homeBn;
     public Hyperlink myProductBn;
     public Hyperlink saleReportBn;
     public Hyperlink returnProductBn;
-    public Hyperlink invoiceBn;
     public Hyperlink stockH;
-    public Hyperlink returnHistoryBn;
-
     public Separator topLine;
     public Hyperlink patientView;
     public Label patientViewTop;
     public Label billingBnTop;
-    public Hyperlink consultBn;
     public Hyperlink consultListBn;
-    public Hyperlink prescriptionBn;
     private DBConnection dbConnection;
     private CustomDialog customDialog;
     private Main main;
@@ -65,8 +63,8 @@ public class Dashboard implements Initializable {
 
         hideElement(showIv,patientViewTop);
         hideMenu(null);
-        setToolTip(invoiceBn,patientView,consultBn,homeBn,myProductBn,
-                stockH,saleReportBn,returnProductBn,consultListBn,prescriptionBn);
+        setToolTip(patientView,homeBn,myProductBn,
+                stockH,saleReportBn,returnProductBn,consultListBn);
 
         main_container.getStylesheets().add(Objects.requireNonNull(getClass().getResource("css/setting.css")).toExternalForm());
         dbConnection = new DBConnection();
@@ -77,8 +75,6 @@ public class Dashboard implements Initializable {
 
         if (Objects.equals(Login.currentRoleName, RoleKey.STAFF)){
             myProductBnClick(null);
-        } else if (Login.currentRoleName.equalsIgnoreCase(RoleKey.DOCTOR)) {
-            prescriptionBnClick(null);
         } else {
             homeBnClick(null);
         }
@@ -112,12 +108,9 @@ public class Dashboard implements Initializable {
         myProductBn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         returnProductBn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         saleReportBn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        invoiceBn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         stockH.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         patientView.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        consultBn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         consultListBn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        prescriptionBn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         showIv.setVisible(true);
        hideElement(userImage,fullName,userRole, fullName,hideIv,topLine);
     }
@@ -134,12 +127,9 @@ public class Dashboard implements Initializable {
         myProductBn.setContentDisplay(ContentDisplay.LEFT);
         returnProductBn.setContentDisplay(ContentDisplay.LEFT);
         saleReportBn.setContentDisplay(ContentDisplay.LEFT);
-        invoiceBn.setContentDisplay(ContentDisplay.LEFT);
         stockH.setContentDisplay(ContentDisplay.LEFT);
         patientView.setContentDisplay(ContentDisplay.LEFT);
-        consultBn.setContentDisplay(ContentDisplay.LEFT);
         consultListBn.setContentDisplay(ContentDisplay.LEFT);
-        prescriptionBn.setContentDisplay(ContentDisplay.LEFT);
 
         userImage.setVisible(true);
         fullName.setVisible(true);
@@ -147,7 +137,6 @@ public class Dashboard implements Initializable {
         topLine.setVisible(true);
 
         hideIv.setVisible(true);
-       // menuContainer.setStyle("-fx-padding: 0 10 0 10");
         hideElement(showIv);
     }
     private void setting() {
@@ -156,17 +145,10 @@ public class Dashboard implements Initializable {
         setVisible(saleReportBn, Objects.equals(Login.currentRoleName, RoleKey.ADMIN));
         setVisible(returnProductBn, (Objects.equals(Login.currentRoleName, RoleKey.ADMIN) ||
                 Objects.equals(Login.currentRoleName, RoleKey.STAFF)));
-        setVisible(invoiceBn, Objects.equals(Login.currentRoleName, RoleKey.ADMIN) ||
-                Objects.equals(Login.currentRoleName, RoleKey.STAFF));
 
         // top
         setVisible(billingBnTop, Objects.equals(Login.currentRoleName, RoleKey.ADMIN) ||
                 Objects.equals(Login.currentRoleName, RoleKey.STAFF));
-
-        setVisible(invoiceBn, Objects.equals(Login.currentRoleName, RoleKey.ADMIN) ||
-                Objects.equals(Login.currentRoleName, RoleKey.STAFF));
-        setVisible(prescriptionBn, Objects.equals(Login.currentRoleName, RoleKey.DOCTOR));
-
     }
 
     private void setVisible(Node node, boolean isVisible) {
@@ -195,6 +177,8 @@ public class Dashboard implements Initializable {
         MenuItem users = new MenuItem("USERS");
         MenuItem doctor = new MenuItem("DOCTOR");
         MenuItem returnHistory = new MenuItem("RETURN HISTORY");
+        MenuItem purchaseHistory = new MenuItem("PURCHASE HISTORY");
+        MenuItem dues = new MenuItem("DUES");
         MenuItem backup = new MenuItem("BACKUP");
         MenuItem logout = new MenuItem("LOGOUT");
 
@@ -215,10 +199,11 @@ public class Dashboard implements Initializable {
 
         users.setVisible(Objects.equals(Login.currentRoleName, RoleKey.ADMIN));
 
-        settingMenuButton.getItems().addAll(product, prescription, profile, users, shopData, doctor, returnHistory, dealer, backup, logout);
+        settingMenuButton.getItems().addAll(product, prescription, profile, users, shopData, doctor,
+                returnHistory,purchaseHistory, dues,dealer, backup, logout);
 
         onClickAction(gst, shopData, profile, users, dealer, backup, company, discount,
-                manufacture, mr, doctor, returnHistory, frequency, timing, logout);
+                manufacture, mr, doctor, returnHistory,purchaseHistory,dues, frequency, timing, logout);
 
     }
 
@@ -226,7 +211,7 @@ public class Dashboard implements Initializable {
                                MenuItem profile, MenuItem users, MenuItem dealer ,
                                MenuItem backup, MenuItem company, MenuItem discount,
                                MenuItem manufacture, MenuItem mr, MenuItem doctor,
-                               MenuItem returnHistory, MenuItem frequency,
+                               MenuItem returnHistory,MenuItem purchaseHistory ,MenuItem dues, MenuItem frequency,
                                MenuItem timing, MenuItem logout) {
 
         gst.setOnAction(event -> {
@@ -241,6 +226,13 @@ public class Dashboard implements Initializable {
         timing.setOnAction(event -> customDialog.showFxmlDialog2("prescription/medicineTime.fxml", ""));
 
         returnHistory.setOnAction(event -> customDialog.showFxmlFullDialog("dashboard/returnHistory.fxml", "RETURN HISTORY"));
+        purchaseHistory.setOnAction(event ->
+                customDialog.showFxmlFullDialog("product/purchase/purchaseHistoryMain.fxml", "PURCHASE HISTORY"));
+
+        dues.setOnAction(event ->
+                customDialog.showFxmlFullDialog("dues/duesMain.fxml", "DUES"));
+
+
         doctor.setOnAction(event -> customDialog.showFxmlFullDialog("doctor/view_doctor.fxml", "DOCTORS"));
 
 
@@ -295,13 +287,9 @@ public class Dashboard implements Initializable {
 
 
     private void replaceScene(String fxml_file_name) {
-        try {
-            Parent parent = FXMLLoader.load(getClass().getResource(fxml_file_name));
-            contentArea.getChildren().removeAll();
-            contentArea.getChildren().setAll(parent);
-        } catch (IOException e) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, e);
-        }
+        Parent parent =FileLoader.loadFxmlFile(fxml_file_name);
+        contentArea.getChildren().removeAll();
+        contentArea.getChildren().setAll(parent);
     }
 
     public void logout() {
@@ -330,21 +318,21 @@ public class Dashboard implements Initializable {
 
     public void homeBnClick(ActionEvent actionEvent) {
         selectedBg(homeBn);
-        unselectedBg(patientView,consultBn,consultListBn,myProductBn,stockH,
-                        saleReportBn,returnProductBn,invoiceBn,prescriptionBn);
+        unselectedBg(patientView,consultListBn,myProductBn,stockH,
+                        saleReportBn,returnProductBn);
         replaceScene("dashboard/home.fxml");
     }
 
     public void myProductBnClick(ActionEvent actionEvent) {
         selectedBg(myProductBn);
-        unselectedBg(patientView,consultBn,consultListBn,homeBn,stockH,
-                saleReportBn,returnProductBn,invoiceBn,prescriptionBn);
+        unselectedBg(patientView,consultListBn,homeBn,stockH,
+                saleReportBn,returnProductBn);
         replaceScene("dashboard/itemMaster.fxml");
     }
     public void stockReport(ActionEvent event) {
         selectedBg( stockH);
-        unselectedBg(patientView,consultBn,consultListBn,homeBn,myProductBn,
-                saleReportBn,returnProductBn,invoiceBn,prescriptionBn);
+        unselectedBg(patientView,consultListBn,homeBn,myProductBn,
+                saleReportBn,returnProductBn);
         replaceScene("dashboard/stockReport.fxml");
     }
 
@@ -356,24 +344,18 @@ public class Dashboard implements Initializable {
 
     public void saleReportBnClick(ActionEvent actionEvent) {
         selectedBg(  saleReportBn);
-        unselectedBg(patientView,consultBn,consultListBn,homeBn,myProductBn,
-                stockH,returnProductBn,invoiceBn,prescriptionBn);
-        replaceScene("dashboard/billingReport.fxml");
+        unselectedBg(patientView,consultListBn,homeBn,myProductBn,
+                stockH,returnProductBn);
+        replaceScene("reports/reports.fxml");
     }
 
     public void returnProductBnClick(ActionEvent actionEvent) {
         selectedBg(returnProductBn  );
-        unselectedBg(patientView,consultBn,consultListBn,homeBn,myProductBn,
-                stockH,saleReportBn,invoiceBn,prescriptionBn);
+        unselectedBg(patientView,consultListBn,homeBn,myProductBn,
+                stockH,saleReportBn);
         replaceScene("dashboard/returnMedicine.fxml");
     }
 
-    public void invoiceBnClick(ActionEvent actionEvent) {
-        selectedBg(  invoiceBn);
-        unselectedBg(patientView,consultBn,consultListBn,homeBn,myProductBn,
-                stockH,saleReportBn,returnProductBn,prescriptionBn);
-        replaceScene("dashboard/invoiceReport.fxml");
-    }
 
     public void patientMain(MouseEvent mouseEvent) {
 
@@ -382,34 +364,21 @@ public class Dashboard implements Initializable {
 
     public void patientViewClick(ActionEvent actionEvent) {
         selectedBg(   patientView);
-        unselectedBg(invoiceBn,consultBn,consultListBn,homeBn,myProductBn,
-                stockH,saleReportBn,returnProductBn,prescriptionBn);
+        unselectedBg(consultListBn,homeBn,myProductBn,
+                stockH,saleReportBn,returnProductBn);
         patientView.setFocusTraversable(true);
         replaceScene("patient/patientMain.fxml");
     }
 
-    public void consultBnClick(ActionEvent actionEvent) {
-        selectedBg(consultBn );
-        unselectedBg(invoiceBn,patientView,consultListBn,homeBn,myProductBn,
-                stockH,saleReportBn,returnProductBn,prescriptionBn);
-        replaceScene("consultant/consultant_form.fxml");
-    }
 
     public void consultListBnClick(ActionEvent actionEvent) {
         selectedBg( consultListBn);
-        unselectedBg(invoiceBn,patientView,consultBn,homeBn,myProductBn,
-                stockH,saleReportBn,returnProductBn,prescriptionBn);
+        unselectedBg(patientView,homeBn,myProductBn,
+                stockH,saleReportBn,returnProductBn);
         replaceScene("consultant/consultant_list.fxml");
 
     }
 
-    public void prescriptionBnClick(ActionEvent actionEvent) {
-
-        selectedBg(prescriptionBn);
-        unselectedBg(invoiceBn,patientView,consultBn,homeBn,myProductBn,
-                stockH,saleReportBn,returnProductBn,consultListBn);
-        replaceScene("prescription/prescriptionMaster.fxml");
-    }
 
     private void setToolTip(Hyperlink... hyperlinks){
 
@@ -419,5 +388,9 @@ public class Dashboard implements Initializable {
 
         }
 
+    }
+
+    public void hardRefreshBnClick(ActionEvent mouseEvent) {
+        new CommonUtil.HardRefresh(hardRefreshBn,true).execute();
     }
 }

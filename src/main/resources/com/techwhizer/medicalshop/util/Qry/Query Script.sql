@@ -166,6 +166,8 @@ CREATE TABLE TBL_ITEMS_MASTER
     COMPOSITION  VARCHAR(300) NOT NULL,
     DOSE         VARCHAR(200) NOT NULL,
     TAG          VARCHAR(300) NOT NULL,
+    is_stockable boolean,
+    department_code VARCHAR(50),
     foreign key (GST_ID) REFERENCES tbl_product_tax (TAX_ID),
     foreign key (CREATED_BY) REFERENCES tbl_users (user_id),
     foreign key (MFR_ID) REFERENCES tbl_manufacturer_list (MFR_ID),
@@ -175,13 +177,15 @@ CREATE TABLE TBL_ITEMS_MASTER
 CREATE TABLE TBL_PURCHASE_MAIN
 (
     PURCHASE_MAIN_ID SERIAL PRIMARY KEY,
-    DEALER_ID        INT         NOT NULL,
+    DEALER_ID        INT         ,
     BILL_NUM         VARCHAR(50) NOT NULL,
     DEALER_BILL_NUM  VARCHAR(50),
     BILL_DATE        VARCHAR(15) NOT NULL,
     CREATED_DATE     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     IS_ACTIVE        INT       DEFAULT 1,
-    FOREIGN KEY (DEALER_ID) REFERENCES tbl_dealer (DEALER_ID)
+    created_by int,
+    updated_by int,
+    updated_date timestamp
 );
 
 CREATE TABLE TBL_PURCHASE_ITEMS
@@ -189,14 +193,17 @@ CREATE TABLE TBL_PURCHASE_ITEMS
     PURCHASE_ITEMS_ID SERIAL PRIMARY KEY,
     PURCHASE_MAIN_ID  INT          NOT NULL,
     ITEM_ID           INT          NOT NULL,
-    BATCH             VARCHAR(100) NOT NULL,
-    EXPIRY_DATE       VARCHAR(50)  NOT NULL,
+    BATCH             VARCHAR(100) ,
+    EXPIRY_DATE       VARCHAR(50) ,
     LOT_NUMBER        VARCHAR(50),
     PURCHASE_RATE     NUMERIC,
     MRP               NUMERIC,
     SALE_PRICE        NUMERIC,
     QUANTITY          NUMERIC      NOT NULL,
     QUANTITY_UNIT     VARCHAR(20)  NOT NULL,
+    created_by int,
+    updated_by int,
+    updated_date timestamp,
     FOREIGN KEY (PURCHASE_MAIN_ID) REFERENCES TBL_PURCHASE_MAIN (PURCHASE_MAIN_ID),
     FOREIGN KEY (ITEM_ID) REFERENCES TBL_ITEMS_MASTER (ITEM_ID)
 );
@@ -210,6 +217,10 @@ CREATE TABLE TBL_STOCK
     QUANTITY          NUMERIC     NOT NULL,
     QUANTITY_UNIT     VARCHAR(20) NOT NULL,
     UPDATE_DATE       VARCHAR(20) NOT NULL,
+    created_date timestamp default current_timestamp,
+    created_by int,
+    updated_by int,
+    updated_date timestamp,
     FOREIGN KEY (ITEM_ID) REFERENCES TBL_ITEMS_MASTER (ITEM_ID),
     FOREIGN KEY (PURCHASE_MAIN_ID) REFERENCES TBL_PURCHASE_MAIN (PURCHASE_MAIN_ID),
     FOREIGN KEY (PURCHASE_ITEMS_ID) REFERENCES TBL_PURCHASE_ITEMS (PURCHASE_ITEMS_ID)
@@ -251,56 +262,58 @@ CREATE TABLE TBL_CART
     MRP          NUMERIC               NOT NULL,
     STRIP        INT,
     PCS          INT,
-
+    created_by int not null,
     CREATED_DATE TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE TBL_SALE_MAIN
 (
-    SALE_MAIN_ID        SERIAL PRIMARY KEY                  NOT NULL,
-    PATIENT_ID          INTEGER                             NOT NULL,
-    DOCTOR_ID           INT,
-    SELLER_ID           INTEGER                             NOT NULL,
+    SALE_MAIN_ID                   SERIAL PRIMARY KEY                  NOT NULL,
+    PATIENT_ID                     INTEGER                             NOT NULL,
+    REFERRED_BY                      INT,
+    SELLER_ID                      INTEGER                             NOT NULL,
     ADDITIONAL_DISCOUNT_AMOUNT     NUMERIC,
     ADDITIONAL_DISCOUNT_PERCENTAGE NUMERIC,
     TOTAL_DISCOUNT_AMOUNT          NUMERIC,
-    PAYMENT_MODE        VARCHAR                             NOT NULL,
-    TOT_TAX_AMOUNT      NUMERIC,
-    NET_AMOUNT          NUMERIC                             NOT NULL,
-    INVOICE_NUMBER      VARCHAR(100)                        NOT NULL,
-    BILL_TYPE           VARCHAR(100)                        NOT NULL,
-    sale_date           timestamp default CURRENT_TIMESTAMP NOT NULL,
+    PAYMENT_MODE                   VARCHAR                             NOT NULL,
+    TOT_TAX_AMOUNT                 NUMERIC,
+    NET_AMOUNT                     NUMERIC                             NOT NULL,
+    INVOICE_NUMBER                 VARCHAR(100)                        NOT NULL,
+    BILL_TYPE                      VARCHAR(100)                        NOT NULL,
+    sale_date                      timestamp default CURRENT_TIMESTAMP NOT NULL,
+    RECEIVED_AMOUNT                NUMERIC,
+    consultation_doctor_id int ,
     FOREIGN KEY (SELLER_ID)
         REFERENCES tbl_users (user_id)
 );
 
 CREATE TABLE TBL_SALE_ITEMS
 (
-    SALE_ITEM_ID  BIGSERIAL PRIMARY KEY               NOT NULL,
-    SALE_MAIN_ID  INTEGER                             NOT NULL,
-    ITEM_ID       INTEGER                             NOT NULL,
-    ITEM_NAME     VARCHAR(200)                        NOT NULL,
-
-    PACK          VARCHAR(200),
-    MFR_ID        INT,
-    BATCH         VARCHAR(200),
-    EXPIRY_DATE   VARCHAR(50),
-
-    PURCHASE_RATE NUMERIC                             NOT NULL,
-    MRP           NUMERIC   DEFAULT 0                 NOT NULL,
-    SALE_RATE     NUMERIC                             NOT NULL,
-    STRIP         INT       default 0,
-    PCS           INT       default 0,
-    DISCOUNT      numeric,
-    HSN_SAC       NUMERIC,
-    igst          NUMERIC,
-    sgst          NUMERIC,
-    cgst          NUMERIC,
-    STRIP_TAB     INT,
-    NET_AMOUNT    NUMERIC                             NOT NULL,
-    TAX_AMOUNT    NUMERIC,
-    sale_date     timestamp default CURRENT_TIMESTAMP NOT NULL,
-    stock_id      integer                             not null,
+    SALE_ITEM_ID                   BIGSERIAL PRIMARY KEY               NOT NULL,
+    SALE_MAIN_ID                   INTEGER                             NOT NULL,
+    ITEM_ID                        INTEGER                             NOT NULL,
+    ITEM_NAME                      VARCHAR(200)                        NOT NULL,
+    PACK                           VARCHAR(200),
+    MFR_ID                         INT,
+    BATCH                          VARCHAR(200),
+    EXPIRY_DATE                    VARCHAR(50),
+    PURCHASE_RATE                  NUMERIC                             NOT NULL,
+    MRP                            NUMERIC   DEFAULT 0                 NOT NULL,
+    SALE_RATE                      NUMERIC                             NOT NULL,
+    STRIP                          INT       default 0,
+    PCS                            INT       default 0,
+    DISCOUNT                       numeric,
+    HSN_SAC                        NUMERIC,
+    igst                           NUMERIC,
+    sgst                           NUMERIC,
+    cgst                           NUMERIC,
+    STRIP_TAB                      INT,
+    NET_AMOUNT                     NUMERIC                             NOT NULL,
+    TAX_AMOUNT                     NUMERIC,
+    sale_date                      timestamp default CURRENT_TIMESTAMP NOT NULL,
+    stock_id                       integer                             not null,
+    is_stockable boolean,
+    ADDITIONAL_DISCOUNT_PERCENTAGE numeric DEFAULT 0,
 
     FOREIGN KEY (SALE_MAIN_ID)
         REFERENCES TBL_SALE_MAIN (SALE_MAIN_ID),
@@ -340,21 +353,22 @@ CREATE TABLE TBL_RETURN_MAIN
     RETURN_BY_ID   INT          NOT NULL,
     REFUND_AMOUNT  NUMERIC      NOT NULL,
     REMARK         VARCHAR(500) NULL,
+    sale_main_id int,
     FOREIGN KEY (RETURN_BY_ID) REFERENCES tbl_users (user_id),
     RETURN_DATE    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE TBL_RETURN_ITEMS
 (
-    RETURNS_ID     SERIAL PRIMARY KEY,
-    STOCK_ID       INT NOT NULL,
-    SALE_ITEM_ID   INT NOT NULL,
-    QUANTITY       BIGINT,
-    QUANTITY_UNIT  VARCHAR(20),
-    RETURN_MAIN_ID INT NOT NULL,
+    RETURNS_ID      SERIAL PRIMARY KEY,
+    STOCK_ID        INT NOT NULL,
+    SALE_ITEM_ID    INT NOT NULL,
+    QUANTITY        BIGINT,
+    QUANTITY_UNIT   VARCHAR(20),
+    RETURN_MAIN_ID  INT NOT NULL,
     DISCOUNT_AMOUNT numeric,
-    AMOUNT numeric,
-    NET_AMOUNT numeric
+    AMOUNT          numeric,
+    NET_AMOUNT      numeric
 );
 
 CREATE TABLE tbl_frequency
@@ -387,8 +401,8 @@ CREATE TABLE TBL_PATIENT
     SALUTATION_ID    INT,
     FIRST_NAME       VARCHAR(100)       NOT NULL,
     PATIENT_CATEGORY VARCHAR(200) DEFAULT 'GENERAL/CASH',
-    UHID_NO VARCHAR(200),
-    admission_number varchar(50),
+    UHID_NO          VARCHAR(200),
+    patient_number varchar(50),
     MIDDLE_NAME      VARCHAR(100),
     LAST_NAME        VARCHAR(100),
     GENDER           VARCHAR(10),
@@ -410,7 +424,7 @@ CREATE TABLE TBL_PATIENT
     created_by       int,
     last_update      timestamp,
     last_update_by   int,
-    CREATION_DATE    timestamp default CURRENT_TIMESTAMP
+    CREATION_DATE    timestamp    default CURRENT_TIMESTAMP
 );
 
 
@@ -424,11 +438,12 @@ CREATE TABLE patient_consultation
     patient_id             INT,
     referred_by_doctor_id  INT,
     referred_by_name       varchar(300),
-    description varchar(1000),
+    description            varchar(1000),
     consultation_doctor_id INT,
-    receipt_num varchar(100),
-    receipt_type varchar(100),
+    receipt_num            varchar(100),
+    receipt_type           varchar(100),
     remarks                varchar(500),
+    sale_main_id int ,
     consultant_status      VARCHAR(100) DEFAULT 'Pending',
     consultation_date      timestamp    DEFAULT CURRENT_TIMESTAMP,
     CREATED_BY             INT,
@@ -436,38 +451,6 @@ CREATE TABLE patient_consultation
     UPDATE_BY              INT,
     LAST_UPDATE_DATE       timestamp    default CURRENT_TIMESTAMP
 );
-
-CREATE  TABLE PRESCRIBE_MEDICINE_MASTER(
-  PRESCRIBE_MASTER_MEDICINE_ID   SERIAL PRIMARY KEY,
-  consultation_id         int,
-  PATIENT_ID INT,
-  INVOICE_NUM VARCHAR(30),
-  CREATED_BY INT,
-  CREATION_DATE TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)
-;
-
-CREATE  TABLE PRESCRIBE_MEDICINE_ITEMS
-(
-    PRESCRIBE_ITEMS_MEDICINE_ID   SERIAL PRIMARY KEY,
-    ITEM_NAME               VARCHAR(400),
-    ITEM_ID                 INT,
-    PRESCRIBE_MASTER_MEDICINE_ID INT ,
-    IS_ITEM_EXISTS_IN_STOCK bool,
-    COMPOSITION             VARCHAR(300),
-    TAG                     VARCHAR(200),
-    REMARK                  VARCHAR(1000),
-    QUANTITY                VARCHAR(100),
-    TIME                    VARCHAR(500),
-    DOSE                    VARCHAR(200),
-    FREQUENCY               VARCHAR(400),
-    DURATION                VARCHAR(100),
-    STATUS                  VARCHAR(50) DEFAULT 1,
-    CREATION_DATE           TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
-);
-
-
-
 
 CREATE TABLE payment_information
 (
@@ -486,42 +469,188 @@ CREATE TABLE payment_information
     CREATION_DATE   TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE consultation_setup(
-    consultation_setup_ID SERIAL PRIMARY KEY ,
-    consultation_fee numeric not null ,
-    fee_valid_days int not null,
-    CREATED_BY INT NOT NULL ,
-    CREATION_DATE TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE consultation_setup
+(
+    consultation_setup_ID SERIAL PRIMARY KEY,
+    consultation_fee      numeric not null,
+    fee_valid_days        int     not null,
+    CREATED_BY            INT     NOT NULL,
+    CREATION_DATE         TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 insert into consultation_setup(consultation_fee, fee_valid_days, CREATED_BY)
-VALUES(400,25,1);
+VALUES (400, 25, 1);
 
 ALTER TABLE TBL_SALE_MAIN
     ADD COLUMN PAYMENT_REFERENCE_NUM VARCHAR(300),
-    ADD COLUMN REMARKS VARCHAR(500),
-    ADD COLUMN CREATED_BY INT;
--------------------09-Jan-2024---------------------
-
---drop patient_age_column
---alter view and create patient view
--- create function
-
-ALTER TABLE tbl_sale_main
-    RENAME COLUMN additional_discount TO ADDITIONAL_DISCOUNT_AMOUNT;
-
-ALTER TABLE tbl_sale_main
-    ADD COLUMN ADDITIONAL_DISCOUNT_PERCENTAGE NUMERIC;
-
-ALTER TABLE tbl_sale_main
-    ADD COLUMN TOTAL_DISCOUNT_AMOUNT NUMERIC;
-
-ALTER TABLE TBL_RETURN_ITEMS ADD DISCOUNT_AMOUNT numeric;
-ALTER TABLE TBL_RETURN_ITEMS ADD AMOUNT numeric;
-ALTER TABLE TBL_RETURN_ITEMS ADD NET_AMOUNT numeric;
+    ADD COLUMN REMARKS               VARCHAR(500),
+    ADD COLUMN CREATED_BY            INT;
 
 
--- remove duplicate dealer [JYOTI MEDICAL AGENCY]
+CREATE  TABLE TBL_DUES(
+    DUES_ID SERIAL PRIMARY KEY ,
+    SOURCE_ID INT,
+    DUES_TYPE VARCHAR(200),
+    DUES_AMOUNT NUMERIC,
+    CREATED_BY INT,
+    CREATED_DATE timestamp DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE TBL_DEPARTMENTS(
+    DEPARTMENT_ID SERIAL PRIMARY KEY ,
+    DEPARTMENT_NAME VARCHAR(300),
+    DEPARTMENT_CODE VARCHAR(50),
+    STATUS BOOLEAN DEFAULT TRUE,
+    CREATED_BY INT,
+    CREATED_DATE timestamp DEFAULT CURRENT_TIMESTAMP
+);
+
+----- From 20-03-2024---------
+
+CREATE  TABLE TBL_PRESCRIPTION_MASTER
+(
+    PRESCRIPTION_MASTER_ID SERIAL PRIMARY KEY,
+    CONSULTATION_ID              int,
+    PATIENT_ID                   INT,
+    PRESCRIPTION_NUM             VARCHAR(30),
+    IS_FINAL BOOLEAN,
+    CREATED_BY             INT,
+    REMARKS TEXT NULL,
+    STATUS INT DEFAULT 1,
+    CREATION_DATE          timestamp    default CURRENT_TIMESTAMP,
+    UPDATE_BY              INT,
+    LAST_UPDATE_DATE       timestamp
+);
+
+CREATE TABLE TBL_PRESCRIPTION_MEDICATIONS
+(
+    MEDICATION_ID  SERIAL PRIMARY KEY,
+    ITEM_NAME                    VARCHAR(400),
+    ITEM_ID                      INT REFERENCES TBL_ITEMS_MASTER(ITEM_ID),
+    PRESCRIPTION_MASTER_ID INT REFERENCES TBL_PRESCRIPTION_MASTER(PRESCRIPTION_MASTER_ID),
+    IS_ITEM_EXISTS_IN_STOCK      bool,
+    COMPOSITION                  VARCHAR(300),
+    TAG                          VARCHAR(200),
+    REMARK                       VARCHAR(1000),
+    QUANTITY                     VARCHAR(100),
+    TIME                         VARCHAR(500),
+    DOSE                         VARCHAR(200),
+    FREQUENCY                    VARCHAR(400),
+    DURATION                     VARCHAR(100),
+    CREATED_BY             INT,
+    STATUS INT DEFAULT 1,
+    CREATION_DATE          timestamp    default CURRENT_TIMESTAMP,
+    UPDATE_BY              INT,
+    LAST_UPDATE_DATE       timestamp
+);
+
+CREATE TABLE TBL_PRESCRIPTION_INVESTIGATION(
+    INVESTIGATION_ID SERIAL PRIMARY KEY ,
+    ITEM_ID INT REFERENCES TBL_ITEMS_MASTER(ITEM_ID),
+    PRESCRIPTION_MASTER_ID INT REFERENCES TBL_PRESCRIPTION_MASTER(PRESCRIPTION_MASTER_ID),
+    PRESCRIBED_DATE TIMESTAMP,
+    RESULT_DATE TIMESTAMP,
+    RESULT_VALUE TEXT,
+    CREATED_BY             INT,
+    STATUS INT DEFAULT 1,
+    CREATION_DATE          timestamp    default CURRENT_TIMESTAMP,
+    UPDATE_BY              INT,
+    LAST_UPDATE_DATE       timestamp
+);
+
+
+
+CREATE TABLE tbl_building
+(
+    building_id   SERIAL PRIMARY KEY,
+    building_name VARCHAR(100) UNIQUE NOT NULL,
+    address varchar(500),
+    status int default 1,
+    created_by int REFERENCES tbl_users(user_id),
+    created_date timestamp default current_timestamp,
+    last_updated_by int REFERENCES tbl_users(user_id),
+    last_updated_date timestamp
+);
+
+CREATE TABLE tbl_floor
+(
+    floor_id     SERIAL PRIMARY KEY,
+    floor_number INT NOT NULL,
+    floor_name varchar(200) NOT NULL,
+    building_id  INT REFERENCES tbl_building (building_id),
+    status int default 1,
+    created_by int REFERENCES tbl_users(user_id),
+    created_date timestamp default current_timestamp,
+    last_updated_by int REFERENCES tbl_users(user_id),
+    last_updated_date timestamp,
+    UNIQUE (floor_number, building_id,floor_name)
+);
+
+CREATE TABLE tbl_ward_facility(
+    ward_facility_id serial primary key ,
+    facility_code varchar(50) NOT NULL,
+    facility_name varchar(200) NOT NULL,
+    status int default 1,
+    created_by int REFERENCES tbl_users(user_id),
+    created_date timestamp default current_timestamp,
+    last_updated_by int REFERENCES tbl_users(user_id),
+    last_updated_date timestamp
+);
+
+CREATE TABLE tbl_wards
+(
+    ward_id   SERIAL PRIMARY KEY,
+    floor_id  INT REFERENCES tbl_floor (floor_id),
+    ward_name VARCHAR(100) NOT NULL,
+    ward_facility_id int REFERENCES tbl_ward_facility(ward_facility_id) ,
+    number_of_beds  INT,
+    status VARCHAR(100) DEFAULT 'Available',
+    is_active int default 1,
+    created_by int REFERENCES tbl_users(user_id),
+    created_date timestamp default current_timestamp,
+    last_updated_by int REFERENCES tbl_users(user_id),
+    last_updated_date timestamp
+);
+
+CREATE TABLE tbl_beds(
+    bed_id SERIAL PRIMARY KEY ,
+    ward_id int NOT NULL,
+    bed_number varchar(60) NOT NULL,
+    bed_name varchar(100) NOT NULL,
+    bed_type varchar(70)NOT NULL,
+    bed_status varchar(50) default 'Available',
+    bed_for varchar(50) default 'Patient',
+    is_active int default 1,
+    created_by int REFERENCES tbl_users(user_id),
+    created_date timestamp default current_timestamp,
+    last_updated_by int REFERENCES tbl_users(user_id),
+    last_updated_date timestamp
+);
+
+CREATE TABLE tbl_bed_history(
+    bed_history_id    SERIAL PRIMARY KEY,
+    bed_id            INT REFERENCES tbl_beds (bed_id),
+    old_ward_id       INT NOT NULL ,
+    old_bed_id        INT NOT NULL,
+    new_ward_id       INT NOT NULL,
+    new_bed_id        INT NOT NULL,
+    reason            TEXT,
+    transferred_by    INT REFERENCES tbl_users(user_id),
+    transfer_date     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_updated_by   int REFERENCES tbl_users(user_id),
+    last_updated_date timestamp
+);
+
+
+-- Bed Type 'General', 'ICU', 'Maternity', 'Pediatric', 'Surgical', 'Other'
+
+
+
+
+
+
+
+
 
 
 

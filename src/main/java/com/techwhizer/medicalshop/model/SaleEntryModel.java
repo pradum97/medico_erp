@@ -22,11 +22,15 @@ public class SaleEntryModel {
     private double gstAmount,purchaseRate,mrp;
     private String batch;
     private int mfrId;
-    private double amtAsPerMrp;
+    private double amtAsPerMrp,totalRequestQuantity;
+    private boolean isStockable;
+    private int departmentId;
+    private String departmentName,departmentCode;
 
     public SaleEntryModel(int itemId,int cartId, int stockId,String productName, double saleRate, String pack, int strip, int pcs, String expiryDate, int discountId, double discount, int gstId,
                           double totalGst, double amount, long hsn, int iGst, int cGst, int sGst, double gstAmount,
-                          double purchaseRate,double mrp,String batch , int mfrId,double amtAsPerMrp) {
+                          double purchaseRate,double mrp,String batch , int mfrId,double amtAsPerMrp,double totalRequestQuantity,boolean isStockable,
+                          int departmentId,String departmentName,String departmentCode) {
         this.itemId = itemId;
         this.cartId = cartId;
         this.stockId = stockId;
@@ -51,7 +55,51 @@ public class SaleEntryModel {
         this.batch = batch;
         this.mfrId = mfrId;
         this.amtAsPerMrp = amtAsPerMrp;
+        this.totalRequestQuantity = totalRequestQuantity;
+        this.isStockable = isStockable;
+        this.departmentId = departmentId;
+        this.departmentName = departmentName;
+        this.departmentCode = departmentCode;
+    }
 
+    public String getDepartmentCode() {
+        return departmentCode;
+    }
+
+    public void setDepartmentCode(String departmentCode) {
+        this.departmentCode = departmentCode;
+    }
+
+    public int getDepartmentId() {
+        return departmentId;
+    }
+
+    public void setDepartmentId(int departmentId) {
+        this.departmentId = departmentId;
+    }
+
+    public String getDepartmentName() {
+        return departmentName;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
+    }
+
+    public boolean isStockable() {
+        return isStockable;
+    }
+
+    public void setStockable(boolean stockable) {
+        isStockable = stockable;
+    }
+
+    public double getTotalRequestQuantity() {
+        return totalRequestQuantity;
+    }
+
+    public void setTotalRequestQuantity(double totalRequestQuantity) {
+        this.totalRequestQuantity = totalRequestQuantity;
     }
 
     public int getStockId() {
@@ -248,4 +296,6 @@ public class SaleEntryModel {
     public void setAmount(double amount) {
         this.amount = amount;
     }
+
+
 }

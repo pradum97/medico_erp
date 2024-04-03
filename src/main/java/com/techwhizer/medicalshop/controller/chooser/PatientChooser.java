@@ -152,13 +152,13 @@ public class PatientChooser implements Initializable {
                 String chest = rs.getString("chest");
                 String creationDate = rs.getString("creation_date");
                 String lastUpdate = rs.getString("last_update");
-                String admission_number = rs.getString("admission_number");
+                String patient_number = rs.getString("patient_number");
                 String uhidNum = rs.getString("uhid_no");
 
 
                 PatientModel pm = new PatientModel(patient_id, salutation_id, created_by, last_update_by, salutation_name, first_name,
                         middle_name, last_name, fullName, gender, age, address, dob, phone, idType, idNum, guardianName, weight, bp, pulse,
-                        sugar, spo2, temp, cvs, cns, chest, creationDate, lastUpdate,admission_number,uhidNum);
+                        sugar, spo2, temp, cvs, cns, chest, creationDate, lastUpdate,patient_number,uhidNum);
                 list.add(pm);
                 count++;
 

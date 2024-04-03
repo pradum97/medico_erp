@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 public class MfrChooser implements Initializable {
-    private int rowsPerPage = 20;
+    private int rowsPerPage = 100;
     public TextField searchTf;
     public TableColumn<ManufacturerModal, Integer> colSrNo;
     public TableColumn<ManufacturerModal, String> colName;
@@ -42,7 +42,6 @@ public class MfrChooser implements Initializable {
     public Pagination pagination;
     private Method method;
     private CustomDialog customDialog;
-    private DBConnection dbConnection;
     private ObservableList<ManufacturerModal> list = FXCollections.observableArrayList();
     private FilteredList<ManufacturerModal> filteredData;
 
@@ -50,8 +49,7 @@ public class MfrChooser implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         method = new Method();
         customDialog = new CustomDialog();
-        dbConnection = new DBConnection();
-        tableView.setFixedCellSize(17);
+        tableView.setFixedCellSize(27);
 
         callThread();
     }
@@ -74,16 +72,15 @@ public class MfrChooser implements Initializable {
 
         @Override
         public Boolean doInBackground(String... params) {
-            /* Background Thread is running */
 
-            Map<String, Object> status = getItems();
-            msg = (String) status.get("message");
-            return (boolean) status.get("is_success");
+            getItems();
+
+            return true;
         }
 
         @Override
         public void onPostExecute(Boolean success) {
-            tableView.setPlaceholder(new Label(msg));
+            tableView.setPlaceholder(new Label("Something went wrong."));
         }
         @Override
         public void progressCallback(Integer... params) {
@@ -91,57 +88,37 @@ public class MfrChooser implements Initializable {
         }
     }
 
-    private Map<String, Object> getItems() {
-
-        if (null != list) {
-            list.clear();
-        }
-        Map<String, Object> map = new HashMap<>();
-
+    private void getItems() {
+        list.clear();
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
-            connection = dbConnection.getConnection();
+            connection = new DBConnection().getConnection();
 
-            String qry = "SELECT * FROM tbl_manufacturer_list order by mfr_id asc";
+            String qry = "SELECT * FROM tbl_manufacturer_list order by mfr_id desc";
             ps = connection.prepareStatement(qry);
             rs = ps.executeQuery();
 
-            int count = 0;
-
             while (rs.next()) {
-
                 int id = rs.getInt("mfr_id");
                 String manufacturer_name = rs.getString("manufacturer_name");
                 String created_date = rs.getString("created_date");
-                count++;
                 list.add(new ManufacturerModal(id,manufacturer_name,created_date));
             }
 
-            if (list.size() > 0) {
+            if (!list.isEmpty()) {
                 pagination.setVisible(true);
                 search_Item();
             }
 
-            if (count > 0) {
-                map.put("is_success", true);
-                map.put("message", "Many item find");
-            } else {
-                map.put("is_success", false);
-                map.put("message", "Item not available");
-            }
-
-
         } catch (SQLException e) {
-            map.put("is_success", false);
-            map.put("message", "Something went wrong ");
+           tableView.setPlaceholder(new Label("Something went wrong"));
             throw new RuntimeException(e);
         } finally {
             DBConnection.closeConnection(connection, ps, rs);
         }
-        return map;
     }
 
     private void search_Item() {

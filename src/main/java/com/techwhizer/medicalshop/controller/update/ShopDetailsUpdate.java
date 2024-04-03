@@ -7,6 +7,7 @@ import com.techwhizer.medicalshop.model.ShopModel;
 import com.techwhizer.medicalshop.util.DBConnection;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -95,19 +96,19 @@ public class ShopDetailsUpdate implements Initializable {
 
         if (sName.isEmpty()) {
 
-            method.show_popup("ENTER SHOP NAME", shopNameTf);
+            method.show_popup("ENTER SHOP NAME", shopNameTf, Side.RIGHT);
             return;
         } else if (sPhone_1.isEmpty()) {
 
-            method.show_popup("ENTER SHOP PHONE-1", phone_1Tf);
+            method.show_popup("ENTER SHOP PHONE-1", phone_1Tf, Side.RIGHT);
             return;
         } else if (sEmail.isEmpty()) {
 
-            method.show_popup("ENTER SHOP EMAIL", emailTF);
+            method.show_popup("ENTER SHOP EMAIL", emailTF, Side.RIGHT);
             return;
         } else if (sAddress.isEmpty()) {
 
-            method.show_popup("ENTER SHOP FULL ADDRESS", addressTF);
+            method.show_popup("ENTER SHOP FULL ADDRESS", addressTF, Side.RIGHT);
             return;
         }
 

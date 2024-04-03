@@ -5,13 +5,15 @@ import com.techwhizer.medicalshop.Main;
 import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.model.FrequencyModel;
 import com.techwhizer.medicalshop.model.MedicineTimeModel;
-import com.techwhizer.medicalshop.model.PrescribedMedicineModel;
+import com.techwhizer.medicalshop.model.PrescriptionMedicationModel;
 import com.techwhizer.medicalshop.model.chooserModel.ItemChooserModel;
 import com.techwhizer.medicalshop.util.DBConnection;
+import com.techwhizer.medicalshop.util.ItemChooserType;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -22,6 +24,7 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -50,12 +53,6 @@ public class AddPrescriptionMedicine implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         method = new Method();
 
-        if (null != Main.primaryStage.getUserData()){
-
-            Map<String,Object> map = (Map<String, Object>) Main.primaryStage.getUserData();
-
-        }
-
         setComValue();
         getFrequency();
         getTimes();
@@ -70,8 +67,11 @@ public class AddPrescriptionMedicine implements Initializable {
         durationType.getSelectionModel().selectFirst();
     }
 
-    public void addItemClick(ActionEvent actionEvent) {
+    public void addMedicineClick(ActionEvent actionEvent) {
 
+        Map<String, Object> data = new HashMap<>();
+        data.put("item_chooser_type", ItemChooserType.PURCHASE);
+        Main.primaryStage.setUserData(data);
         new CustomDialog().showFxmlDialog2("chooser/itemChooser.fxml", "SELECT ITEM");
         if (Main.primaryStage.getUserData() instanceof ItemChooserModel icm) {
             icmGlobal = icm;
@@ -103,7 +103,6 @@ public class AddPrescriptionMedicine implements Initializable {
 
     public void saveItemClick(MouseEvent mouseEvent) {
 
-
         String medicineName = itemNameTf.getText();
         String medicineTag = itemTagTf.getText();
         String quantity = quantityTf.getText();
@@ -113,31 +112,31 @@ public class AddPrescriptionMedicine implements Initializable {
         String remarks = remarkTf.getText();
 
         if (medicineName.isEmpty()) {
-            method.show_popup("Please enter medicine name", itemNameTf);
+            method.show_popup("Please enter medicine name", itemNameTf, Side.RIGHT);
             return;
         } else if (medicineTag.isEmpty()) {
-            method.show_popup("Please enter medicine tag", itemTagTf);
+            method.show_popup("Please enter medicine tag", itemTagTf, Side.RIGHT);
             return;
         } else if (quantity.isEmpty()) {
-            method.show_popup("Please enter quantity.", quantityTf);
+            method.show_popup("Please enter quantity.", quantityTf, Side.RIGHT);
             return;
         } else if (unitCom.getSelectionModel().isEmpty()) {
-            method.show_popup("Please select quantity unit.", unitCom);
+            method.show_popup("Please select quantity unit.", unitCom, Side.RIGHT);
             return;
         } else if (freqCom.getSelectionModel().isEmpty()) {
-            method.show_popup("Please select frequency.", freqCom);
+            method.show_popup("Please select frequency.", freqCom, Side.RIGHT);
             return;
         } else if (duration.isEmpty()) {
-            method.show_popup("Please enter duration", durationTf);
+            method.show_popup("Please enter duration", durationTf, Side.RIGHT);
             return;
         } else if (timingCom.getSelectionModel().isEmpty()) {
-            method.show_popup("Please select time.", timingCom);
+            method.show_popup("Please select time.", timingCom, Side.RIGHT);
             return;
         } else if (composition.isEmpty()) {
-            method.show_popup("Please enter medicine composition", compositionTf);
+            method.show_popup("Please enter medicine composition", compositionTf, Side.RIGHT);
             return;
         } else if (dose.isEmpty()) {
-            method.show_popup("Please enter medicine dose", doseTf);
+            method.show_popup("Please enter medicine dose", doseTf, Side.RIGHT);
             return;
         }
 
@@ -146,9 +145,9 @@ public class AddPrescriptionMedicine implements Initializable {
         String times = timingCom.getSelectionModel().getSelectedItem().getTime();
         String qtyUnit = unitCom.getSelectionModel().getSelectedItem();
 
-        PrescribedMedicineModel pmm = new PrescribedMedicineModel(medicineName,
+        PrescriptionMedicationModel pmm = new PrescriptionMedicationModel(0,medicineName,
                 medicineTag,quantity+"-"+qtyUnit,freq,
-                duration+"-"+durationTypeStr,times,composition,dose,remarks, icmGlobal == null ?0:icmGlobal.getItemId(), icmGlobal  != null);
+                duration+"-"+durationTypeStr,times,composition,dose,remarks, icmGlobal == null ?0:icmGlobal.getItemId(), icmGlobal  != null,0);
 
         Stage stage = ((Stage) itemNameTf.getScene().getWindow());
 
@@ -218,7 +217,7 @@ public class AddPrescriptionMedicine implements Initializable {
          freqCom.setItems(frequencyList);
 
 
-        }catch (Exception e){
+        }catch (Exception ignored){
 
         }finally {
             DBConnection.closeConnection(connection,ps,rs);

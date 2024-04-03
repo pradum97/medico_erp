@@ -1,12 +1,14 @@
 package com.techwhizer.medicalshop.method;
 
 import com.techwhizer.medicalshop.PropertiesLoader;
+import com.techwhizer.medicalshop.controller.auth.Login;
 import com.techwhizer.medicalshop.model.*;
 import com.techwhizer.medicalshop.util.DBConnection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Side;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -19,10 +21,7 @@ import java.math.BigDecimal;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.nio.file.Files;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -44,6 +43,20 @@ public class Method extends StaticData {
         pi.setStyle("-fx-progress-color: red");
 
         return pi;
+    }
+
+
+    public static Timestamp getCurrenSqlTimeStamp(){
+       return new Timestamp(System.currentTimeMillis());
+    }
+
+    public static Timestamp getCurrenSqlTimeStampFromLocalDateTime(LocalDateTime localDateTime){
+        return Timestamp.valueOf(localDateTime);
+    }
+
+    public static Timestamp getCurrenSqlTimeStampFromLocalDate(LocalDate localDate){
+        LocalDateTime localDateTime = localDate.atStartOfDay();
+        return Timestamp.valueOf(localDateTime);
     }
 
     public ProgressIndicator getProgressBarWhite(double height , double width){
@@ -239,6 +252,28 @@ public class Method extends StaticData {
         }
     }
 
+    public void convertDateFormat_2(DatePicker... date) {
+        for (DatePicker datePicker : date) {
+            datePicker.setConverter(new StringConverter<>() {
+                private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                @Override
+                public String toString(LocalDate localDate) {
+                    if (localDate == null)
+                        return "";
+                    return dateTimeFormatter.format(localDate);
+                }
+
+                @Override
+                public LocalDate fromString(String dateString) {
+                    if (dateString == null || dateString.trim().isEmpty()) {
+                        return null;
+                    }
+                    return LocalDate.parse(dateString, dateTimeFormatter);
+                }
+            });
+        }
+    }
+
     public ObservableList<Role> getRole() {
         Connection connection = null;
         PreparedStatement ps = null;
@@ -272,17 +307,31 @@ public class Method extends StaticData {
         }
     }
 
+    public static void setGlobalZoomout(Scene scene){
+        scene.getRoot().setScaleX(0.98); // Zoom out horizontally
+        scene.getRoot().setScaleY(0.98);
+    }
+
     public void hideElement(Node node) {
         node.setVisible(false);
         node.managedProperty().bind(node.visibleProperty());
     }
 
-    public ContextMenu show_popup(String message, Object textField) {
+    public ContextMenu show_popup(String message, Object textField,Side side) {
 
         ContextMenu form_Validator = new ContextMenu();
         form_Validator.setAutoHide(true);
         form_Validator.getItems().add(new MenuItem(message));
-        form_Validator.show((Node) textField, Side.RIGHT, 10, 0);
+        form_Validator.show((Node) textField, side, 10, 0);
+        return form_Validator;
+    }
+
+    public ContextMenu show_popup_bottom(String message, Object textField) {
+
+        ContextMenu form_Validator = new ContextMenu();
+        form_Validator.setAutoHide(true);
+        form_Validator.getItems().add(new MenuItem(message));
+        form_Validator.show((Node) textField, Side.BOTTOM, 10, 0);
         return form_Validator;
     }
 
@@ -411,7 +460,7 @@ public class Method extends StaticData {
         return txt;
     }
 
-    public boolean isItemAvailableInStock(int itemId) {
+    public boolean isItemAvailableInStock(int stockId) {
 
         Connection connection = null;
         PreparedStatement ps = null;
@@ -419,9 +468,9 @@ public class Method extends StaticData {
 
         try {
             connection = new DBConnection().getConnection();
-            String qry = "select item_id from tbl_stock where item_id = ? and quantity > 0";
+            String qry = "select stock_id from tbl_stock where stock_id = ? and quantity > 0";
             ps = connection.prepareStatement(qry);
-            ps.setInt(1, itemId);
+            ps.setInt(1, stockId);
             rs = ps.executeQuery();
             return rs.next();
         } catch (SQLException e) {
@@ -430,76 +479,19 @@ public class Method extends StaticData {
             DBConnection.closeConnection(connection, ps, rs);
         }
     }
-    public boolean isBatchAvailableInStock(String batch) {
-
-        batch = batch.trim();
-
+    public String getItemUnit(int itemId) {
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
             connection = new DBConnection().getConnection();
-            String qry = """
-                    select tpi.batch from tbl_stock ts
-                    left join tbl_purchase_items tpi on tpi.purchase_items_id = ts.purchase_items_id
-                    where batch = ?
-                    """;
-            ps = connection.prepareStatement(qry);
-            ps.setString(1, batch);
-            rs = ps.executeQuery();
-            return rs.next();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            DBConnection.closeConnection(connection, ps, rs);
-        }
-    }
-
-    public boolean isMultipleItemInStock(int itemId) {
-        Connection connection = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            connection = new DBConnection().getConnection();
-            String qry = """
-                select  count(stock_id) as itemCount  from tbl_stock ts
-                left join tbl_purchase_items tpi on tpi.purchase_items_id = ts.purchase_items_id
-                where tpi.item_id =?  and ts.quantity>0
-                """;
-            ps = connection.prepareStatement(qry);
-            ps.setInt(1, itemId);
-            rs = ps.executeQuery();
-
-            int count = 0;
-            if (rs.next()){
-                 count = rs.getInt("itemCount");
-            }
-
-            return count > 1;
-
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            DBConnection.closeConnection(connection, ps, rs);
-        }
-    }
-
-    public String getStockUnit(int itemId) {
-        Connection connection = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            connection = new DBConnection().getConnection();
-            String qry = "select quantity_unit from tbl_stock where item_id = ?";
+            String qry = "select unit from tbl_items_master where item_id = ?";
             ps = connection.prepareStatement(qry);
             ps.setInt(1, itemId);
             rs = ps.executeQuery();
             if (rs.next()) {
-                return rs.getString("quantity_unit");
+                return rs.getString("unit");
             } else {
                 return null;
             }
@@ -629,7 +621,7 @@ public class Method extends StaticData {
     public String tabToStrip(double tablet, int stripPerTab, String unitType) {
         String val = "";
 
-        if (unitType.equalsIgnoreCase("tab")) {
+        if (unitType != null && unitType.equalsIgnoreCase("tab")) {
             int strip = (int) (tablet / stripPerTab);
             int tab = (int) (tablet % stripPerTab);
 
@@ -725,9 +717,10 @@ public class Method extends StaticData {
 
         try {
             connection = new DBConnection().getConnection();
-            String qry = "select stock_id from tbl_cart where stock_id = ?";
+            String qry = "select stock_id from tbl_cart where stock_id = ? and created_by = ?";
             ps = connection.prepareStatement(qry);
             ps.setInt(1, stockId);
+            ps.setInt(2, Login.currentlyLogin_Id);
             rs = ps.executeQuery();
 
             return rs.next();
@@ -736,9 +729,7 @@ public class Method extends StaticData {
         } finally {
             DBConnection.closeConnection(connection, ps, rs);
         }
-
     }
-
     public String decimalFormatter(Object o) {
         DecimalFormat formatter = new DecimalFormat("#0.00");
         return formatter.format(o);
@@ -883,5 +874,15 @@ public class Method extends StaticData {
             DBConnection.closeConnection(connection, ps, rs);
         }
 
+    }
+
+
+    public static Double removeDecimal(double value) {
+
+        try {
+            return Double.parseDouble(String.format("%.2f", value));
+        } catch (Exception e) {
+            return value;
+        }
     }
 }

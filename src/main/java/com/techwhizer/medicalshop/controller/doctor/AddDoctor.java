@@ -9,6 +9,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
@@ -35,7 +36,7 @@ public class AddDoctor implements Initializable {
     private CustomDialog customDialog;
     private DBConnection dbConnection;
     private DoctorModel dm;
-    ObservableList<String> doctorType = FXCollections.observableArrayList("IN HOUSE","OUT SIDE");
+    ObservableList<String> doctorType = FXCollections.observableArrayList("IN HOUSE","OUT SIDE","OTHER");
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -78,10 +79,10 @@ public class AddDoctor implements Initializable {
         String qlf = qualificationTf.getText();
 
         if (name.isEmpty()) {
-            method.show_popup("Please Enter doctor name", nameTf);
+            method.show_popup("Please Enter doctor name", nameTf, Side.RIGHT);
             return;
         }else if(comDoctorType.getSelectionModel().toString().isEmpty()){
-            method.show_popup("Please select doctor type", comDoctorType);
+            method.show_popup("Please select doctor type", comDoctorType, Side.RIGHT);
             return;
         }
 

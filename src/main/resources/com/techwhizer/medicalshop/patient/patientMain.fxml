@@ -59,7 +59,7 @@
          <children>
             <HBox alignment="CENTER">
                <children>
-                  <Label text="Patients Master">
+                  <Label text="Patient Master">
                      <font>
                         <Font name="Arial Black" size="14.0" />
                      </font>
@@ -81,7 +81,7 @@
                               </TextField>
                           </children>
                       </HBox>
-                      <Button graphicTextGap="10.0" mnemonicParsing="false" onAction="#addPatient" prefHeight="31.0" prefWidth="134.0" style="-fx-cursor: hand; -fx-background-color: white; -fx-text-fill: black; -fx-font-weight: BOLD; -fx-background-radius: 3; -fx-border-color: grey; -fx-border-radius: 3;" text="ADD PATIENT">
+                      <Button graphicTextGap="10.0" mnemonicParsing="false" onAction="#addPatient" prefHeight="28.0" prefWidth="134.0" style="-fx-cursor: hand; -fx-background-color: white; -fx-text-fill: black; -fx-font-weight: BOLD; -fx-background-radius: 100; -fx-border-color: grey; -fx-border-radius: 100;" text="ADD PATIENT">
                           <HBox.margin>
                               <Insets right="70.0" />
                           </HBox.margin>

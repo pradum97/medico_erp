@@ -1,9 +1,49 @@
+.body{
+    -fx-font-size: 10px;
+}
+.consult_status_cancel .list-cell
+{
+    -fx-background: white;
+    -fx-background-color: #941b3a;
+    -fx-text-fill: white;
+}
+
+.consult_status_pending .list-cell
+{
+    -fx-background: white;
+    -fx-background-color: D9512C;
+    -fx-text-fill: white;
+}
+.consult_status_done .list-cell
+{
+    -fx-background: white;
+    -fx-background-color: #035903;
+    -fx-text-fill: white;
+}
+
+#DateTimePicker_TextField {
+    -fx-background-radius:3 0 0 3;
+    -fx-border-radius:3 0 0 3 ;
+    -fx-border-color: grey;
+}
+
+#DateTimePicker_TextField:disabled {
+    -fx-opacity: 1.0;
+}
+
+#DateTimePicker_Button {
+    -fx-background-radius:0 3 3 0;
+    -fx-border-radius:0 3 3 0 ;
+    -fx-border-color: grey;
+}
+
+
 .button {
     -fx-cursor: hand;
 }
 
 .text-input {
-    -fx-font-size: 14px;
+    -fx-font-size: 11px;
 }
 
 .context-menu {
@@ -15,12 +55,27 @@
     -fx-text-fill: white;
 }
 
+.common-context-menu,.common-menu-button {
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-background-color: white;
+    -fx-border-color: grey;
+    -fx-text-fill: black;
+    -fx-cursor: hand;
+
+}
+
+.common-menu-button.menu-item{
+    -fx-min-width: 90px;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-border-color: grey;
+}
 
 #settingMenuButton {
     -fx-background-radius: 4;
     -fx-background-color: #1a75ff;
     -fx-padding: 1;
-
     -fx-text-fill: white;
 }
 
@@ -97,20 +152,21 @@
 }
 
 .table-view .column-header .label {
-    -fx-padding: 0.5em;
+    -fx-padding: 0.4em;
     -fx-text-fill: black;
     -fx-alignment: center-left;
+    -fx-font-size: 9px;
 }
 
 .table-view .table-cell {
-    -fx-padding: 0.5em;
+    -fx-padding: 0.3em;
     -fx-background-color: transparent;
     -fx-border-color: transparent -fx-table-cell-border-color -fx-table-cell-border-color transparent;
     -fx-alignment:center-left;
     -fx-table-cell-border-color: transparent;
     -fx-text-fill: black;
-    -fx-cell-size: 30;
-    -fx-font-size: 12;
+    -fx-cell-size: 25;
+    -fx-font-size: 10;
 }
 
 
@@ -153,4 +209,26 @@
 
 .pagination{
     -fx-page-information-visible:false;
+}
+
+
+.tag-bar {
+    -fx-border-color: lightblue;
+    -fx-spacing: 3;
+    -fx-padding: 3;
+    -fx-max-height: 30;
+}
+
+.tag-bar .tag {
+    -fx-background-color: -fx-selection-bar;
+    -fx-border-radius: 5 5 5 5;
+}
+
+.tag-bar .tag {
+    -fx-text-fill: white;
+}
+
+.tag-bar .tag .button{
+    -fx-text-fill: orange;
+    -fx-font-weight: bold;
 }

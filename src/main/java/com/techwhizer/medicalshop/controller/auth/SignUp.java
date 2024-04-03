@@ -11,6 +11,7 @@ import com.techwhizer.medicalshop.util.SecurePassword;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
@@ -117,36 +118,36 @@ public class SignUp implements Initializable {
         Matcher matcher = pattern.matcher(email);
 
         if (first_name.isEmpty()) {
-            method.show_popup("Enter First Name", first_name_f);
+            method.show_popup("Enter First Name", first_name_f, Side.RIGHT);
             return;
 
         } else if (username.isEmpty()) {
-            method.show_popup("Enter Username", username_f);
+            method.show_popup("Enter Username", username_f, Side.RIGHT);
             return;
 
         } else if (hasSpace(username)) {
-            method.show_popup("SPACE NOT ALLOW PLEASE REMOVE SPACE FROM USERNAME", username_f);
+            method.show_popup("SPACE NOT ALLOW PLEASE REMOVE SPACE FROM USERNAME", username_f, Side.RIGHT);
             return;
         } else if (isExist("USERNAME", username)) {
-            method.show_popup("USERNAME ALREADY EXISTS!", username_f);
+            method.show_popup("USERNAME ALREADY EXISTS!", username_f, Side.RIGHT);
             return;
         } else if (phone.isEmpty()) {
-            method.show_popup("Enter 10-digit Phone Number", phone_f);
+            method.show_popup("Enter 10-digit Phone Number", phone_f, Side.RIGHT);
             return;
 
         } else if (hasSpace(phone)) {
-            method.show_popup("SPACE NOT ALLOW PLEASE REMOVE SPACE FROM PHONE", phone_f);
+            method.show_popup("SPACE NOT ALLOW PLEASE REMOVE SPACE FROM PHONE", phone_f, Side.RIGHT);
             return;
         }
         long phoneNum = 0;
         try {
             phoneNum = Long.parseLong(phone);
         } catch (NumberFormatException e) {
-            method.show_popup("Enter 10-digit Phone Number Without Country Code", phone_f);
+            method.show_popup("Enter 10-digit Phone Number Without Country Code", phone_f, Side.RIGHT);
             return;
         }
         if (isExistPhone("PHONE", phoneNum)) {
-            method.show_popup("PHONE NUM ALREADY EXISTS!", phone_f);
+            method.show_popup("PHONE NUM ALREADY EXISTS!", phone_f, Side.RIGHT);
             return;
         }
 
@@ -158,31 +159,31 @@ public class SignUp implements Initializable {
             customDialog.showAlertBox("Registration Failed ", "Enter 10-digit Phone Number Without Country Code");
             return;
         } else if (email.isEmpty()) {
-            method.show_popup("Enter Valid Email", email_f);
+            method.show_popup("Enter Valid Email", email_f, Side.RIGHT);
             return;
 
         } else if (!matcher.matches()) {
-            method.show_popup("Enter Valid Email", email_f);
+            method.show_popup("Enter Valid Email", email_f, Side.RIGHT);
             return;
 
         } else if (hasSpace(email)) {
-            method.show_popup("SPACE NOT ALLOW PLEASE REMOVE SPACE FROM EMAIL", email_f);
+            method.show_popup("SPACE NOT ALLOW PLEASE REMOVE SPACE FROM EMAIL", email_f, Side.RIGHT);
             return;
         } else if (isExist("EMAIL", email)) {
-            method.show_popup("EMAIL ALREADY EXISTS!", email_f);
+            method.show_popup("EMAIL ALREADY EXISTS!", email_f, Side.RIGHT);
             return;
         } else if (null == gender_comboBox.getValue()) {
-            method.show_popup("Choose Your Gender", gender_comboBox);
+            method.show_popup("Choose Your Gender", gender_comboBox, Side.RIGHT);
             return;
 
         } else if (null == role_combobox.getValue()) {
-            method.show_popup("Choose role_combobox", role_combobox);
+            method.show_popup("Choose role_combobox", role_combobox, Side.RIGHT);
             return;
         } else if (full_address.isEmpty()) {
-            method.show_popup("Enter Full Address", full_address_f);
+            method.show_popup("Enter Full Address", full_address_f, Side.RIGHT);
             return;
         } else if (password.isEmpty()) {
-            method.show_popup("Enter Password", password_f);
+            method.show_popup("Enter Password", password_f, Side.RIGHT);
             return;
         } else if (null == mac_address) {
             mac_address = "Not-Found";

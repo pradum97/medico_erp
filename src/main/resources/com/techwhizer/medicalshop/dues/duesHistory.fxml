@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="825.0" stylesheets="@../css/main.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.dues.DuesHistory">
+    <center>
+        <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <children>
+                <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0">
+                    <children>
+                        <TableView fx:id="tableView" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="colSrNo" editable="false" maxWidth="60.0" minWidth="60.0" prefWidth="60.0" sortable="false" text="SR #" />
+                                <TableColumn fx:id="colPaid" editable="false" maxWidth="100.0" minWidth="105.0" prefWidth="129.60003662109375" sortable="false" text="PAID AMT" />
+                                <TableColumn fx:id="colPaymentMode" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="-1.0" sortable="false" text="PAYMENT MODE" />
+                                <TableColumn fx:id="colDate" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="-1.0" sortable="false" text="PAYMENT DATE" />
+                        <TableColumn fx:id="colReferenceNumber" editable="false" maxWidth="190.0" minWidth="120.0" prefWidth="-1.0" sortable="false" text="REFERENCE #" />
+                        <TableColumn fx:id="colRemark" editable="false" maxWidth="1.7976931348623157E308" minWidth="120.0" prefWidth="-1.0" sortable="false" text="REMARKS" />
+                            </columns>
+                     <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                     </columnResizePolicy>
+                        </TableView>
+                    </children>
+                </VBox>
+            </children>
+        </AnchorPane>
+    </center>
+    <top>
+        <HBox spacing="20.0" BorderPane.alignment="CENTER">
+            <children>
+                <VBox alignment="CENTER" spacing="15.0">
+                    <children>
+                        <HBox>
+                            <children>
+                                <Label text="PATIENT NAME :">
+                                    <font>
+                                        <Font name="Arial Bold" size="11.0" />
+                                    </font>
+                                </Label>
+                                <Label fx:id="patientNameL" layoutX="10.0" layoutY="10.0" textFill="#04852f">
+                                    <HBox.margin>
+                                        <Insets left="5.0" />
+                                    </HBox.margin>
+                           <font>
+                              <Font name="Arial Bold" size="12.0" />
+                           </font>
+                                </Label>
+                            </children>
+                        </HBox>
+                    </children>
+                    <HBox.margin>
+                        <Insets left="10.0" />
+                    </HBox.margin>
+                </VBox>
+                <Separator orientation="VERTICAL" />
+                <VBox alignment="CENTER" layoutX="20.0" layoutY="10.0" spacing="15.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <HBox alignment="CENTER_LEFT">
+                            <children>
+                                <Label minWidth="80.0" text="ADDRESS : ">
+                                    <font>
+                                        <Font name="Arial Bold" size="11.0" />
+                                    </font>
+                                </Label>
+                                <Label fx:id="patientAddressL" alignment="CENTER" layoutX="10.0" layoutY="10.0" textAlignment="CENTER" textFill="#04852f" wrapText="true">
+                           <font>
+                              <Font name="Arial Bold" size="12.0" />
+                           </font></Label>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+        </HBox>
+    </top>
+</BorderPane>
