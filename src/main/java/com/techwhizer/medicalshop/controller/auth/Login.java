@@ -6,6 +6,7 @@ import com.techwhizer.medicalshop.PropertiesLoader;
 import com.techwhizer.medicalshop.method.GetUserProfile;
 import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.model.UserDetails;
+import com.techwhizer.medicalshop.util.CommonUtil;
 import com.techwhizer.medicalshop.util.DBConnection;
 import com.techwhizer.medicalshop.util.SecurePassword;
 import com.victorlaerte.asynctask.AsyncTask;
@@ -73,6 +74,7 @@ public class Login implements Initializable {
     }
 
     private Map<String, Object> getProfileDetails(ResultSet rs, PreparedStatement ps) throws SQLException {
+       new CommonUtil.HardRefresh(null,false).execute();
         return openDashboard(rs, ps);
         // return  getLicenseData(rs , ps);
     }

@@ -141,7 +141,7 @@ public class ItemMaster implements Initializable {
         public void onPostExecute(Boolean success) {
             refresh_bn.setDisable(false);
             tableView.setPlaceholder(new Label("Not Available"));
-            if (itemList.size() > 0) {
+            if (!itemList.isEmpty()) {
                 pagination.setVisible(true);
                 search_Item();
             }
@@ -155,9 +155,8 @@ public class ItemMaster implements Initializable {
 
     private void getAllProduct() {
 
-        if (null != itemList) {
-            itemList.clear();
-        }
+        itemList.clear();
+        searchTf.setText("");
 
         Connection connection = null;
         PreparedStatement ps = null;
@@ -179,6 +178,7 @@ public class ItemMaster implements Initializable {
                     "left join tbl_product_tax tpt on tpt.tax_id = tim.gst_id\n" +
                     "left join tbl_departments dep on dep.department_code = tim.department_code "+
                     "left join tbl_discount td on tim.discount_id = td.discount_id order by item_id desc";
+
             ps = connection.prepareStatement(qry);
             rs = ps.executeQuery();
 

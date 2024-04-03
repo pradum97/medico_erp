@@ -115,7 +115,10 @@ public class BatchChooser implements Initializable {
             connection = dbConnection.getConnection();
 
             String qry = """
-                    select  stock_id,tpi.purchase_items_id ,tim.items_name,tim.strip_tab ,tpi.batch , tpi.expiry_date , ts.quantity , ts.quantity_unit  from tbl_stock ts
+                    select  stock_id,tpi.purchase_items_id ,tim.items_name,tim.strip_tab ,tpi.batch ,
+                     tpi.expiry_date , ts.quantity , ts.quantity_unit,
+                       tab_to_strip(ts.quantity,tim.strip_tab,ts.quantity_unit) as tab_to_strip
+                       from tbl_stock ts
                     left join tbl_purchase_items tpi on tpi.purchase_items_id = ts.purchase_items_id
                     left join tbl_items_master tim on tim.item_id = ts.item_id
                     where tpi.item_id =?  and ts.quantity>0 order by expiry_date asc
@@ -137,10 +140,9 @@ public class BatchChooser implements Initializable {
                 int strip_tab = rs.getInt("strip_tab");
                 int purchase_items_id = rs.getInt("purchase_items_id");
                 String quantityUnit = rs.getString("quantity_unit");
+                String qty = rs.getString("tab_to_strip");
+
                 count++;
-
-                String qty = method.tabToStrip(quantity, strip_tab, quantityUnit);
-
                 BatchChooserModel bcm = new BatchChooserModel(stockId, itemName, batch,
                         expiryDate, quantity, quantityUnit, qty,strip_tab,purchase_items_id);
                 itemList.add(bcm);

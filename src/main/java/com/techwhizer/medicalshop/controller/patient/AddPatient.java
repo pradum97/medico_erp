@@ -392,7 +392,8 @@ public class AddPatient implements Initializable {
                 SalutationModel sm = CommonUtil.getSalutation(pm.getSalutation_id()).get(0);
                 for (int i = 0; i < salutationList.size(); i++) {
                     if (salutationList.get(i).getSalutationName().equals(sm.getSalutationName())){
-                        salutationCom.getSelectionModel().select(i);
+                        int finalI = i;
+                        Platform.runLater(() -> salutationCom.getSelectionModel().select(finalI));
                     }
                 }
             }

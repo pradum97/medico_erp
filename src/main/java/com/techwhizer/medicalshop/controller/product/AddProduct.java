@@ -326,6 +326,7 @@ public class AddProduct implements Initializable {
                 method.hideElement(progressBar);
             });
             throw new RuntimeException(e);
+        }finally {
         }
     }
 

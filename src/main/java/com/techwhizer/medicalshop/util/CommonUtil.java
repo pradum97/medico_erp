@@ -1,23 +1,27 @@
 package com.techwhizer.medicalshop.util;
 
+import com.techwhizer.medicalshop.CustomDialog;
 import com.techwhizer.medicalshop.controller.common.model.DepartmentModel;
+import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.model.ConsultationSetupModel;
 import com.techwhizer.medicalshop.model.DoctorModel;
 import com.techwhizer.medicalshop.model.SalutationModel;
 import com.techwhizer.medicalshop.util.type.DoctorType;
+import com.victorlaerte.asynctask.AsyncTask;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 public class CommonUtil {
+
 
     private static final String DATE_PATTERN = "dd/MM/yyyy";
 
@@ -255,5 +259,71 @@ public class CommonUtil {
             DBConnection.closeConnection(connection, ps, rs);
         }
         return salutationList;
+    }
+
+    public static class HardRefresh extends AsyncTask<String, Integer, Boolean> {
+        Button button;
+        boolean isMessageShow;
+
+        public HardRefresh(Button button, boolean isMessageShow) {
+            this.button = button;
+            this.isMessageShow = isMessageShow;
+        }
+
+        @Override
+        public void onPreExecute() {
+
+            if (null != button){
+                button.setGraphic(new Method().getProgressBarWhite(25,25));
+                button.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+            }
+        }
+
+        @Override
+        public Boolean doInBackground(String... params) {
+            refreshMaterializedViews(isMessageShow);
+            return false;
+        }
+
+        private void refreshMaterializedViews(boolean isMessageShow) {
+            Connection connection = null;
+            PreparedStatement ps = null;
+
+            try{
+                connection = new DBConnection().getConnection();
+                String qry = "select refresh_all_materialized_views_concurrently()";
+
+                ps = connection.prepareStatement(qry);
+              boolean isSuccess = ps.execute();
+
+              if(isMessageShow){
+                  if(isSuccess){
+                      new CustomDialog().showAlertBox("Success","Successfully Refreshed.");
+                  }else {
+                      new CustomDialog().showAlertBox("Failed","Refresh Failed. Please try again!");
+                  }
+              }
+            } catch (SQLException e) {
+                if(isMessageShow){
+                    new CustomDialog().showAlertBox("Error","Something went wrong.");
+                }
+                throw new RuntimeException(e);
+            }finally {
+                DBConnection.closeConnection(connection,ps,null);
+            }
+
+        }
+        @Override
+        public void onPostExecute(Boolean success) {
+            if (null != button){
+                button.setGraphic(null);
+                button.setContentDisplay(ContentDisplay.TEXT_ONLY);
+            }
+        }
+
+        @Override
+        public void progressCallback(Integer... params) {
+
+        }
     }
 }

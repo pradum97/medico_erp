@@ -13,7 +13,7 @@ import com.techwhizer.medicalshop.model.PatientModel;
 import com.techwhizer.medicalshop.model.PriceTypeModel;
 import com.techwhizer.medicalshop.model.SaleEntryModel;
 import com.techwhizer.medicalshop.model.chooserModel.BatchChooserModel;
-import com.techwhizer.medicalshop.model.chooserModel.ItemChooserModel;
+import com.techwhizer.medicalshop.model.chooserModel.StockItemChooserModel;
 import com.techwhizer.medicalshop.util.CommonUtil;
 import com.techwhizer.medicalshop.util.DBConnection;
 import com.techwhizer.medicalshop.util.type.DoctorType;
@@ -43,11 +43,12 @@ import javafx.util.Callback;
 
 import java.net.URL;
 import java.sql.*;
-import java.util.*;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.ResourceBundle;
 
 public class Billing implements Initializable {
     public Label patientNameL;
-    public Label addItem;
     public TableView<SaleEntryModel> tableView;
     public TableColumn<SaleEntryModel, Integer> colSrNo;
     public TableColumn<SaleEntryModel, String> colProductName;
@@ -73,7 +74,6 @@ public class Billing implements Initializable {
     public VBox amountContainer;
     public Button checkOutButton;
     public HBox progressBar;
-    public Label doctorNameL;
     public Label patientAgeL;
     public Label patientAddressL;
     public Label itemNameL;
@@ -95,6 +95,7 @@ public class Billing implements Initializable {
     public Label genderL;
     public TextField receivedAmountTf;
     public ImageView applyDiscountBn;
+    public HBox priceRadioContainerHB;
     private CustomDialog customDialog;
     private Method method;
     private DBConnection dbConnection;
@@ -109,13 +110,15 @@ public class Billing implements Initializable {
     static private int rowsPerPage = 20;
     private BatchChooserModel bcm;
     private double addDiscountPercentage = 0.0;
-
-    private static ObservableList<ItemChooserModel> popItemList = FXCollections.observableArrayList();
-
+    PriceTypeModel ptm = null;
+    private static ObservableList<StockItemChooserModel> popItemList = FXCollections.observableArrayList();
 
     enum Type {
         GET_PATIENT, SAVE, GET_CART_DATA, GET_POPUP_ITEM, GET_POPUP_ITEM_CART_DATA
     }
+
+    RadioButton saleRB = new RadioButton("Sale Rate");
+    RadioButton purchaseRB = new RadioButton("Purchase Rate");
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -126,6 +129,7 @@ public class Billing implements Initializable {
         method.hideElement(progressBar);
         tableViewPatient.setFixedCellSize(26);
 
+        setRadioGroup();
 
         Platform.runLater(() -> {
             Method.setGlobalZoomout(genderL.getScene());
@@ -137,6 +141,38 @@ public class Billing implements Initializable {
 
             discountConfig();
         });
+    }
+
+    public void refreshPatientBnClick(ActionEvent actionEvent) {
+        callThread(Type.GET_PATIENT);
+    }
+
+    private void setRadioGroup() {
+
+        ToggleGroup group = new ToggleGroup();
+
+        saleRB.setToggleGroup(group);
+        purchaseRB.setToggleGroup(group);
+
+        saleRB.setStyle("-fx-font-size: 9px;-fx-font-weight: bold;");
+        purchaseRB.setStyle("-fx-font-size: 9px;-fx-font-weight: bold");
+
+        priceRadioContainerHB.getChildren().addAll(saleRB, purchaseRB);
+
+        saleRB.setGraphicTextGap(100);
+        group.selectedToggleProperty().addListener((observableValue, toggle, t1) -> {
+            if (bcm != null && ptm != null) {
+                if (purchaseRB.isSelected()) {
+                    saleRateTf.setText(String.valueOf(ptm.getPurchaseRate()));
+                } else {
+                    saleRateTf.setText(String.valueOf(ptm.getSaleRate()));
+                }
+            } else {
+                saleRateTf.setText("0");
+            }
+
+        });
+        saleRB.setSelected(true);
     }
 
     public void applyDiscountBnClick(MouseEvent mouseEvent) {
@@ -152,9 +188,9 @@ public class Billing implements Initializable {
 
     public void keyPress(KeyEvent keyEvent) {
 
-        if (keyEvent.getCode() == KeyCode.ENTER) {
-
-        }
+//        if (keyEvent.getCode() == KeyCode.ENTER) {
+//
+//        }
 
     }
 
@@ -388,13 +424,9 @@ public class Billing implements Initializable {
                 totalAmtAsPerMrp += amountAsPerMrp;
             }
             setTableDate();
+            Platform.runLater(() -> tableView.setPlaceholder(new Label("Item Not Available.")));
         } catch (SQLException e) {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    tableView.setPlaceholder(new Label("Something went wrong"));
-                }
-            });
+            Platform.runLater(() -> tableView.setPlaceholder(new Label("Something went wrong")));
             throw new RuntimeException(e);
         } finally {
             DBConnection.closeConnection(connection, ps, rs);
@@ -494,9 +526,7 @@ public class Billing implements Initializable {
     }
 
     public void addPatient(ActionEvent actionEvent) {
-
         customDialog.showFxmlDialog2("patient/addPatient.fxml", "Add New Patient");
-
         if (Main.primaryStage.getUserData() instanceof Boolean) {
 
             boolean isSuccess = (Boolean) Main.primaryStage.getUserData();
@@ -512,26 +542,13 @@ public class Billing implements Initializable {
     }
 
     public void chooseItem(MouseEvent mouseEvent) {
-        Main.primaryStage.setUserData(popItemList);
-        customDialog.showFxmlDialog2("chooser/BillingitemChooser.fxml", "SELECT ITEM");
 
-        if (Main.primaryStage.getUserData() instanceof ItemChooserModel icm) {
+       // Main.primaryStage.setUserData(popItemList);
+        customDialog.showFxmlDialog2("chooser/StockItemChooser.fxml", "SELECT ITEM");
 
-            if (method.isItemAvailableInStock(icm.getItemId())) {
+        if (Main.primaryStage.getUserData() instanceof StockItemChooserModel sicm) {
 
-                if (method.isMultipleItemInStock(icm.getItemId())) {
-
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("item_id", icm.getItemId());
-                    map.put("item_name", icm.getItemName());
-                    Main.primaryStage.setUserData(map);
-                    customDialog.showFxmlDialog2("chooser/batchChooser.fxml", "SELECT BATCH");
-
-                    if (Main.primaryStage.getUserData() instanceof BatchChooserModel bcm) {
-                        this.bcm = bcm;
-                    }
-
-                } else {
+            if (method.isItemAvailableInStock(sicm.getStockId())) {
 
                     Connection connection = null;
                     PreparedStatement ps = null;
@@ -541,13 +558,25 @@ public class Billing implements Initializable {
                         connection = new DBConnection().getConnection();
 
                         String qry = """
-                                 select  stock_id,tpi.purchase_items_id ,tim.items_name,tim.strip_tab ,tpi.batch , tpi.expiry_date , ts.quantity , ts.quantity_unit  from tbl_stock ts
-                                                    left join tbl_purchase_items tpi on tpi.purchase_items_id = ts.purchase_items_id
-                                                    left join tbl_items_master tim on tim.item_id = ts.item_id
-                                                    where tpi.item_id =?  and ts.quantity>0 order by expiry_date asc
+                                select stock_id,
+                                       tpi.purchase_items_id,
+                                       tim.items_name,
+                                       tim.strip_tab,
+                                       tpi.batch,
+                                       tpi.expiry_date,
+                                       ts.quantity,
+                                       ts.quantity_unit,
+                                       tab_to_strip(ts.quantity,tim.strip_tab,ts.quantity_unit) as tab_to_strip
+                                from tbl_stock ts
+                                         left join tbl_purchase_items tpi on tpi.purchase_items_id = ts.purchase_items_id
+                                         left join tbl_items_master tim on tim.item_id = ts.item_id
+                                where ts.stock_id =?
+                                  and ts.quantity > 0
+                                order by expiry_date asc
+                                                                
                                 """;
                         ps = connection.prepareStatement(qry);
-                        ps.setInt(1, icm.getItemId());
+                        ps.setInt(1, sicm.getStockId());
                         rs = ps.executeQuery();
 
                         if (rs.next()) {
@@ -560,77 +589,63 @@ public class Billing implements Initializable {
                             int strip_tab = rs.getInt("strip_tab");
                             int purchase_items_id = rs.getInt("purchase_items_id");
                             String quantityUnit = rs.getString("quantity_unit");
-                            String qty = method.tabToStrip(quantity, strip_tab, quantityUnit);
+                            String qty = rs.getString("tab_to_strip");
 
                             bcm = new BatchChooserModel(stockId, itemName, batch,
                                     expiryDate, quantity, quantityUnit, qty, strip_tab, purchase_items_id);
                         }
 
+                        if (sicm.isStockable()) {
+                            avlQuantity.setText(bcm.getFullQty());
+                            tabPerStripL.setText(String.valueOf(bcm.getStripTab()));
+                            stripTf.setDisable(false);
+                            pcsTf.setDisable(false);
+                        } else {
+                            avlQuantity.setText("∞");
+                            tabPerStripL.setText("");
 
-                    } catch (SQLException e) {
-                        throw new RuntimeException(e);
-                    } finally {
-                        DBConnection.closeConnection(connection, ps, rs);
-                    }
+                            stripTf.setText("0");
+                            pcsTf.setText("1");
+                            stripTf.setDisable(true);
+                            pcsTf.setDisable(true);
+                        }
 
-                }
+                        saleRateTf.setFocusTraversable(false);
 
-                if (null == bcm) {
-                    return;
-                }
+                        itemNameL.setText(bcm.getItemName());
+                        ptm = method.getStockPrice(bcm.getPurchaseItemId());
 
-                if (icm.isStockable()) {
+                        mrpL.setText(String.valueOf(method.removeZeroAfterDecimal(ptm.getMrp())));
+                        saleRB.setSelected(true);
 
-                    avlQuantity.setText(bcm.getFullQty());
-                    tabPerStripL.setText(String.valueOf(bcm.getStripTab()));
-                    stripTf.setDisable(false);
-                    pcsTf.setDisable(false);
-                } else {
-                    avlQuantity.setText("∞");
-                    tabPerStripL.setText("");
-
-                    stripTf.setText("0");
-                    pcsTf.setText("1");
-                    stripTf.setDisable(true);
-                    pcsTf.setDisable(true);
-
-                }
+                        if (ptm.getSaleRate() < 1) {
+                            saleRateTf.setText(method.removeZeroAfterDecimal(ptm.getMrp()));
+                        } else {
+                            saleRateTf.setText(method.removeZeroAfterDecimal(ptm.getSaleRate()));
+                        }
 
 
-                saleRateTf.setFocusTraversable(false);
+                        if (method.isItemAvlInCart(bcm.getStockId())) {
 
-                itemNameL.setText(bcm.getItemName());
-                PriceTypeModel ptm = method.getStockPrice(bcm.getPurchaseItemId());
+                            ps = null;
+                            rs = null;
 
-                mrpL.setText(String.valueOf(method.removeZeroAfterDecimal(ptm.getMrp())));
+                            String cartQry = "select * from tbl_cart where stock_id = ? and created_by = ?";
+                            ps = connection.prepareStatement(cartQry);
+                            ps.setInt(1, bcm.getStockId());
+                            ps.setInt(2, Login.currentlyLogin_Id);
+                            rs = ps.executeQuery();
+                            if (rs.next()) {
+                                double mrp = rs.getDouble("mrp");
+                                int strip = rs.getInt("strip");
+                                int pcs = rs.getInt("pcs");
 
-                if (ptm.getSaleRate() < 1) {
-                    saleRateTf.setText(method.removeZeroAfterDecimal(ptm.getMrp()));
-                } else {
-                    saleRateTf.setText(method.removeZeroAfterDecimal(ptm.getSaleRate()));
-                }
+                                mrpL.setText(method.removeZeroAfterDecimal(mrp));
+                                stripTf.setText(method.removeZeroAfterDecimal(strip));
+                                pcsTf.setText(method.removeZeroAfterDecimal(pcs));
+                                customDialog.showAlertBox("", "Item Already Added");
+                            }
 
-                if (method.isItemAvlInCart(bcm.getStockId())) {
-                    Connection connection = null;
-                    PreparedStatement ps = null;
-                    ResultSet rs = null;
-
-                    try {
-                        connection = new DBConnection().getConnection();
-                        String qry = "select * from tbl_cart where stock_id = ? and created_by = ?";
-                        ps = connection.prepareStatement(qry);
-                        ps.setInt(1, bcm.getStockId());
-                        ps.setInt(2, Login.currentlyLogin_Id);
-                        rs = ps.executeQuery();
-                        if (rs.next()) {
-                            double mrp = rs.getDouble("mrp");
-                            int strip = rs.getInt("strip");
-                            int pcs = rs.getInt("pcs");
-
-                            mrpL.setText(method.removeZeroAfterDecimal(mrp));
-                            stripTf.setText(method.removeZeroAfterDecimal(strip));
-                            pcsTf.setText(method.removeZeroAfterDecimal(pcs));
-                            customDialog.showAlertBox("", "Item Already Added");
                         }
 
                     } catch (SQLException e) {
@@ -638,8 +653,7 @@ public class Billing implements Initializable {
                     } finally {
                         DBConnection.closeConnection(connection, ps, rs);
                     }
-                } else {
-                }
+
 
             } else {
                 customDialog.showAlertBox("", "Item stock not available. Please add purchase item");
@@ -775,6 +789,8 @@ public class Billing implements Initializable {
             ps.setInt(5, Login.currentlyLogin_Id);
 
             int res = ps.executeUpdate();
+            ptm = null;
+            saleRB.setSelected(true);
 
             if (res > 0) {
                 resetChooseItemField();
@@ -798,9 +814,7 @@ public class Billing implements Initializable {
 
         @Override
         public void onPreExecute() {
-
             switch (type) {
-
                 case GET_CART_DATA, GET_POPUP_ITEM_CART_DATA -> {
                     if (null != tableView) {
                         tableView.setItems(null);
@@ -811,33 +825,31 @@ public class Billing implements Initializable {
                     assert tableView != null;
                     tableView.setPlaceholder(method.getProgressBarRed(40, 40));
                 }
-
                 case GET_PATIENT -> {
                     tableViewPatient.setPlaceholder(method.getProgressBarRed(40, 40));
                 }
-
-
             }
-
-
         }
 
         @Override
         public Boolean doInBackground(String... params) {
 
             switch (type) {
-
-                case GET_CART_DATA -> {
-                    getCartData();
-                }
-
+                case GET_CART_DATA -> getCartData();
                 case GET_PATIENT -> {
-                    referByCom.setItems(CommonUtil.getDoctor(DoctorType.OUT_SIDE));
+                    ObservableList<DoctorModel> referredDoctorList = CommonUtil.getDoctor(DoctorType.OUT_SIDE);
+                    Platform.runLater(() -> referByCom.setItems(referredDoctorList));
+                    for (int i = 0; i < referredDoctorList.size(); i++) {
+                        if (referredDoctorList.get(i).getDrName().equals("SELF")) {
+                            int finalI = i;
+                            Platform.runLater(() -> referByCom.getSelectionModel().select(finalI));
+                        }
+                    }
                     consultNameCom.setItems(CommonUtil.getDoctor(DoctorType.IN_HOUSE));
                     getPatient();
                 }
                 case GET_POPUP_ITEM_CART_DATA -> {
-                    getItems();
+                   // getItems();
                     getCartData();
                 }
             }
@@ -847,8 +859,10 @@ public class Billing implements Initializable {
 
         @Override
         public void onPostExecute(Boolean success) {
-            tableView.setPlaceholder(new Label("Item Not Available."));
-            tableViewPatient.setPlaceholder(new Label("Patient Not Available."));
+            switch (type) {
+                case GET_PATIENT -> tableViewPatient.setPlaceholder(new Label("Patient Not Available."));
+            }
+
         }
 
         @Override
@@ -858,7 +872,6 @@ public class Billing implements Initializable {
     }
 
     private void resetChooseItemField() {
-
         avlQuantity.setText("");
         tabPerStripL.setText("");
         itemNameL.setText("SELECT ITEM");
@@ -868,15 +881,10 @@ public class Billing implements Initializable {
         pcsTf.setText("");
         stripTf.setDisable(false);
         pcsTf.setDisable(false);
-
-
     }
 
     private void getPatient() {
-
-        if (null != patientList) {
-            patientList.clear();
-        }
+        patientList.clear();
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -984,7 +992,7 @@ public class Billing implements Initializable {
             changeTableViewPatient(pagination.getCurrentPageIndex(), rowsPerPage);
         });
 
-        pagination.setCurrentPageIndex(0);
+        Platform.runLater(() -> pagination.setCurrentPageIndex(0));
         changeTableViewPatient(0, rowsPerPage);
         Platform.runLater(() -> {
             pagination.currentPageIndexProperty().addListener(
@@ -1069,7 +1077,20 @@ public class Billing implements Initializable {
             customDialog.showAlertBox("Shop Details Not Available",
                     "Please update shop details");
             return;
-        } else if (receivedAmountStr.isEmpty()) {
+        }
+
+        boolean isCosultAvl = false;
+        for (SaleEntryModel model : tableView.getItems()) {
+            if (Objects.equals(model.getDepartmentCode(), "Consultation")) {
+                isCosultAvl = true;
+                break;
+            }
+        }
+        if (isCosultAvl && consultNameCom.getSelectionModel().isEmpty()) {
+            method.show_popup("Please Select Doctor", consultNameCom, Side.RIGHT);
+            return;
+        }
+        if (receivedAmountStr.isEmpty()) {
             method.show_popup("Please enter received Amount", receivedAmountTf, Side.TOP);
             return;
         }
@@ -1078,10 +1099,15 @@ public class Billing implements Initializable {
             receivedAmountDouble = Double.parseDouble(receivedAmountStr);
 
         } catch (NumberFormatException e) {
-            method.show_popup("Please enter valid received Amount", receivedAmountTf, Side.RIGHT);
+            method.show_popup("Please enter valid received Amount", receivedAmountTf, Side.TOP);
             return;
         }
+        double  invoiceValue = Double.parseDouble(invoiceValueTf.getText());
 
+        if (receivedAmountDouble > invoiceValue){
+            method.show_popup("Received amount cannot more then invoice amount.", receivedAmountTf, Side.TOP);
+            return;
+        }
 
         String billType = billingTypeC.getSelectionModel().getSelectedItem();
 
@@ -1354,8 +1380,6 @@ public class Billing implements Initializable {
                         }
 
 
-                        System.out.println(!consultNameCom.getSelectionModel().isEmpty() &&
-                                Objects.equals(model.getDepartmentCode(), "Consultation"));
 
                         System.out.println(model.getDepartmentCode());
 
@@ -1394,9 +1418,9 @@ public class Billing implements Initializable {
                     }
 
                     if (resItem > 0) {
-
                         connection.commit();
                         addDiscTF.setText(String.valueOf(0));
+                        receivedAmountTf.setText("");
                         patientModel = null;
                         Platform.runLater(() -> patientNameL.setText("SELECT PATIENT"));
                         clearAll();
@@ -1418,100 +1442,7 @@ public class Billing implements Initializable {
             }
             e.printStackTrace();
         } finally {
-
-            DBConnection.closeConnection(connection, ps, rs);
-        }
-
-    }
-
-    private static class ClearCartAsync extends AsyncTask<String, Integer, Boolean> {
-        @Override
-        public void onPreExecute() {
-
-        }
-
-        @Override
-        public Boolean doInBackground(String... params) {
-
-            cartClean();
-
-            return false;
-
-        }
-
-        private void cartClean() {
-
-            Connection con = null;
-            PreparedStatement ps = null;
-            String query = "DELETE FROM tbl_cart WHERE created_by = ?";
-            try {
-                con = new DBConnection().getConnection();
-                ps = con.prepareStatement(query);
-                ps.setInt(1, Login.currentlyLogin_Id);
-                int res = ps.executeUpdate();
-
-                if (res > 0) {
-                    System.out.println("Cart clean successfully.");
-                }
-
-            } catch (SQLException e) {
-                new CustomDialog().showAlertBox("ERROR", "Failed to Clear Cart !");
-                e.printStackTrace();
-            } finally {
-                DBConnection.closeConnection(con, ps, null);
-            }
-        }
-
-        @Override
-        public void onPostExecute(Boolean success) {
-
-        }
-
-        @Override
-        public void progressCallback(Integer... params) {
-
-        }
-    }
-
-    private void getItems() {
-        popItemList.clear();
-        Connection connection = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            connection = dbConnection.getConnection();
-
-            String qry = """
-                    select * from available_quantity_v where avl_qty_pcs > 0 and status = 1
-                    """;
-            ps = connection.prepareStatement(qry);
-            rs = ps.executeQuery();
-
-            while (rs.next()) {
-
-                int itemId = rs.getInt("ITEM_ID");
-                String itemName = rs.getString("ITEMS_NAME");
-                String packing = rs.getString("PACKING");
-                int tabPerStrip = rs.getInt("STRIP_TAB");
-                String unit = rs.getString("unit");
-                String composition = rs.getString("composition");
-                String tag = rs.getString("tag");
-                String medicineDose = rs.getString("dose");
-                String avlQty = rs.getString("avl_qty_strip");
-                boolean isStockable = rs.getBoolean("is_stockable");
-                int departmentId = rs.getInt("department_id");
-                String departmentName = rs.getString("department_name");
-
-                popItemList.add(new ItemChooserModel(itemId, itemName, packing, null, unit, tabPerStrip, composition, tag,
-                        medicineDose, isStockable ? avlQty : "∞", isStockable,departmentId,departmentName));
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
             DBConnection.closeConnection(connection, ps, rs);
         }
     }
-
 }

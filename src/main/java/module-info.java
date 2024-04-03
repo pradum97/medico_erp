@@ -26,7 +26,7 @@ module com.techwhizer.medicalshop {
 
     opens com.techwhizer.medicalshop.InvoiceModel to javafx.fxml;
     exports com.techwhizer.medicalshop.InvoiceModel;
-
+    opens com.techwhizer.medicalshop.reports to javafx.fxml;
 
     opens com.techwhizer.medicalshop.method to javafx.fxml;
     exports com.techwhizer.medicalshop.method;
@@ -98,6 +98,10 @@ module com.techwhizer.medicalshop {
 
     exports com.techwhizer.medicalshop.controller.investigation.model;
     opens com.techwhizer.medicalshop.controller.investigation.model to javafx.fxml;
+    exports com.techwhizer.medicalshop.report;
+    opens com.techwhizer.medicalshop.report to javafx.fxml;
+    exports com.techwhizer.medicalshop.controller.reports;
+    opens com.techwhizer.medicalshop.controller.reports to javafx.fxml;
 
 
 }

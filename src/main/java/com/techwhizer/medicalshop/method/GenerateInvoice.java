@@ -335,6 +335,9 @@ public class GenerateInvoice {
                 String  prescriptionDate= rs.getString("prescription_date");
                 String  consultName= rs.getString("consult_name");
                 String  remarks= rs.getString("remarks");
+
+                int age = rs.getInt("age");
+
                 param.put("gender", String.valueOf(gender.charAt(0)).toUpperCase());
                 param.put("weight", weight);
                 param.put("name", name);
@@ -343,6 +346,7 @@ public class GenerateInvoice {
                 param.put("phone", phone);
                 param.put("invoiceNumber",prescriptionNum);
                 param.put("uhidNum",uhid_no);
+                param.put("age",String.valueOf(age));
 
                 ConsultationSetupModel csm = CommonUtil.getConsultationSetup();
                 param.put("fee_valid_days",csm==null?25:csm.getFee_valid_days());
@@ -422,6 +426,8 @@ public class GenerateInvoice {
                 String cns = rs.getString("cns");
                 String chest = rs.getString("chest");
                 String  uhid_no= rs.getString("uhid_no");
+                int age = rs.getInt("age");
+
                 param.put("gender", String.valueOf(gender.charAt(0)).toUpperCase());
                 param.put("weight", weight);
                 param.put("name", name);
@@ -430,7 +436,7 @@ public class GenerateInvoice {
                 param.put("phone", phone);
                 param.put("invoiceNumber","");
                 param.put("uhidNum",uhid_no);
-
+                param.put("age",String.valueOf(age));
                 param.put("fee_valid_days",0);
                 String companyLogoPath = "img/company/gangotri_company_logo.png";
                 param.put("company_logo1", new ImageLoader().reportLogo(companyLogoPath));

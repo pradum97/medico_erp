@@ -8,6 +8,7 @@ import com.techwhizer.medicalshop.model.MedicineTimeModel;
 import com.techwhizer.medicalshop.model.PrescriptionMedicationModel;
 import com.techwhizer.medicalshop.model.chooserModel.ItemChooserModel;
 import com.techwhizer.medicalshop.util.DBConnection;
+import com.techwhizer.medicalshop.util.ItemChooserType;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -69,9 +70,9 @@ public class AddPrescriptionMedicine implements Initializable {
     public void addMedicineClick(ActionEvent actionEvent) {
 
         Map<String, Object> data = new HashMap<>();
-        data.put("is_stockable", true);
+        data.put("item_chooser_type", ItemChooserType.PURCHASE);
         Main.primaryStage.setUserData(data);
-        new CustomDialog().showFxmlDialog2("chooser/commonItemChooser.fxml", "SELECT ITEM");
+        new CustomDialog().showFxmlDialog2("chooser/itemChooser.fxml", "SELECT ITEM");
         if (Main.primaryStage.getUserData() instanceof ItemChooserModel icm) {
             icmGlobal = icm;
            itemNameTf.setText(icm.getItemName());

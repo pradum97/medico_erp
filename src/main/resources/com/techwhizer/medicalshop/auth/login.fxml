@@ -18,7 +18,7 @@
    <center>
       <VBox alignment="CENTER" fillWidth="false" prefHeight="700.0" prefWidth="800.0">
 
-          <VBox prefHeight="437.0" prefWidth="431.0" style="-fx-background-color: #ffffff; -fx-background-radius: 4; -fx-border-radius: 4; -fx-padding: 8; -fx-border-color: grey;">
+          <VBox prefHeight="408.0" prefWidth="431.0" style="-fx-background-color: #ffffff; -fx-background-radius: 4; -fx-border-radius: 4; -fx-padding: 8; -fx-border-color: grey;">
 
                <VBox alignment="TOP_CENTER" spacing="10.0" style="-fx-background-color: white">
 

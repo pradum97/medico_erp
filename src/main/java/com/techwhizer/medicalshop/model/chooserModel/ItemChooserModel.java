@@ -5,13 +5,13 @@ import com.techwhizer.medicalshop.model.GstModel;
 
 public class ItemChooserModel {
 
-    private int itemId = 0 ;
+    private int itemId ;
     private String itemName;
     private String packing;
-    private GstModel discountModel;
+    private GstModel gstModel;
     private String unit;
     private int tabPerStrip;
-    private String composition,productTag,medicineDose,availableQuantity;
+    private String composition,productTag,medicineDose;
     private boolean isStockable;
     private int department_id;
     private String department_name;
@@ -22,32 +22,23 @@ public class ItemChooserModel {
     }
 
     public ItemChooserModel(int itemId, String itemName, String packing,
-                             GstModel discountModel,String unit,int tabPerStrip,
-                            String composition, String productTag,String medicineDose,String availableQuantity,
+                             GstModel gstModel,String unit,int tabPerStrip,
+                            String composition, String productTag,String medicineDose,
                             boolean isStockable,int department_id, String department_name) {
         this.itemId = itemId;
         this.itemName = itemName;
-      //  this.discountModel = discountModel;
+        this.gstModel = gstModel;
         this.unit = unit;
         this.tabPerStrip = tabPerStrip;
         this.packing = packing;
         this.composition = composition;
         this.productTag = productTag;
         this.medicineDose = medicineDose;
-        this.availableQuantity = availableQuantity;
         this.isStockable = isStockable;
         this.department_id = department_id;
         this.department_name = department_name;
     }
 
-
-    public GstModel getDiscountModel() {
-        return discountModel;
-    }
-
-    public void setDiscountModel(GstModel discountModel) {
-        this.discountModel = discountModel;
-    }
 
     public int getDepartment_id() {
         return department_id;
@@ -71,14 +62,6 @@ public class ItemChooserModel {
 
     public void setStockable(boolean stockable) {
         isStockable = stockable;
-    }
-
-    public String getAvailableQuantity() {
-        return availableQuantity;
-    }
-
-    public void setAvailableQuantity(String availableQuantity) {
-        this.availableQuantity = availableQuantity;
     }
 
     public String getMedicineDose() {
@@ -154,10 +137,10 @@ public class ItemChooserModel {
     }
 
     public GstModel getGstModel() {
-        return discountModel;
+        return gstModel;
     }
 
     public void setGstModel(GstModel discountModel) {
-        this.discountModel = discountModel;
+        this.gstModel = discountModel;
     }
 }

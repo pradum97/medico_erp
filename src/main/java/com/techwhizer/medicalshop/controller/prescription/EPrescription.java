@@ -14,6 +14,7 @@ import com.techwhizer.medicalshop.model.ConsultantModel;
 import com.techwhizer.medicalshop.model.PrescriptionMedicationModel;
 import com.techwhizer.medicalshop.model.chooserModel.ItemChooserModel;
 import com.techwhizer.medicalshop.util.DBConnection;
+import com.techwhizer.medicalshop.util.ItemChooserType;
 import com.victorlaerte.asynctask.AsyncTask;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -35,6 +36,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import org.apache.poi.ss.formula.FormulaType;
 
 import java.net.URL;
 import java.sql.*;
@@ -48,17 +50,26 @@ public class EPrescription implements Initializable {
 
 
     public TextArea remarksTa;
-    public Button saveAsFinalBn;
     public Button saveAsDraftBn;
     public Button printBn;
     public TableView<PrescriptionMasterModel> tableViewPrescription;
     public TableColumn<PrescriptionMasterModel, Integer> colPrescriptionSrNum;
     public TableColumn<PrescriptionMasterModel, String> colPrescriptionNum;
     public TableColumn<PrescriptionMasterModel, String> colPrescriptionDate;
+    public SplitMenuButton getLastInfoMenuButton;
 
     enum Type {
         PRINT, SAVE, UPDATE, INIT, UPDATE_DELETE, VIEW_MEDICINE, GET_LAST, RE_BIND
     }
+
+    enum LastPrescriptionType{
+        INVESTIGATION,MEDICATION,BOTH
+    }
+
+    enum FromType{
+        LAST_INFO_MENU,OTHER
+    }
+
 
     public Pagination pagination;
     public Label genderL;
@@ -70,6 +81,7 @@ public class EPrescription implements Initializable {
     public TableColumn<InvestigationModel, Integer> colInveSr;
     public TableColumn<InvestigationModel, String> colInveItemName;
     public TableColumn<InvestigationModel, String> colInvePrescribedDate;
+    public TableColumn<InvestigationModel, String> colInvestAction;
     public TableColumn<InvestigationModel, String> colInveResultDate;
     public TableColumn<InvestigationModel, String> colInveResultValue;
     private ObservableList<ConsultantModel> consultList = FXCollections.observableArrayList();
@@ -108,6 +120,10 @@ public class EPrescription implements Initializable {
         tableview.setFixedCellSize(30.0);
         tableViewPrescription.setFixedCellSize(29);
 
+        investigationTableView.setFixedCellSize(30.0);
+
+
+
         if (Main.primaryStage.getUserData() instanceof ConsultantModel cm2) {
             this.cm = cm2;
             patientNameL.setText(cm2.getPatient_name());
@@ -127,8 +143,6 @@ public class EPrescription implements Initializable {
         setupTable();
 
         startup();
-
-        saveAsFinalBn.setVisible(false);
         printBn.setVisible(false);
     }
 
@@ -152,6 +166,8 @@ public class EPrescription implements Initializable {
 
     public void addInvestigationClick(ActionEvent actionEvent) {
         investigationList.add(getInvestigationDefaultItem());
+        double totalHeight = investigationTableView.getFixedCellSize() * investigationList.size() + 40;
+        investigationTableView.setMinHeight(totalHeight);
     }
 
     private InvestigationModel getInvestigationDefaultItem() {
@@ -162,6 +178,51 @@ public class EPrescription implements Initializable {
         investigationTableView.setItems(investigationList);
         colInveSr.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(investigationTableView.getItems().indexOf(cellData.getValue()) + 1));
         colInvePrescribedDate.setCellValueFactory(new PropertyValueFactory<>("prescribedDateFor"));
+
+        Callback<TableColumn<InvestigationModel, String>, TableCell<InvestigationModel, String>> cellAction =
+                (TableColumn<InvestigationModel, String> param) -> new TableCell<>() {
+                    @Override
+                    public void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                            setText(null);
+
+                        } else {
+                            InvestigationModel icm = investigationTableView.getItems().get(getIndex());
+
+                            ImageView ivDelete = new ImageView(new ImageLoader().load("img/icon/delete_ic.png"));
+                            ivDelete.setFitHeight(12);
+                            ivDelete.setFitWidth(12);
+
+                            ivDelete.setStyle("-fx-cursor: hand ; -fx-background-color: red ; -fx-background-radius: 3 ");
+
+                            ivDelete.setVisible(icm.getResultValue() == null || icm.getResultValue().isEmpty());
+                            ivDelete.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                                @Override
+                                public void handle(MouseEvent mouseEvent) {
+                                    new Method().selectTable(getIndex(), investigationTableView);
+                                    InvestigationModel icm = investigationTableView.getSelectionModel().getSelectedItem();
+                                    investigationList.remove(icm);
+                                    investigationTableView.getItems().remove(icm);
+
+                                    double totalHeight = investigationTableView.getFixedCellSize() * investigationList.size() - 40; // 30 is for header
+                                    investigationTableView.setMinHeight(totalHeight);
+                                }
+                            });
+
+                            HBox managebtn = new HBox(ivDelete);
+                            managebtn.setStyle("-fx-alignment:center");
+                            HBox.setMargin(ivDelete, new Insets(2, 2, 0, 2));
+
+                            setGraphic(managebtn);
+                            setText(null);
+
+                        }
+                    }
+                };
+
+        colInvestAction.setCellFactory(cellAction);
 
         Callback<TableColumn<InvestigationModel, String>, TableCell<InvestigationModel, String>> cellItemName = (TableColumn<InvestigationModel, String> param) -> new TableCell<>() {
             @Override
@@ -178,9 +239,9 @@ public class EPrescription implements Initializable {
                     inveItemSelect.setStyle("-fx-border-color: grey;-fx-border-radius: 3;-fx-padding: 2 10 2 10");
                     inveItemSelect.setOnAction(actionEvent -> {
                         Map<String, Object> data = new HashMap<>();
-                        data.put("is_stockable", false);
+                        data.put("item_chooser_type", ItemChooserType.INVESTIGATION);
                         Main.primaryStage.setUserData(data);
-                        customDialog.showFxmlDialog2("chooser/commonItemChooser.fxml", "");
+                        customDialog.showFxmlDialog2("chooser/itemChooser.fxml", "");
 
                         if (Main.primaryStage.getUserData() instanceof ItemChooserModel icm) {
                             im.setItemDetails(icm);
@@ -276,6 +337,8 @@ public class EPrescription implements Initializable {
         customDialog.showFxmlDialog2("prescription/addPrescriptionMedicine.fxml", "");
         if (Main.primaryStage.getUserData() instanceof PrescriptionMedicationModel pmm) {
             medicineList.add(pmm);
+            double totalHeight = tableview.getFixedCellSize() * medicineList.size() + 45;
+            tableview.setMinHeight(totalHeight);
         }
     }
 
@@ -291,10 +354,6 @@ public class EPrescription implements Initializable {
         colRemarks.setCellValueFactory(new PropertyValueFactory<>("remark"));
         colDose.setCellValueFactory(new PropertyValueFactory<>("dose"));
         setOptionalCell();
-    }
-
-    public void saveAsFinalBnClick(ActionEvent actionEvent) {
-        saveBnClick(true, saveAsFinalBn);
     }
 
     public void saveAsDraftBnClick(ActionEvent actionEvent) {
@@ -345,7 +404,10 @@ public class EPrescription implements Initializable {
                         public void handle(MouseEvent mouseEvent) {
                             new Method().selectTable(getIndex(), tableview);
                             PrescriptionMedicationModel icm = tableview.getSelectionModel().getSelectedItem();
+                            medicineList.remove(icm);
                             tableview.getItems().remove(icm);
+                            double totalHeight = tableview.getFixedCellSize() * medicineList.size() - 45;
+                            tableview.setMinHeight(totalHeight);
                         }
                     });
 
@@ -465,7 +527,7 @@ public class EPrescription implements Initializable {
                 case INIT -> {
                     init();
                 }
-                case RE_BIND -> getPrescriptionDetailsById(((Integer) data.get("prescription_master_id")));
+                case RE_BIND -> getPrescriptionDetailsById(((Integer) data.get("prescription_master_id")),LastPrescriptionType.BOTH,FromType.OTHER);
             }
             return true;
         }
@@ -536,7 +598,47 @@ public class EPrescription implements Initializable {
         colPrescriptionNum.setCellFactory(cellEdit);
     }
 
-    private void getPrescriptionDetailsById(int prescMasterId) {
+
+    public void onlyInvestigationMenuClick(ActionEvent actionEvent) {
+        getPrescriptionDetailsById(getLastPrescriptionMasterId(),LastPrescriptionType.INVESTIGATION,FromType.LAST_INFO_MENU);
+    }
+
+    public void onlyMedicationMenuClick(ActionEvent actionEvent) {
+        getPrescriptionDetailsById(getLastPrescriptionMasterId(),LastPrescriptionType.MEDICATION,FromType.LAST_INFO_MENU);
+    }
+
+    public void bothMenuClick(ActionEvent actionEvent) {
+        getPrescriptionDetailsById(getLastPrescriptionMasterId(),LastPrescriptionType.BOTH,FromType.LAST_INFO_MENU);
+    }
+
+    private int getLastPrescriptionMasterId(){
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            connection = new DBConnection().getConnection();
+            String qry = """
+                    select prescription_master_id from tbl_prescription_master where consultation_id = ? order by prescription_master_id desc
+                                        
+                    """;
+            ps = connection.prepareStatement(qry);
+            ps.setInt(1,cm.getConsultation_id());
+            rs = ps.executeQuery();
+
+            if (rs.next()){
+                return rs.getInt("prescription_master_id");
+            }else {
+                return 0;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private void getPrescriptionDetailsById(int prescMasterId,LastPrescriptionType lastPrescriptionType,FromType fromType) {
         investigationList.clear();
         medicineList.clear();
 
@@ -558,12 +660,23 @@ public class EPrescription implements Initializable {
                 String prescriptionNum = rs.getString("prescription_num");
                 String remarks = rs.getString("remarks");
 
-                investigationList.addAll( getInvestigation(prescriptionMasterId.get()));
-                medicineList.addAll(getMedication(prescriptionMasterId.get())) ;
+               switch (lastPrescriptionType){
 
+                   case INVESTIGATION -> investigationList.addAll( getInvestigation(prescriptionMasterId.get()));
+                   case MEDICATION -> medicineList.addAll(getMedication(prescriptionMasterId.get())) ;
+                   default -> {
+                       investigationList.addAll( getInvestigation(prescriptionMasterId.get()));
+                       medicineList.addAll(getMedication(prescriptionMasterId.get())) ;
+                   }
+               }
                 Platform.runLater(() -> {
                     remarksTa.setText(remarks);
-                    receiptNumL.setText(prescriptionNum);
+                    if (fromType == FromType.OTHER){
+                        receiptNumL.setText(prescriptionNum);
+                    }else {
+                        receiptNumL.setText("");
+                    }
+
                 });
             }
         } catch (SQLException e) {
@@ -784,7 +897,7 @@ public class EPrescription implements Initializable {
                     connection.commit();
                     new CustomDialog().showAlertBox("Success", "Prescription Successfully Saved.");
                     callThread(Type.INIT, new HashMap<>());
-                    getPrescriptionDetailsById(prescriptionMasterId.get());
+                    getPrescriptionDetailsById(prescriptionMasterId.get(),LastPrescriptionType.BOTH,FromType.OTHER);
                 }
             }
         } catch (SQLException | NullPointerException e) {

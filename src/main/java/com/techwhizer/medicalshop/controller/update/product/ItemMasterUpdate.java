@@ -410,23 +410,10 @@ public class ItemMasterUpdate implements Initializable {
 
         }
         statusCom.getSelectionModel().select(status);
-        if (method.isItemAvailableInStock(icm.getItemId())) {
-            String stockUnit = method.getStockUnit(icm.getItemId());
 
-            if (stockUnit.equalsIgnoreCase("TAB") || stockUnit.equalsIgnoreCase("STRIP")) {
-                unitCom.setItems(staticData.tabUnit);
-                unitCom.getSelectionModel().select(icm.getUnit());
-            } else {
-                unitCom.setItems(staticData.pcsUnit);
-                unitCom.getSelectionModel().select("PCS");
-            }
-
-
-        } else {
-            unitCom.setItems(staticData.getUnit());
-            unitCom.getSelectionModel().select(icm.getUnit());
-        }
-
+        unitCom.setItems(staticData.getUnit());
+        unitCom.getSelectionModel().select(icm.getUnit());
+        unitCom.getSelectionModel().select(icm.getUnit());
 
     }
 
@@ -542,8 +529,6 @@ public class ItemMasterUpdate implements Initializable {
             discountId = discountCom.getSelectionModel().getSelectedItem().getDiscount_id();
         }
 
-
-        System.out.println("departmentCode-"+departmentCode);
 
         ItemsModel itemsModel = new ItemsModel(productName, unit, null, discountId, gstId,
                 mrpD, mrpD, mrpD, type, narcotic, itemType, status, stripTabL,composition,tag,medicineDose,icm.isStockable(),departmentCode);

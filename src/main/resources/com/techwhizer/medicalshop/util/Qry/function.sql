@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION tab_to_strip(total_tab int, strip_tab int, unit varchar(50))
+CREATE OR REPLACE FUNCTION tab_to_strip(total_tab numeric, strip_tab numeric, unit varchar(50))
     RETURNS VARCHAR(1000) AS
 $$
 DECLARE
@@ -7,30 +7,26 @@ DECLARE
     tab    int;
 
 BEGIN
-
     IF unit = 'TAB' THEN
-
-        strip = coalesce(total_tab, 0) / coalesce(strip_tab, 1);
-        tab = coalesce(total_tab, 0) % coalesce(strip_tab, 1);
+        strip = split_part(cast((coalesce(total_tab, 0) / coalesce(strip_tab, 1))as varchar(30)), '.', 1) ;
+        tab = (coalesce(total_tab, 0) % coalesce(strip_tab, 1));
 
         if strip > 0 then
-            result = strip || '-STR';
+            result = (strip || '-STR');
         END IF;
-
 
         if tab > 0 THEN
             if strip > 0 THEN
                 result = concat(result, ',');
             END IF;
             result = concat(result, tab , '-TAB');
-        END IF;
+       END IF;
 
     ELSE
         result = total_tab || '-PCS';
     END IF;
 
-
-    RETURN coalesce(result,'0');
+    RETURN coalesce(result,concat('0-',unit));
 END ;
 $$ LANGUAGE plpgsql;
 
@@ -48,40 +44,25 @@ BEGIN
 END ;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION get_available_quantity(itemId int,format varchar(50))
+CREATE OR REPLACE FUNCTION get_available_quantity(stockId int,returnFormat varchar(50))
     RETURNS VARCHAR(300)
     LANGUAGE plpgsql AS
-$func$
-
+$$
 BEGIN
-
-    return
-
-    (case when format = 'PCS' or format = 'TAB' THEN
-              cast((select distinct sum(quantity) from tbl_stock ts where item_id = itemId limit 1) as varchar(1000))
+    return (
+        case when upper(returnFormat) = 'PCS' or upper(returnFormat) = 'TAB' THEN
+        cast((select distinct quantity from tbl_stock ts where ts.stock_id = stockId) as varchar(300))
+        when upper(returnFormat) = 'STRIP' THEN
+            cast( ( select distinct tab_to_strip(ts.quantity,tim.strip_tab,ts.quantity_unit)
+             from stock_v ts
+                      left join public.tbl_items_master tim on ts.item_id = tim.item_id
+             where ts.stock_id =stockId) as varchar(300))
          ELSE
-
-            cast(( select distinct
-
-                       tab_to_strip(cast(
-
-                                            (select sum(quantity) from tbl_stock ts where item_id = itemId) as int),
-                                    cast(tim.strip_tab as int),ts.quantity_unit)
-
-
-                   from stock_v ts
-
-                            left join public.tbl_items_master tim on ts.item_id = tim.item_id
-
-                   where ts.item_id = itemId limit 1) as varchar(1000))
+        concat('0-','PCS')
         END
-    );
-
-
-
+    ) ;
 END ;
-$func$;
-
+$$;
 
 CREATE OR REPLACE FUNCTION get_remaining_dues(dues_source_id int)
     RETURNS VARCHAR(50) AS
@@ -112,9 +93,74 @@ BEGIN
     left join payment_information pi on pi.document_id = td.dues_id
      where td.source_id = tsm.sale_main_id and pi.document_source = 'DUES'),0) as received_amount
     from tbl_sale_main tsm
-              where tsm.sale_main_id = saleMainId
+    where tsm.sale_main_id = saleMainId
     );
-
-    return result;
+    return cast(result as numeric);
 END ;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION refresh_billing_report_v()
+    RETURNS TRIGGER AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW CONCURRENTLY billing_report_v;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+
+----------for materialized view-------
+CREATE OR REPLACE FUNCTION refresh_billing_report_v_fn()
+    RETURNS TRIGGER AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW CONCURRENTLY billing_report_v;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION refresh_item_chooser_v_fn()
+    RETURNS TRIGGER AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW CONCURRENTLY item_chooser_v;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION refresh_stock_v_fn()
+    RETURNS TRIGGER AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW CONCURRENTLY stock_v;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION refresh_patient_v_fn()
+    RETURNS TRIGGER AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW CONCURRENTLY patient_v;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION refresh_all_materialized_views_concurrently() RETURNS VOID AS $$
+DECLARE
+    mv_name TEXT;
+BEGIN
+    FOR mv_name IN SELECT matviewname FROM pg_matviews WHERE schemaname = 'public' LOOP
+            EXECUTE 'REFRESH MATERIALIZED VIEW  CONCURRENTLY  ' || quote_ident(mv_name);
+        END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION refresh_all_materialized_views() RETURNS VOID AS $$
+DECLARE
+    mv_name TEXT;
+BEGIN
+    FOR mv_name IN SELECT matviewname FROM pg_matviews WHERE schemaname = 'public' LOOP
+            EXECUTE 'REFRESH MATERIALIZED VIEW  ' || quote_ident(mv_name);
+        END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+--------------------------------------------
+
+

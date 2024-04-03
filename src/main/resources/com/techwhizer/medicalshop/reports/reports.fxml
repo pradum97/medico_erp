@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.reports.Reports">
+   <center>
+      <TabPane fx:id="containerTabPane" style="-fx-tab-min-width: 150px; -fx-tab-selected-color: #04852f;">
+         <tabs>
+            <Tab fx:id="billingReportTab" closable="false" text="Billing Reports" />
+             <Tab fx:id="invoiceReportTab" closable="false" text="Invoice Report" />
+            <Tab fx:id="departmentWiseReportTab" closable="false" text="Department Wise Report" />
+         </tabs>
+      </TabPane>
+   </center>
+   <top>
+      <HBox alignment="CENTER" prefWidth="200.0" style="-fx-background-color: #04852f;" BorderPane.alignment="CENTER">
+         <children>
+            <Label text="Billing Report" textFill="WHITE">
+               <font>
+                  <Font name="Arial Black" size="12.179104804992676" />
+               </font>
+            </Label>
+         </children>
+         <padding>
+            <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+         </padding>
+      </HBox>
+   </top>
+</BorderPane>

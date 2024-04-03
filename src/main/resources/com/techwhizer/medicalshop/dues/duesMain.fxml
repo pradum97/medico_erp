@@ -17,7 +17,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.dues.DuesMain">
+<BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.techwhizer.medicalshop.controller.dues.DuesMain">
    <top>
       <VBox BorderPane.alignment="CENTER">
          <children>

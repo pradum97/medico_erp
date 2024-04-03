@@ -36,7 +36,7 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 
 public class PatientMain implements Initializable {
-    private int rowsPerPage = 50;
+    private int rowsPerPage = 60;
     public TableView<PatientModel> tableView;
     public TableColumn<PatientModel, Integer> colSrNo;
     public TableColumn<PatientModel, String> colName;

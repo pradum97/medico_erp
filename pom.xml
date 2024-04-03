@@ -16,13 +16,6 @@
 
     <dependencies>
 
-
-        <dependency>
-            <groupId>com.github.hemeroc</groupId>
-            <artifactId>javafx-datetimepicker</artifactId>
-            <version>master-SNAPSHOT</version>
-        </dependency>
-
         <dependency>
             <groupId>net.sf.jasperreports</groupId>
             <artifactId>jasperreports</artifactId>

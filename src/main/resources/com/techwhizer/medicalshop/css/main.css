@@ -55,12 +55,27 @@
     -fx-text-fill: white;
 }
 
+.common-context-menu,.common-menu-button {
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-background-color: white;
+    -fx-border-color: grey;
+    -fx-text-fill: black;
+    -fx-cursor: hand;
+
+}
+
+.common-menu-button.menu-item{
+    -fx-min-width: 90px;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-border-color: grey;
+}
 
 #settingMenuButton {
     -fx-background-radius: 4;
     -fx-background-color: #1a75ff;
     -fx-padding: 1;
-
     -fx-text-fill: white;
 }
 

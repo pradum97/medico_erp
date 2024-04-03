@@ -4,9 +4,11 @@
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Pagination?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitMenuButton?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
@@ -23,7 +25,7 @@
          <children>
             <VBox spacing="5.0" style="-fx-background-color: white; -fx-border-color: grey; -fx-border-radius: 3;" VBox.vgrow="ALWAYS">
                <children>
-                  <ScrollPane fitToHeight="true" fitToWidth="true" pannable="true">
+                  <ScrollPane fitToHeight="true" fitToWidth="true" pannable="true" VBox.vgrow="ALWAYS">
                      <content>
                         <VBox spacing="10.0">
                            <children>
@@ -108,7 +110,7 @@
                                  </children>
                               </VBox>
                               <Separator prefWidth="200.0" />
-                              <VBox alignment="CENTER_LEFT">
+                              <VBox alignment="CENTER_LEFT" VBox.vgrow="ALWAYS">
                                  <children>
                                     <HBox>
                                        <children>
@@ -120,9 +122,10 @@
                                           <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS" />
                                        </children>
                                     </HBox>
-                                    <TableView fx:id="investigationTableView" focusTraversable="false" maxHeight="300.0" minHeight="200.0" prefHeight="200.0" style="-fx-border-color: grey; -fx-border-radius: 4; -fx-border-radius: 4;" VBox.vgrow="ALWAYS">
+                                    <TableView fx:id="investigationTableView" focusTraversable="false" minHeight="150.0" style="-fx-border-color: grey; -fx-border-radius: 4; -fx-border-radius: 4;" VBox.vgrow="ALWAYS">
                                        <columns>
                                           <TableColumn fx:id="colInveSr" maxWidth="42.0" minWidth="40.0" text="SR#" />
+                                          <TableColumn fx:id="colInvestAction" maxWidth="40.0" minWidth="40.0" prefWidth="-1.0" />
                                           <TableColumn fx:id="colInveItemName" maxWidth="250.0" minWidth="230.0" text="ITEM NAME">
                                              <graphic>
                                                 <Button mnemonicParsing="false" onAction="#addInvestigationClick" style="-fx-background-color: #339933; -fx-background-radius: 500;">
@@ -148,14 +151,14 @@
                                     </TableView>
                                  </children>
                               </VBox>
-                              <VBox alignment="CENTER_LEFT">
+                              <VBox alignment="CENTER_LEFT" VBox.vgrow="ALWAYS">
                                  <children>
                                     <Label text="Medication :" textFill="#04a03d">
                                        <font>
                                           <Font name="Arial Black" size="12.179104804992676" />
                                        </font>
                                     </Label>
-                                    <TableView fx:id="tableview" focusTraversable="false" prefHeight="250.0" prefWidth="300.0" style="-fx-border-color: grey; -fx-border-radius: 4; -fx-background-radius: 4;">
+                                    <TableView fx:id="tableview" focusTraversable="false" minWidth="180.0" prefWidth="300.0" style="-fx-border-color: grey; -fx-border-radius: 4; -fx-background-radius: 4;">
                                       <columns>
                                         <TableColumn fx:id="colSr" maxWidth="42.0" minWidth="40.0" prefWidth="-1.0" text="SR#" />
                                           <TableColumn fx:id="colAction" maxWidth="40.0" minWidth="40.0" prefWidth="-1.0" />
@@ -202,6 +205,13 @@
                                           <Insets bottom="3.0" left="15.0" right="15.0" top="3.0" />
                                        </padding>
                                     </Button>
+                                    <SplitMenuButton fx:id="getLastInfoMenuButton" mnemonicParsing="false" style="-fx-border-color: #7DDA58; -fx-background-radius: 4; -fx-border-radius: 4;" styleClass="common-context-menu" text="Get Last Info">
+                                      <items>
+                                        <MenuItem mnemonicParsing="false" onAction="#onlyInvestigationMenuClick" styleClass="common-menu-button" text="Investigation" />
+                                        <MenuItem mnemonicParsing="false" onAction="#onlyMedicationMenuClick" styleClass="common-menu-button" text="Medication" />
+                                          <MenuItem mnemonicParsing="false" onAction="#bothMenuClick" styleClass="common-menu-button" text="Both" />
+                                      </items>
+                                    </SplitMenuButton>
                                     <Button fx:id="emptyPrint" layoutX="534.0" layoutY="26.0" mnemonicParsing="false" style="-fx-background-color: #04852f; -fx-background-radius: 30; -fx-cursor: hand;" text="PRINT EMPTY" textFill="WHITE" visible="false">
                                        <padding>
                                           <Insets bottom="3.0" left="15.0" right="15.0" top="3.0" />
@@ -210,18 +220,6 @@
                                           <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
                                                 <Image url="@../img/icon/print_ic.png" />
-                                             </image>
-                                          </ImageView>
-                                       </graphic>
-                                    </Button>
-                                    <Button fx:id="saveAsFinalBn" mnemonicParsing="false" onAction="#saveAsFinalBnClick" style="-fx-background-color: #04852f; -fx-background-radius: 30; -fx-cursor: hand;" text="Save &amp; Freeze" textFill="WHITE">
-                                       <padding>
-                                          <Insets bottom="3.0" left="15.0" right="15.0" top="3.0" />
-                                       </padding>
-                                       <graphic>
-                                          <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@../img/icon/download_ic.png" />
                                              </image>
                                           </ImageView>
                                        </graphic>
@@ -288,7 +286,7 @@
                      <children>
                         <TableView fx:id="tableViewPrescription" minWidth="100.0" style="-fx-border-color: white;" VBox.vgrow="ALWAYS">
                            <columns>
-                              <TableColumn fx:id="colPrescriptionSrNum" editable="false" maxWidth="30.0" minWidth="30.0" prefWidth="-1.0" sortable="false" text="SR#" />
+                              <TableColumn fx:id="colPrescriptionSrNum" editable="false" maxWidth="30.0" minWidth="35.0" prefWidth="-1.0" sortable="false" text="SR#" />
                               <TableColumn fx:id="colPrescriptionNum" editable="false" maxWidth="85.0" minWidth="90.0" prefWidth="-1.0" sortable="false" text="Prescription #" />
                               <TableColumn fx:id="colPrescriptionDate" editable="false" maxWidth="110.0" minWidth="110.0" prefWidth="-1.0" sortable="false" text="Date" />
                            </columns>

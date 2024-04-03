@@ -8,6 +8,7 @@ import com.techwhizer.medicalshop.model.PriceTypeModel;
 import com.techwhizer.medicalshop.model.PurchaseItemsTemp;
 import com.techwhizer.medicalshop.model.chooserModel.ItemChooserModel;
 import com.techwhizer.medicalshop.util.DBConnection;
+import com.techwhizer.medicalshop.util.ItemChooserType;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
@@ -20,6 +21,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -76,7 +79,6 @@ public class AddPurchaseItems implements Initializable {
                 stripTabLabel.setText("");
                 stripTabContainer.setDisable(true);
                 stripTabTf.setText("");
-
             } else {
                 quantityUnitCom.setItems(staticData.getQuantityUnit());
                 quantityUnitCom.getSelectionModel().select("PCS");
@@ -84,6 +86,7 @@ public class AddPurchaseItems implements Initializable {
                 stripTabContainer.setDisable(true);
                 stripTabTf.setText("");
             }
+
         });
     }
     public void cancelClick(ActionEvent actionEvent) {
@@ -238,6 +241,9 @@ public class AddPurchaseItems implements Initializable {
     }
 
     public void chooseProduct(MouseEvent actionEvent) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("item_chooser_type", ItemChooserType.PURCHASE);
+        Main.primaryStage.setUserData(data);
         customDialog.showFxmlDialog2("chooser/itemChooser.fxml", "SELECT PRODUCT");
 
         if (Main.primaryStage.getUserData() instanceof ItemChooserModel icm) {
@@ -245,33 +251,24 @@ public class AddPurchaseItems implements Initializable {
             productNameL.setText(icm.getItemName());
             packingTf.setText(icm.getPacking());
 
-            if (method.isItemAvailableInStock(icm.getItemId())){
+            String stockUnit = icm.getUnit();
 
-                String stockUnit = method.getStockUnit(icm.getItemId());
+            if (stockUnit.equalsIgnoreCase("STRIP")){
+                unitCom.setItems(staticData.strip);
+                unitCom.getSelectionModel().select(stockUnit);
 
-                if (stockUnit.equalsIgnoreCase("TAB") || stockUnit.equalsIgnoreCase("STRIP")){
-                    unitCom.setItems(staticData.strip);
-                    unitCom.getSelectionModel().select(icm.getUnit());
-                    if (icm.getUnit().equalsIgnoreCase("strip")) {
-                        stripTabTf.setText(String.valueOf(icm.getTabPerStrip()));
-                    }
-                }else {
-                    unitCom.setItems(staticData.pcsUnit);
-                    unitCom.getSelectionModel().select("PCS");
-                }
-
-                PriceTypeModel ptm = method.getLastPrice(icm.getItemId());
-                purchaseRateTf.setText(method.removeZeroAfterDecimal(ptm.getPurchaseRate()));
-                mrpTf.setText(method.removeZeroAfterDecimal(ptm.getMrp()));
-                saleRateTf.setText(method.removeZeroAfterDecimal(ptm.getSaleRate()));
-
-            }else {
-                if (icm.getUnit().equalsIgnoreCase("strip")) {
+                if (stockUnit.equalsIgnoreCase("strip")) {
                     stripTabTf.setText(String.valueOf(icm.getTabPerStrip()));
                 }
-                unitCom.setItems(staticData.getUnit());
-                unitCom.getSelectionModel().select(icm.getUnit());
+            }else {
+                unitCom.setItems(staticData.pcsUnit);
+                unitCom.getSelectionModel().select("PCS");
             }
+
+            PriceTypeModel ptm = method.getLastPrice(icm.getItemId());
+            purchaseRateTf.setText(method.removeZeroAfterDecimal(ptm.getPurchaseRate()));
+            mrpTf.setText(method.removeZeroAfterDecimal(ptm.getMrp()));
+            saleRateTf.setText(method.removeZeroAfterDecimal(ptm.getSaleRate()));
         }
     }
 }

@@ -124,7 +124,7 @@ getPurchaseItems(purchaseMainId);
             connection = new DBConnection().getConnection();
             String qry = """
                     select tpi.purchase_items_id,purchase_main_id,tim.item_id,tim.items_name,
-                           tab_to_strip(cast(tpi.quantity as integer),cast(tim.strip_tab as integer),tpi.quantity_unit) as quantity
+                           tab_to_strip(tpi.quantity,tim.strip_tab,tpi.quantity_unit) as quantity
                             ,tpi.batch,tpi.expiry_date,tpi.lot_number,
                           tpi.purchase_rate,tpi.mrp,tpi.sale_price
                                         

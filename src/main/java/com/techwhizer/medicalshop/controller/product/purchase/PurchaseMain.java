@@ -64,7 +64,6 @@ public class PurchaseMain implements Initializable {
     private ObservableList<PurchaseItemsTemp> itemList = FXCollections.observableArrayList();
     private DealerModel dealerModel;
     private PurchaseItemsTemp pit;
-    private static ObservableList<ItemChooserModel> popupItemList = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -80,64 +79,6 @@ public class PurchaseMain implements Initializable {
             stage.setMaximized(true);
         });
     }
-    private void getItems() {
-        popupItemList.clear();
-        Connection connection = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            connection = dbConnection.getConnection();
-
-            String qry = """
-                    select * from available_quantity_v where is_stockable = true and status = 1
-                    """;
-            ps = connection.prepareStatement(qry);
-            rs = ps.executeQuery();
-
-            int count = 0;
-
-            while (rs.next()) {
-
-                int itemId = rs.getInt("ITEM_ID");
-                String itemName = rs.getString("ITEMS_NAME");
-                String packing = rs.getString("PACKING");
-                int gstId = rs.getInt("gst_id");
-                int cGst = rs.getInt("cgst");
-                int iGst = rs.getInt("igst");
-                int sGst = rs.getInt("sgst");
-                int hsn = rs.getInt("hsn_sac");
-                int tabPerStrip = rs.getInt("STRIP_TAB");
-                int status = rs.getInt("status");
-                String gstName = rs.getString("gstName");
-                String type = rs.getString("type");
-                String unit = rs.getString("unit");
-                String composition = rs.getString("composition");
-                String tag = rs.getString("tag");
-                String medicineDose = rs.getString("dose");
-                String avlQty = rs.getString("avl_qty_strip");
-                boolean isStockable = rs.getBoolean("is_stockable");
-                count++;
-
-                int departmentId = rs.getInt("department_id");
-                String departmentName = rs.getString("department_name");
-
-                GstModel gm = new GstModel(gstId, hsn, sGst, cGst, iGst, gstName, null);
-                popupItemList.add(new ItemChooserModel(itemId, itemName, packing, gm, unit, tabPerStrip,composition,tag,medicineDose,
-                        avlQty,isStockable,departmentId,departmentName));
-
-            }
-
-
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            DBConnection.closeConnection(connection, ps, rs);
-        }
-
-    }
-
 
     private void setData() {
         setOptionalCell();
@@ -149,7 +90,6 @@ public class PurchaseMain implements Initializable {
 
     public void addPurchaseItem(ActionEvent actionEvent) {
 
-        Main.primaryStage.setUserData(popupItemList);
         customDialog.showFxmlDialog2("product/purchase/addPurchaseItems.fxml","ADD PURCHASE ITEM");
 
         if (Main.primaryStage.getUserData() instanceof PurchaseItemsTemp pit){
@@ -285,14 +225,8 @@ public class PurchaseMain implements Initializable {
 
         @Override
         public Boolean doInBackground(String... params) {
-            switch (type){
-
-                case "SAVE"-> uploadData();
-
-                case "INIT"->{
-                    getItems();
-                }
-
+            if (type.equals("SAVE")) {
+                uploadData();
             }
 
             return false;
