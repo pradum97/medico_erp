@@ -389,8 +389,4 @@ public class Dashboard implements Initializable {
         }
 
     }
-
-    public void hardRefreshBnClick(ActionEvent mouseEvent) {
-        new CommonUtil.HardRefresh(hardRefreshBn,true).execute();
-    }
 }

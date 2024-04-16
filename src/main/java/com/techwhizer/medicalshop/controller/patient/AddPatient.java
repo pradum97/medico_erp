@@ -92,18 +92,6 @@ public class AddPatient implements Initializable {
             genderCom.getSelectionModel().select((pm.getGender()));
             idTypeCom.getSelectionModel().select((pm.getIdType()));
 
-           SalutationModel sm = CommonUtil.getSalutation(pm.getSalutation_id()).get(0);
-//            salutationCom.getItems().add(sm);
-//            salutationCom.getSelectionModel().selectFirst();
-
-
-
-            ObservableList<SalutationModel> l = salutationCom.getItems();
-            ;
-            System.out.println(l.indexOf(sm));
-
-            salutationCom.getSelectionModel().select(3);
-
         });
 
         firstNameTf.setText(pm.getFirstName());

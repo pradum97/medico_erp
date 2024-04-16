@@ -19,6 +19,7 @@ public class Reports implements Initializable {
 
         billingReportTab.setContent(FileLoader.loadFxmlFile("reports/billingReport.fxml"));
         invoiceReportTab.setContent(FileLoader.loadFxmlFile("reports/invoiceReport.fxml"));
+        departmentWiseReportTab.setContent(FileLoader.loadFxmlFile("reports/departmentWiseReport.fxml"));
 
 //        tabPaneContainer.getSelectionModel().selectedItemProperty()
 //                .addListener((observable, oldTab, newTab) -> {
