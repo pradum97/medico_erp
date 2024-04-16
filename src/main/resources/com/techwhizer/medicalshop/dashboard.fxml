@@ -163,18 +163,7 @@
                   <Insets right="50.0" />
                </VBox.margin>
                <children>
-                  <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
-                     <children>
-                        <Button fx:id="hardRefreshBn" alignment="CENTER" graphicTextGap="8.0" minHeight="20.0" onAction="#hardRefreshBnClick" prefHeight="20.0" prefWidth="102.0" style="-fx-background-color: red; -fx-border-radius: 15; -fx-background-radius: 15; -fx-cursor: hand;" text="Hard Refresh" textAlignment="CENTER" textFill="WHITE">
-                           <font>
-                              <Font name="System Bold" size="11.0" />
-                           </font>
-                           <padding>
-                              <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
-                           </padding>
-                        </Button>
-                     </children>
-                  </HBox>
+
                   <HBox alignment="CENTER" fillHeight="false" spacing="20.0">
                      <children>
                         <Label fx:id="billingBnTop" alignment="CENTER" graphicTextGap="8.0" layoutX="10.0" layoutY="10.0" onMouseClicked="#saleProductBnClick" prefHeight="25.0" prefWidth="110.0" style="-fx-background-color: #1a75ff; -fx-border-radius: 15; -fx-background-radius: 15; -fx-border-color: white; -fx-cursor: hand;" text="BILLING" textAlignment="CENTER" textFill="WHITE">

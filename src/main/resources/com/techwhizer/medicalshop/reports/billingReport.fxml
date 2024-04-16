@@ -81,7 +81,7 @@
                                         <Cursor fx:constant="HAND" />
                                     </cursor>
                                 </DatePicker>
-                                <Button fx:id="searchReportBn" mnemonicParsing="false" onAction="#searchReportBn" prefHeight="25.0" prefWidth="81.0" style="-fx-cursor: hand;-fx-background-color: #008080; -fx-text-fill: WHITE; -fx-background-radius: 3; -fx-border-radius: 3;" text="SUBMIT">
+                                <Button fx:id="searchReportBn" mnemonicParsing="false" onAction="#searchReportBn" prefHeight="25.0" prefWidth="81.0" style="-fx-cursor: hand;-fx-background-color: #008080; -fx-text-fill: WHITE; -fx-background-radius: 3; -fx-border-radius: 3;" text="SEARCH">
                                     <font>
                                         <Font name="Arial Bold" size="12.0" />
                                     </font>
@@ -145,7 +145,7 @@
                                       <Insets right="1.0" />
                                   </HBox.margin>
                               </Label>
-                              <Label fx:id="totalNetAmountL1" layoutX="180.0" layoutY="23.0" text="₹" textFill="#fcfcfc">
+                              <Label fx:id="tL" layoutX="180.0" layoutY="23.0" text="₹" textFill="#fcfcfc">
                                   <font>
                                       <Font name="Arial Black" size="14.0" />
                                   </font>

@@ -17,6 +17,8 @@ module com.techwhizer.medicalshop {
     requires org.apache.poi.ooxml;
     requires org.apache.poi.poi;
     requires itextpdf;
+    requires javafx.web;
+    requires com.fasterxml.jackson.databind;
 
 
     opens com.techwhizer.medicalshop.controller to javafx.fxml;
@@ -37,6 +39,9 @@ module com.techwhizer.medicalshop {
 
     opens com.techwhizer.medicalshop.controller.product.gst to javafx.fxml;
     exports com.techwhizer.medicalshop.controller.product.gst;
+
+    opens com.techwhizer.medicalshop.controller.reports.model to javafx.fxml;
+    exports com.techwhizer.medicalshop.controller.reports.model;
 
     opens com.techwhizer.medicalshop.controller.user to javafx.fxml;
     exports com.techwhizer.medicalshop.controller.user;

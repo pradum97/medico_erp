@@ -344,7 +344,7 @@ public class BillingReport implements Initializable {
         customColumn(colDate);
     }
 
-    private void convertDateFormat(DatePicker... date) {
+    public static void convertDateFormat(DatePicker... date) {
 
         for (DatePicker datePicker : date) {
 

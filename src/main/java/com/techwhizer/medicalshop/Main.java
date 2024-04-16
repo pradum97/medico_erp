@@ -4,6 +4,7 @@ import com.techwhizer.medicalshop.controller.auth.Login;
 import com.techwhizer.medicalshop.controller.dashboard.Billing;
 import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.util.AppConfig;
+import com.techwhizer.medicalshop.util.CommonUtil;
 import com.techwhizer.medicalshop.util.DBConnection;
 import com.victorlaerte.asynctask.AsyncTask;
 import javafx.application.Application;
@@ -26,18 +27,16 @@ public class Main extends Application {
     public void start(Stage stage) throws IOException {
         primaryStage = stage;
 
-//        new Timer().schedule(
-//                new TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        if(Login.currentlyLogin_Id > 0){
-//                            new MyAsyncTask().execute();
-//                        }
-//                    }
-//                }, 0, 10000);
+        new Timer().schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        new CommonUtil.HardRefresh(null,false).execute();
+
+                    }
+                }, 0, 900000);
 
         Parent root = FXMLLoader.load(Objects.requireNonNull(Main.class.getResource("auth/login.fxml")));
-      //  Parent root = FXMLLoader.load(Objects.requireNonNull(Main.class.getResource("dashboard.fxml")));
         stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream(AppConfig.APPLICATION_ICON))));
         stage.setTitle(AppConfig.APPLICATION_NAME);
         stage.setMaximized(true);
@@ -65,7 +64,5 @@ public class Main extends Application {
     public static void main(String... args) {
         launch(args);
     }
-
-
 
 }
