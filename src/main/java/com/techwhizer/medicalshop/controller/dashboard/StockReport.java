@@ -1,9 +1,11 @@
 package com.techwhizer.medicalshop.controller.dashboard;
 
 import com.techwhizer.medicalshop.CustomDialog;
+import com.techwhizer.medicalshop.ImageLoader;
 import com.techwhizer.medicalshop.Main;
 import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.model.DealerModel;
+import com.techwhizer.medicalshop.model.StockModel;
 import com.techwhizer.medicalshop.model.StockModel;
 import com.techwhizer.medicalshop.util.DBConnection;
 import com.techwhizer.medicalshop.util.ExcelExporter;
@@ -19,6 +21,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
 import javafx.util.Callback;
@@ -35,7 +38,6 @@ import java.util.*;
 public class StockReport implements Initializable {
 
     public Label createdDate;
-    public Label statusL;
     public Button refresh_bn;
     public ComboBox<String> filterCom;
     public Button excelExportBn;
@@ -56,6 +58,7 @@ public class StockReport implements Initializable {
     public TableColumn<StockModel, String> colMrp;
     public TableColumn<StockModel, String> colSale;
     public TableColumn<StockModel, String> colQty;
+    public TableColumn<StockModel, String> colAction;
     public Pagination pagination;
 
     private Method method;
@@ -361,6 +364,60 @@ public class StockReport implements Initializable {
     private void setOptionalCell() {
 
         Callback<TableColumn<StockModel, String>, TableCell<StockModel, String>>
+                cellFactoryAction = (TableColumn<StockModel, String> param) -> new TableCell<>() {
+            @Override
+            public void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                    setText(null);
+
+                } else {
+
+                    Button editBn = new Button();
+
+                    ImageView ivEdit = new ImageView(new ImageLoader().load("img/icon/update_ic.png"));
+                    ivEdit.setFitHeight(12);
+                    ivEdit.setFitWidth(12);
+
+
+                    editBn.setGraphic(ivEdit);
+                    editBn.setStyle("-fx-cursor: hand ; -fx-background-color: #06a5c1 ; -fx-background-radius: 3 ;-fx-padding: 2 4 2 4");
+
+                    editBn.setOnAction((event) -> {
+                        method.selectTable(getIndex(), tableView);
+                        StockModel icm = tableView.getSelectionModel().getSelectedItem();
+                        Main.primaryStage.setUserData(icm.getStockId());
+                        customDialog.showFxmlDialog2("product/stockUpdate.fxml", "STOCK ITEM UPDATE");
+
+                        if(Main.primaryStage.getUserData() instanceof Boolean isUpdated){
+                            if(isUpdated){
+                                Map<String, Object> data = new HashMap<>();
+                                data.put("filter_type", "In Stock");
+                                data.put("type", "start");
+                                data.put("dealer_id", 0);
+                                callThread(data);
+                            }
+                        }
+
+
+                    });
+
+
+                    HBox managebtn = new HBox(editBn);
+                    managebtn.setStyle("-fx-alignment:center");
+                    HBox.setMargin(editBn, new Insets(0, 8, 0, 8));
+
+                    setGraphic(managebtn);
+
+                    setText(null);
+
+                }
+            }
+
+        };
+
+        Callback<TableColumn<StockModel, String>, TableCell<StockModel, String>>
                 cellQty = (TableColumn<StockModel, String> param) -> new TableCell<>() {
             @Override
             public void updateItem(String item, boolean empty) {
@@ -423,6 +480,8 @@ public class StockReport implements Initializable {
 
         };
 
+
+        colAction.setCellFactory(cellFactoryAction);
         colExpiryDate.setCellFactory(cellExpiryDate);
         colQty.setCellFactory(cellQty);
     }

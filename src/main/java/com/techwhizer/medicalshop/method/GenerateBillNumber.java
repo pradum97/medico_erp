@@ -12,7 +12,6 @@ import java.util.Date;
 import java.util.Random;
 
 public class GenerateBillNumber {
-
     public String generatePurchaseBillNum() {
         Connection connection = null;
         PreparedStatement ps = null;
@@ -153,6 +152,32 @@ public class GenerateBillNumber {
 
     }
 
+    public String getBuildingNumber() {
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            connection = new DBConnection().getConnection();
+            ps = connection.prepareStatement("select max(building_id) from tbl_building");
+            rs = ps.executeQuery();
+            String uniqueNumber = null;
+
+            if (rs.next()) {
+                long id = rs.getInt(1) + 1;
+                uniqueNumber = String.format("%02d", id);
+            }
+
+            return "BLDG-"+uniqueNumber;
+        } catch (SQLException e) {
+            return null;
+        } finally {
+            DBConnection.closeConnection(connection, ps, rs);
+
+        }
+
+    }
+
     public String generateUHIDNum() {
         Connection connection = null;
         PreparedStatement ps = null;
@@ -194,7 +219,6 @@ public class GenerateBillNumber {
 
     }
 
-
     public String generatorConsultReceiptNumber(String receiptIType) {
         Connection connection = null;
         PreparedStatement ps = null;
@@ -202,7 +226,7 @@ public class GenerateBillNumber {
 
         try {
             connection = new DBConnection().getConnection();
-            ps = connection.prepareStatement("select max(consultation_id) from patient_consultation");
+            ps = connection.prepareStatement("select max(building_id) from tbl_building");
             rs = ps.executeQuery();
             String invoiceNum = null;
 

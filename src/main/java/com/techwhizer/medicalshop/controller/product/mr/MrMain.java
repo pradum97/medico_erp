@@ -163,7 +163,7 @@ public class MrMain implements Initializable {
         colPhone.setCellValueFactory(new PropertyValueFactory<>("phone"));
         colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
         colCompany.setCellValueFactory(new PropertyValueFactory<>("company"));
-        colAddress.setCellValueFactory(new PropertyValueFactory<>("addressTf"));
+        colAddress.setCellValueFactory(new PropertyValueFactory<>("address"));
         colDate.setCellValueFactory(new PropertyValueFactory<>("createdDate"));
         colGender.setCellValueFactory(new PropertyValueFactory<>("gender"));
 
@@ -171,7 +171,7 @@ public class MrMain implements Initializable {
         onColumnEdit(colPhone,"phone");
         onColumnEdit(colEmail,"email");
         onColumnEdit(colCompany,"company");
-        onColumnEdit(colAddress,"addressTf");
+        onColumnEdit(colAddress,"address");
         onColumnEdit(colGender,"gender");
 
 
@@ -182,7 +182,6 @@ public class MrMain implements Initializable {
         SortedList<MrModel> sortedData = new SortedList<>(
                 FXCollections.observableArrayList(filteredData.subList(Math.min(fromIndex, minIndex), minIndex)));
         sortedData.comparatorProperty().bind(tableView.comparatorProperty());
-
         tableView.setItems(sortedData);
     }
 

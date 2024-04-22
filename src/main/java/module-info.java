@@ -43,6 +43,12 @@ module com.techwhizer.medicalshop {
     opens com.techwhizer.medicalshop.controller.reports.model to javafx.fxml;
     exports com.techwhizer.medicalshop.controller.reports.model;
 
+    opens com.techwhizer.medicalshop.controller.master.model to javafx.fxml;
+    exports com.techwhizer.medicalshop.controller.master.model;
+
+    opens com.techwhizer.medicalshop.controller.master to javafx.fxml;
+    exports com.techwhizer.medicalshop.controller.master;
+
     opens com.techwhizer.medicalshop.controller.user to javafx.fxml;
     exports com.techwhizer.medicalshop.controller.user;
 

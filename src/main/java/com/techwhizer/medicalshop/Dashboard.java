@@ -4,12 +4,10 @@ import com.techwhizer.medicalshop.controller.auth.Login;
 import com.techwhizer.medicalshop.method.GetUserProfile;
 import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.model.UserDetails;
-import com.techwhizer.medicalshop.util.CommonUtil;
 import com.techwhizer.medicalshop.util.DBConnection;
 import com.techwhizer.medicalshop.util.RoleKey;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -21,14 +19,11 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Dashboard implements Initializable {
     @FXML
@@ -159,18 +154,26 @@ public class Dashboard implements Initializable {
     private void addButtonMenu() {
 
         // product -- start
-        Menu product = new Menu("ITEM MASTER");
-        Menu prescription = new Menu("PRESCRIPTION");
-        MenuItem discount = new MenuItem("DISCOUNT");
-        MenuItem gst = new MenuItem("GST");
-        MenuItem company = new MenuItem("COMPANY");
-        MenuItem manufacture = new MenuItem("MANUFACTURE");
+        MenuItem masterMenu = new MenuItem("MASTER");
+
+        MenuItem buildingMasterItem = new MenuItem("BUILDING MASTER");
+        MenuItem floorMasterItem = new MenuItem("FLOOR MASTER");
+        MenuItem roomMasterItem = new MenuItem("ROOM MASTER");
+        MenuItem bedMasterItem = new MenuItem("BED MASTER");
+
+
+        MenuItem discount = new MenuItem("DISCOUNT MASTER");
+        MenuItem gst = new MenuItem("GST MASTER");
+        MenuItem company = new MenuItem("MEDICINE COMPANY");
+        MenuItem manufacture = new MenuItem("MEDICINE MANUFACTURE");
         MenuItem mr = new MenuItem("MEDICAL REPRESENTATIVE");
 
 
-        product.getItems().addAll(discount,gst,company,manufacture,mr);
+//        masterMenu.getItems().addAll(discount,gst,company,manufacture,mr,
+//                buildingMasterItem,floorMasterItem,roomMasterItem);
 
         // general -- end
+        Menu prescription = new Menu("PRESCRIPTION");
         MenuItem dealer = new MenuItem("DEALER");
         MenuItem shopData = new MenuItem("SHOP DETAILS");
         MenuItem profile = new MenuItem("PROFILE");
@@ -199,11 +202,18 @@ public class Dashboard implements Initializable {
 
         users.setVisible(Objects.equals(Login.currentRoleName, RoleKey.ADMIN));
 
-        settingMenuButton.getItems().addAll(product, prescription, profile, users, shopData, doctor,
+        settingMenuButton.getItems().addAll(masterMenu, prescription, profile, users, shopData, doctor,
                 returnHistory,purchaseHistory, dues,dealer, backup, logout);
 
         onClickAction(gst, shopData, profile, users, dealer, backup, company, discount,
                 manufacture, mr, doctor, returnHistory,purchaseHistory,dues, frequency, timing, logout);
+
+        onClickMasterMenuItem(masterMenu);
+    }
+
+    private void onClickMasterMenuItem(MenuItem masterMenu) {
+
+        masterMenu.setOnAction(event -> customDialog.showFxmlFullDialog("master/master.fxml", "Master"));
 
     }
 

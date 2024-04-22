@@ -563,6 +563,7 @@ CREATE TABLE TBL_PRESCRIPTION_INVESTIGATION(
 CREATE TABLE tbl_building
 (
     building_id   SERIAL PRIMARY KEY,
+    building_number VARCHAR(10),
     building_name VARCHAR(100) UNIQUE NOT NULL,
     address varchar(500),
     status int default 1,
@@ -571,6 +572,7 @@ CREATE TABLE tbl_building
     last_updated_by int REFERENCES tbl_users(user_id),
     last_updated_date timestamp
 );
+
 
 CREATE TABLE tbl_floor
 (
@@ -585,6 +587,7 @@ CREATE TABLE tbl_floor
     last_updated_date timestamp,
     UNIQUE (floor_number, building_id,floor_name)
 );
+
 
 CREATE TABLE tbl_ward_facility(
     ward_facility_id serial primary key ,

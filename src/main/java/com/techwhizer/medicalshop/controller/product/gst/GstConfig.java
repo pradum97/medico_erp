@@ -146,7 +146,7 @@ public class GstConfig implements Initializable {
 
                             HBox managebtn = new HBox(iv_edit, iv_delete);
 
-                            managebtn.setStyle("-fx-alignment:center");
+                          //  managebtn.setStyle("-fx-alignment:center");
                             HBox.setMargin(iv_edit, new Insets(2, 2, 0, 3));
                             HBox.setMargin(iv_delete, new Insets(2, 3, 0, 20));
 
@@ -162,7 +162,7 @@ public class GstConfig implements Initializable {
 
         colAction.setCellFactory(cellFactory);
         tableViewGst.setItems(gstModelList);
-        customColumn(colGstName);
+        //customColumn(colGstName);
 
         int fromIndex = index * limit;
         int toIndex = Math.min(fromIndex + limit, gstModelList.size());
@@ -274,7 +274,7 @@ public class GstConfig implements Initializable {
             }
             gstModelList = new GetTax().getGst();
 
-            if (gstModelList.size()>0){
+            if (!gstModelList.isEmpty()){
                 pagination.setVisible(true);
             }
 
