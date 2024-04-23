@@ -14,6 +14,7 @@
             <tabs>
                 <Tab fx:id="bedMasterTab" closable="false" text="Bed Master" />
                 <Tab fx:id="roomMasterReportTab" closable="false" text="Room Master" />
+                <Tab fx:id="wardFacilityTab" closable="false" text="Ward Facility" />
                 <Tab fx:id="floorMasterTab" closable="false" text="Floor Master" />
                 <Tab fx:id="buildingMasterTab" closable="false" text="Building Master" />
                 <Tab fx:id="discountMasterTab" closable="false" text="Discount Master" />

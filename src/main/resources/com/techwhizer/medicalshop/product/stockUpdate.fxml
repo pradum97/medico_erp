@@ -33,26 +33,50 @@
                      </children>
                   </HBox>
                   <Separator prefWidth="200.0" />
-                  <HBox>
-                     <padding>
-                        <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
-                     </padding>
+                  <VBox>
                      <children>
-                        <Label minWidth="85.0" prefHeight="17.0" prefWidth="84.0" text="ITEM NAME : ">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="itemNameL" minWidth="320.0" textFill="#04852f" wrapText="true" HBox.hgrow="ALWAYS">
-                           <HBox.margin>
-                              <Insets left="5.0" />
-                           </HBox.margin>
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
+                        <HBox>
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                           <children>
+                              <Label minWidth="85.0" prefHeight="17.0" prefWidth="84.0" text="ITEM NAME : ">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="itemNameL" minWidth="320.0" textFill="#04852f" wrapText="true" HBox.hgrow="ALWAYS">
+                                 <HBox.margin>
+                                    <Insets left="5.0" />
+                                 </HBox.margin>
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </HBox>
+                        <HBox>
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                           <children>
+                              <Label minWidth="57.0" prefHeight="17.0" prefWidth="57.0" text="BATCH :">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="batchNameTf" minWidth="320.0" textFill="#04852f" wrapText="true" HBox.hgrow="ALWAYS">
+                                 <HBox.margin>
+                                    <Insets left="5.0" />
+                                 </HBox.margin>
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </HBox>
                      </children>
-                  </HBox>
+                  </VBox>
                   <Separator prefWidth="200.0" />
                   <VBox alignment="CENTER" spacing="20.0" VBox.vgrow="ALWAYS">
                      <children>
@@ -70,7 +94,7 @@
                                     </Label>
                                     <HBox alignment="BOTTOM_CENTER">
                                        <children>
-                                          <ComboBox fx:id="unitCom" disable="true" minHeight="27.0" prefHeight="27.0" prefWidth="164.0" promptText="SELECT UNIT" style="-fx-border-color: grey; -fx-border-radius: 3 0 0 3;" />
+                                          <ComboBox fx:id="unitCom" disable="true" focusTraversable="false" minHeight="27.0" prefHeight="27.0" prefWidth="164.0" promptText="SELECT UNIT" style="-fx-border-color: grey; -fx-border-radius: 3 0 0 3;" />
                                        </children>
                                     </HBox>
                                  </children>
@@ -114,11 +138,14 @@
                                           <Font name="Arial Bold" size="12.0" />
                                        </font>
                                     </Label>
-                                    <TextField fx:id="tabPcsTf" alignment="CENTER" minHeight="27.0" minWidth="70.0" prefHeight="27.0" prefWidth="100.0" promptText="Enter TAB/PCS" style="-fx-border-color: grey; -fx-border-radius: 0 3 3 0;">
+                                    <HBox>
                                        <VBox.margin>
                                           <Insets />
                                        </VBox.margin>
-                                    </TextField>
+                                       <children>
+                                          <TextField fx:id="tabPcsTf" alignment="CENTER" minHeight="27.0" minWidth="70.0" prefHeight="27.0" prefWidth="100.0" promptText="Enter TAB/PCS" style="-fx-border-color: grey; -fx-border-radius: 3 0 0 3;" HBox.hgrow="ALWAYS" />
+                                       </children>
+                                    </HBox>
                                  </children>
                               </VBox>
                            </children>

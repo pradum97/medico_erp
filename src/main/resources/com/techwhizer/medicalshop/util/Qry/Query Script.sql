@@ -600,6 +600,7 @@ CREATE TABLE tbl_ward_facility(
     last_updated_date timestamp
 );
 
+
 CREATE TABLE tbl_wards
 (
     ward_id   SERIAL PRIMARY KEY,
