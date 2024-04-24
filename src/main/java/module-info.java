@@ -113,6 +113,8 @@ module com.techwhizer.medicalshop {
     opens com.techwhizer.medicalshop.report to javafx.fxml;
     exports com.techwhizer.medicalshop.controller.reports;
     opens com.techwhizer.medicalshop.controller.reports to javafx.fxml;
+    exports com.techwhizer.medicalshop.controller.master.ward;
+    opens com.techwhizer.medicalshop.controller.master.ward to javafx.fxml;
 
 
 }

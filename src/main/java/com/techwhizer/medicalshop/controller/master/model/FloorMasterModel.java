@@ -16,6 +16,11 @@ public class FloorMasterModel {
         this.buildingName = buildingName;
     }
 
+    @Override
+    public String toString() {
+        return getFloorName()+" ( "+getFloorNumber()+" ) ";
+    }
+
     public String getBuildingName() {
         return buildingName;
     }

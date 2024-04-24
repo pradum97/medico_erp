@@ -34,7 +34,8 @@ public class Master implements Initializable {
 
             buildingMasterTab.setContent(FileLoader.loadFxmlFile("master/buildingMaster.fxml"));
             floorMasterTab.setContent(FileLoader.loadFxmlFile("master/floorMaster.fxml"));
-            wardFacilityTab.setContent(FileLoader.loadFxmlFile("master/wardFacilityMaster.fxml"));
+            wardFacilityTab.setContent(FileLoader.loadFxmlFile("master/ward/wardFacilityMaster.fxml"));
+            roomMasterReportTab.setContent(FileLoader.loadFxmlFile("master/ward/wardMaster.fxml"));
 
             mrMasterTab.setContent(FileLoader.loadFxmlFile("product/mr/mrMain.fxml"));
             manufacturerMasterTab.setContent(FileLoader.loadFxmlFile("product/manufactureMain.fxml"));

@@ -1,4 +1,4 @@
-package com.techwhizer.medicalshop.controller.master;
+package com.techwhizer.medicalshop.controller.master.ward;
 
 import com.techwhizer.medicalshop.controller.auth.Login;
 import com.techwhizer.medicalshop.controller.master.model.WardFacilityMasterModel;

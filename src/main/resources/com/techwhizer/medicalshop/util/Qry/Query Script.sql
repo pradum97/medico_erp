@@ -600,25 +600,44 @@ CREATE TABLE tbl_ward_facility(
     last_updated_date timestamp
 );
 
+INSERT INTO tbl_ward_facility (facility_code, facility_name,created_by)
+VALUES
+    ('ICU', 'Intensive Care Unit',1),
+    ('GENERAL BED', 'General Bed',1),
+    ('DELUXE PRIVATE CABIN', 'Deluxe Private Cabin',1),
+    ('AC DELUXE ROOM', 'AC Deluxe Room',1),
+    ('SEMI PRIVATE', 'Semi Private',1),
+    ('PRIVATE CABIN', 'Private Cabin',1),
+    ('TWIN SHARING NON AC', 'Twin Sharing Non-AC',1),
+    ('NICU', 'Neonatal Intensive Care Unit',1),
+    ('Emergency', 'Emergency',1),
+    ('CASUALTY', 'Casualty',1),
+    ('ECONOMY BED', 'Economy Bed',1),
+    ('HDU', 'High Dependency Unit',1),
+    ('VR Bed', 'Virtual Reality Bed',1);
 
 CREATE TABLE tbl_wards
 (
     ward_id   SERIAL PRIMARY KEY,
+    building_id INT REFERENCES tbl_building(building_id),
     floor_id  INT REFERENCES tbl_floor (floor_id),
     ward_name VARCHAR(100) NOT NULL,
     ward_facility_id int REFERENCES tbl_ward_facility(ward_facility_id) ,
-    number_of_beds  INT,
-    status VARCHAR(100) DEFAULT 'Available',
-    is_active int default 1,
+    number_of_beds  BIGINT,
+    status int default 1,
     created_by int REFERENCES tbl_users(user_id),
     created_date timestamp default current_timestamp,
     last_updated_by int REFERENCES tbl_users(user_id),
     last_updated_date timestamp
 );
 
+
+
 CREATE TABLE tbl_beds(
     bed_id SERIAL PRIMARY KEY ,
     ward_id int NOT NULL,
+    row_number int ,
+    column_number int,
     bed_number varchar(60) NOT NULL,
     bed_name varchar(100) NOT NULL,
     bed_type varchar(70)NOT NULL,
