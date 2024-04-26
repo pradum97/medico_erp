@@ -22,6 +22,23 @@ import java.time.format.DateTimeFormatter;
 
 public class CommonUtil {
 
+    public static ObservableList<String> getBedStatus() {
+        return FXCollections.observableArrayList(
+                "Available","In Use","Repair","Under Construction"
+        );
+    }
+
+    public static ObservableList<String> getBedFor() {
+        return FXCollections.observableArrayList(
+                "Patient","Attended","Both"
+        );
+    }
+
+    public static ObservableList<String> getBedType() {
+        return FXCollections.observableArrayList(
+            "General", "ICU", "Maternity", "Pediatric", "Surgical", "Other"
+        );
+    }
 
     private static final String DATE_PATTERN = "dd/MM/yyyy";
 

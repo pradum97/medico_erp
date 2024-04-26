@@ -5,7 +5,6 @@ public class WardModel {
     private int buildingId;
     private int floorId;
     private int facilityId;
-
     private String buildingName,floorName,facilityName;
     private String wardName;
     private int noOfBeds;
@@ -23,6 +22,10 @@ public class WardModel {
         this.wardName = wardName;
         this.noOfBeds = noOfBeds;
         this.createdDate = createdDate;
+    }
+    @Override
+    public String toString() {
+        return getWardName();
     }
 
     public int getWardId() {

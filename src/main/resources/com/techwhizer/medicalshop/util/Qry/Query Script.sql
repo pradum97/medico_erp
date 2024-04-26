@@ -650,6 +650,10 @@ CREATE TABLE tbl_beds(
     last_updated_date timestamp
 );
 
+
+
+
+
 CREATE TABLE tbl_bed_history(
     bed_history_id    SERIAL PRIMARY KEY,
     bed_id            INT REFERENCES tbl_beds (bed_id),
