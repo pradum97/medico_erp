@@ -37,7 +37,6 @@ public class AddDiscount implements Initializable {
 
         method = new Method();
         dbConnection = new DBConnection();
-        PropertiesLoader propLoader = new PropertiesLoader();
     }
 
     public void submitBn(ActionEvent event) {

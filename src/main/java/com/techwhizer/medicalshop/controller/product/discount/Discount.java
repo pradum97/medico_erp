@@ -86,7 +86,7 @@ public class Discount implements Initializable {
             boolean isSuccess = (boolean) status.get("is_success");
             msg = (String) status.get("message");
 
-            if (discountList.size() > 0) {
+            if (!discountList.isEmpty()) {
                 pagination.setVisible(true);
             }
             changeTableView(pagination.getCurrentPageIndex(), rowsPerPage);
@@ -122,7 +122,7 @@ public class Discount implements Initializable {
 
         setOptionalCell();
 
-        customColumn(colDiscountName);
+    //    customColumn(colDiscountName);
 
         int fromIndex = index * limit;
         int toIndex = Math.min(fromIndex + limit, discountList.size());
@@ -182,7 +182,7 @@ public class Discount implements Initializable {
 
                     HBox managebtn = new HBox(iv_edit);
 
-                    managebtn.setStyle("-fx-alignment:center");
+                 //   managebtn.setStyle("-fx-alignment:center");
                     HBox.setMargin(iv_edit, new Insets(2, 2, 0, 3));
                     setGraphic(managebtn);
 

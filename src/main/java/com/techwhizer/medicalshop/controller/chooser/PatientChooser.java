@@ -291,7 +291,7 @@ public class PatientChooser implements Initializable {
     }
 
     public void add(MouseEvent actionEvent) {
-        customDialog.showFxmlDialog("product/patient/addPatient.fxml", "Add new Patient");
+        customDialog.showFxmlDialog("product/patient/patient_registration_form.fxml", "Add new Patient");
         searchTf.setText("");
         callThread();
 
