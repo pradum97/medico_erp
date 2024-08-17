@@ -631,8 +631,6 @@ CREATE TABLE tbl_wards
     last_updated_date timestamp
 );
 
-
-
 CREATE TABLE tbl_beds(
     bed_id SERIAL PRIMARY KEY ,
     ward_id int NOT NULL,
@@ -649,10 +647,6 @@ CREATE TABLE tbl_beds(
     last_updated_by int REFERENCES tbl_users(user_id),
     last_updated_date timestamp
 );
-
-
-
-
 
 CREATE TABLE tbl_bed_history(
     bed_history_id    SERIAL PRIMARY KEY,

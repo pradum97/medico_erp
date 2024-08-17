@@ -11,13 +11,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="530.0" prefWidth="566.0" xmlns="http://javafx.com/javafx/20.0.1"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.techwhizer.medicalshop.controller.master.bed.AddBed">
+<BorderPane prefHeight="486.0" prefWidth="566.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.master.bed.AddBed">
    <center>
-      <VBox alignment="CENTER" fillWidth="false" prefHeight="492.0" prefWidth="446.0">
+      <VBox alignment="CENTER" fillWidth="false" prefHeight="492.0" prefWidth="566.0">
          <children>
-            <VBox prefHeight="510.0" prefWidth="532.0" spacing="15.0" style="-fx-border-color: grey; -fx-border-radius: 4;">
+            <VBox prefHeight="456.0" prefWidth="532.0" spacing="8.0" style="-fx-border-color: grey; -fx-border-radius: 4;">
                <children>
                   <HBox alignment="CENTER" prefHeight="27.0" prefWidth="426.0">
                      <children>

@@ -4,6 +4,7 @@ import com.techwhizer.medicalshop.FileLoader;
 import com.techwhizer.medicalshop.controller.dashboard.Billing;
 import com.techwhizer.medicalshop.method.Method;
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -31,20 +32,23 @@ public class Master implements Initializable {
         Platform.runLater(() -> {
             Stage stage = (Stage) containerTabPane.getScene().getWindow();
             stage.setMaximized(true);
-
-            buildingMasterTab.setContent(FileLoader.loadFxmlFile("master/buildingMaster.fxml"));
-            floorMasterTab.setContent(FileLoader.loadFxmlFile("master/floorMaster.fxml"));
-            wardFacilityTab.setContent(FileLoader.loadFxmlFile("master/ward/wardFacilityMaster.fxml"));
-            roomMasterReportTab.setContent(FileLoader.loadFxmlFile("master/ward/wardMaster.fxml"));
-            bedMasterTab.setContent(FileLoader.loadFxmlFile("master/bed/bedMaster.fxml"));
-
-            mrMasterTab.setContent(FileLoader.loadFxmlFile("product/mr/mrMain.fxml"));
-            manufacturerMasterTab.setContent(FileLoader.loadFxmlFile("product/manufactureMain.fxml"));
-            pharmaCompanyMasterTab.setContent(FileLoader.loadFxmlFile("product/viewCompany.fxml"));
-            gstMasterTab.setContent(FileLoader.loadFxmlFile("product/gst/gstConfig.fxml"));
-            discountMasterTab.setContent(FileLoader.loadFxmlFile("product/discount/discount.fxml"));
-
+            loadFile();
         });
+    }
+
+    private void loadFile(){
+        roomMasterReportTab.setContent(FileLoader.loadFxmlFile("master/ward/wardMaster.fxml"));
+        roomMasterReportTab.setContent(FileLoader.loadFxmlFile("master/ward/wardMaster.fxml"));
+        floorMasterTab.setContent(FileLoader.loadFxmlFile("master/floorMaster.fxml"));
+        wardFacilityTab.setContent(FileLoader.loadFxmlFile("master/ward/wardFacilityMaster.fxml"));
+        buildingMasterTab.setContent(FileLoader.loadFxmlFile("master/buildingMaster.fxml"));
+        bedMasterTab.setContent(FileLoader.loadFxmlFile("master/bed/bedMaster.fxml"));
+        mrMasterTab.setContent(FileLoader.loadFxmlFile("product/mr/mrMain.fxml"));
+        manufacturerMasterTab.setContent(FileLoader.loadFxmlFile("product/manufactureMain.fxml"));
+        pharmaCompanyMasterTab.setContent(FileLoader.loadFxmlFile("product/viewCompany.fxml"));
+        gstMasterTab.setContent(FileLoader.loadFxmlFile("product/gst/gstConfig.fxml"));
+        discountMasterTab.setContent(FileLoader.loadFxmlFile("product/discount/discount.fxml"));
+
 
     }
 }

@@ -526,7 +526,7 @@ public class Billing implements Initializable {
     }
 
     public void addPatient(ActionEvent actionEvent) {
-        customDialog.showFxmlDialog2("patient/addPatient.fxml", "Add New Patient");
+        customDialog.showFxmlDialog2("patient/patient_registration_form.fxml", "Add New Patient");
         if (Main.primaryStage.getUserData() instanceof Boolean) {
 
             boolean isSuccess = (Boolean) Main.primaryStage.getUserData();

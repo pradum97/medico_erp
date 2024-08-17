@@ -1,12 +1,10 @@
-package com.techwhizer.medicalshop.controller.patient;
+package com.techwhizer.medicalshop.controller.patient.registration;
 
 import com.techwhizer.medicalshop.*;
-import com.techwhizer.medicalshop.controller.auth.Login;
 import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.method.PrintPrescription;
 import com.techwhizer.medicalshop.model.PatientModel;
 import com.techwhizer.medicalshop.util.DBConnection;
-import com.techwhizer.medicalshop.util.RoleKey;
 import com.victorlaerte.asynctask.AsyncTask;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -30,12 +28,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
-public class PatientMain implements Initializable {
+public class PatientList implements Initializable {
     private int rowsPerPage = 60;
     public TableView<PatientModel> tableView;
     public TableColumn<PatientModel, Integer> colSrNo;
@@ -257,7 +253,7 @@ public class PatientMain implements Initializable {
     }
 
     public void addPatient(ActionEvent event) {
-        customDialog.showFxmlDialog2("patient/addPatient.fxml", "Add New Patient");
+        customDialog.showFxmlDialog2("patient/registration/patient_registration_form.fxml", "Add New Patient");
         callThread();
     }
 
@@ -407,7 +403,7 @@ public class PatientMain implements Initializable {
                     bnUpdate.setOnMouseClicked(mouseEvent -> {
                         PatientModel pm = tableView.getSelectionModel().getSelectedItem();
                         Main.primaryStage.setUserData(pm);
-                        customDialog.showFxmlDialog2("patient/addPatient.fxml", "Update Patient Details");
+                        customDialog.showFxmlDialog2("patient/registration/patient_registration_form.fxml", "Update Patient Details");
                         Main.primaryStage.setUserData(null);
                         callThread();
                     });

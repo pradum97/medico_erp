@@ -1,4 +1,4 @@
-package com.techwhizer.medicalshop.controller.patient;
+package com.techwhizer.medicalshop.controller.patient.registration;
 
 import com.techwhizer.medicalshop.CustomDialog;
 import com.techwhizer.medicalshop.ImageLoader;
@@ -32,7 +32,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
-public class AddPatient implements Initializable {
+public class PatientRegistrationForm implements Initializable {
     public TextField phoneTf;
     public TextField addressTf;
     public TextField idNumberTf;

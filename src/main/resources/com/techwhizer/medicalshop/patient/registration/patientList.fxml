@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane stylesheets="@../css/main.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.patient.PatientMain">
+<BorderPane stylesheets="@../../css/main.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.patient.registration.PatientList">
     <center>
         <VBox BorderPane.alignment="CENTER">
             <BorderPane.margin>
@@ -88,7 +88,7 @@
                           <graphic>
                               <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                   <image>
-                                      <Image url="@../img/icon/add_ic_black.png" />
+                                      <Image url="@../../img/icon/add_ic_black.png" />
                                   </image>
                               </ImageView>
                           </graphic>

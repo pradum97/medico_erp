@@ -118,6 +118,11 @@ module com.techwhizer.medicalshop {
 
     exports com.techwhizer.medicalshop.controller.master.bed;
     opens com.techwhizer.medicalshop.controller.master.bed to javafx.fxml;
+    exports com.techwhizer.medicalshop.controller.patient.registration;
+    opens com.techwhizer.medicalshop.controller.patient.registration to javafx.fxml;
+
+    exports com.techwhizer.medicalshop.controller.patient.admission;
+    opens com.techwhizer.medicalshop.controller.patient.admission to javafx.fxml;
 
 
 }
