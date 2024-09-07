@@ -2,174 +2,629 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Pagination?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.patient.admission.AdmissionForm">
-   <right>
-      <VBox prefWidth="294.0" style="-fx-border-color: grey; -fx-border-radius: 3;">
-         <children>
-            <VBox spacing="10.0" VBox.vgrow="ALWAYS">
-               <children>
-                  <HBox alignment="CENTER" spacing="10.0">
-                     <children>
-                        <Button graphicTextGap="3.0" mnemonicParsing="false" onAction="#addPatient" prefHeight="32.0" prefWidth="34.0" style="-fx-cursor: hand; -fx-background-color: white; -fx-background-radius: 3; -fx-border-color: grey; -fx-border-radius: 3;">
-                           <graphic>
-                              <ImageView fitHeight="14.0" fitWidth="14.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../img/icon/add_ic_black.png" />
-                                 </image>
-                              </ImageView>
-                           </graphic>
-                           <font>
-                              <Font name="System Bold" size="9.0" />
-                           </font>
-                        </Button>
-                        <Button graphicTextGap="3.0" layoutX="49.0" layoutY="10.0" mnemonicParsing="false" onAction="#refreshPatientBnClick" prefHeight="32.0" prefWidth="34.0" style="-fx-cursor: hand; -fx-background-color: white; -fx-background-radius: 3; -fx-border-color: grey; -fx-border-radius: 3;">
-                           <graphic>
-                              <ImageView fitHeight="14.0" fitWidth="14.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../img/icon/refresh_ic_red.png" />
-                                 </image>
-                              </ImageView>
-                           </graphic>
-                           <font>
-                              <Font name="System Bold" size="9.0" />
-                           </font>
-                        </Button>
-                        <TextField fx:id="searchNameTf" minHeight="30.0" prefHeight="30.0" prefWidth="170.0" promptText="Enter patient name" style="-fx-border-radius: 3; -fx-border-color: grey;" />
-                     </children>
-                     <VBox.margin>
-                        <Insets top="10.0" />
-                     </VBox.margin>
+<BorderPane prefHeight="307.0" prefWidth="899.0" stylesheets="@../../css/main.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.patient.admission.AdmissionForm">
+   <top>
+      <VBox alignment="CENTER" spacing="5.0" BorderPane.alignment="CENTER">
+         
+            <HBox alignment="CENTER" maxHeight="35.0" minHeight="26.0" style="-fx-background-color: #04852f;">
+               
+                  <Label text="Admission Form" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="16.0" />
+                     </font>
+                  </Label>
+               </HBox>
+            <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" spacing="20.0">
+               
+                  <HBox spacing="5.0">
+                     
+                        <ComboBox fx:id="filterTypeCom" minHeight="28.0" prefHeight="25.0" prefWidth="133.0" style="-fx-border-color: grey; -fx-border-radius: 4;" />
+                        <TextField fx:id="referenceNumTF" minHeight="28.0" prefHeight="25.0" prefWidth="212.0" style="-fx-border-color: grey; -fx-border-radius: 3;" />
+                        <Button mnemonicParsing="false" onAction="#searchPatient" prefHeight="25.0" prefWidth="78.0" style="-fx-background-color: #04852f;" text="SEARCH" textFill="WHITE" />
+               <Button layoutX="365.0" layoutY="10.0" mnemonicParsing="false" onAction="#clearPatient" prefHeight="25.0" prefWidth="52.0" style="-fx-background-color: red;" text="RESET" textFill="WHITE" />
+                        <Separator orientation="VERTICAL" />
+                        <Button mnemonicParsing="false" onAction="#selectPatient" style="-fx-background-color: #04852f;" text="Select Patient" textFill="WHITE" />
+                     
                   </HBox>
-                  <Separator prefWidth="200.0" />
-                  <TableView fx:id="tableViewPatient" minWidth="100.0" VBox.vgrow="ALWAYS">
-                     <columns>
-                        <TableColumn fx:id="colPatientSr" maxWidth="35.0" minWidth="30.0" text="#" visible="false" />
-                        <TableColumn fx:id="colAdmNum" maxWidth="90.0" minWidth="90.0" prefWidth="-1.0" text="Patient #" />
-                        <TableColumn fx:id="colPatientName" minWidth="200.0" prefWidth="-1.0" text="PATIENT NAME" />
-                     </columns>
+               
+            </HBox>
+            <Separator prefWidth="200.0" />
+         
+         <BorderPane.margin>
+            <Insets bottom="10.0" />
+         </BorderPane.margin>
+      </VBox>
+   </top>
+   <right>
+      <VBox prefWidth="299.0" style="-fx-border-radius: 3; -fx-border-color: grey;" BorderPane.alignment="CENTER">
+         
+            <HBox alignment="CENTER" fillHeight="false" prefHeight="24.0" prefWidth="297.0" spacing="10.0">
+               
+                  <Label text="Admission History">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+               
+            </HBox>
+            <VBox prefHeight="200.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
+               
+                  <TableView focusTraversable="false" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                    <columns>
+                      <TableColumn maxWidth="35.0" prefWidth="75.0" text="SR #" />
+                        <TableColumn prefWidth="75.0" text="ADM #" />
+                      <TableColumn prefWidth="75.0" text="Patient Name" />
+                    </columns>
                      <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                      </columnResizePolicy>
                   </TableView>
                   <HBox>
-                     <children>
-                        <Pagination fx:id="pagination" pickOnBounds="false" HBox.hgrow="ALWAYS" />
-                     </children>
+                     
+                        <Pagination HBox.hgrow="ALWAYS" />
+                     
                   </HBox>
-               </children>
+               
             </VBox>
-         </children>
+         
+         <BorderPane.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="1.0" />
+         </BorderPane.margin>
       </VBox>
    </right>
-   <left>
-      <VBox style="-fx-border-radius: 3; -fx-border-color: grey;">
-         <children>
-            <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="10.0">
-               <children>
-                  <HBox spacing="15.0">
+   <center>
+      <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: grey; -fx-border-radius: 4;" BorderPane.alignment="CENTER">
+         
+            <VBox alignment="TOP_CENTER" prefHeight="415.0">
+               
+                  <VBox alignment="TOP_CENTER" spacing="5.0">
+                     
+                        <VBox maxWidth="780.0" spacing="4.0" style="-fx-border-color: grey; -fx-border-radius: 4;">
+                           
+                              <HBox spacing="10.0">
+                                 
+                                    <HBox alignment="CENTER_LEFT">
+                                       
+                                          <Label minWidth="90.0" prefHeight="15.0" prefWidth="90.0" text="Patient Name :">
+                                             <font>
+                                                <Font name="Arial Bold" size="12.0" />
+                                             </font>
+                                          </Label>
+                                          <Label fx:id="patientNameL" alignment="CENTER" layoutX="10.0" layoutY="10.0" minWidth="122.0" style="-fx-border-radius: 3; -fx-cursor: hand;" textAlignment="CENTER" textFill="#04852f">
+                                             <HBox.margin>
+                                                <Insets left="2.0" />
+                                             </HBox.margin>
+                                             <font>
+                                                <Font name="System Bold" size="12.0" />
+                                             </font>
+                                             <padding>
+                                                <Insets left="5.0" />
+                                             </padding>
+                                          </Label>
+                                       
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT">
+                                       
+                                          <Label minWidth="50.0" prefHeight="19.0" prefWidth="10.0" text="Gender :">
+                                             <font>
+                                                <Font name="Arial Bold" size="12.0" />
+                                             </font>
+                                          </Label>
+                                          <Label fx:id="ageGenderL" alignment="CENTER" layoutX="10.0" layoutY="10.0" minWidth="93.0" style="-fx-border-radius: 3; -fx-cursor: hand;" textAlignment="CENTER" textFill="#04852f">
+                                             <HBox.margin>
+                                                <Insets left="2.0" />
+                                             </HBox.margin>
+                                             <font>
+                                                <Font name="System Bold" size="11.0" />
+                                             </font>
+                                             <padding>
+                                                <Insets left="5.0" />
+                                             </padding>
+                                          </Label>
+                                       
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT">
+                                       
+                                          <Label minWidth="43.0" prefHeight="19.0" prefWidth="10.0" text="Reg # :">
+                                             <font>
+                                                <Font name="Arial Bold" size="12.0" />
+                                             </font>
+                                          </Label>
+                                          <Label fx:id="registrationNumL" layoutX="10.0" layoutY="10.0" minWidth="80.0" style="-fx-border-radius: 3; -fx-cursor: hand;" textAlignment="CENTER" textFill="#04852f">
+                                             <HBox.margin>
+                                                <Insets left="2.0" />
+                                             </HBox.margin>
+                                             <font>
+                                                <Font name="System Bold" size="11.0" />
+                                             </font>
+                                             <padding>
+                                                <Insets left="5.0" />
+                                             </padding>
+                                          </Label>
+                                       
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT">
+                                       
+                                          <Label minWidth="50.0" prefHeight="19.0" prefWidth="10.0" text="Adm # :">
+                                             <font>
+                                                <Font name="Arial Bold" size="12.0" />
+                                             </font>
+                                          </Label>
+                                          <Label fx:id="admissionNumL" layoutX="10.0" layoutY="10.0" minWidth="90.0" style="-fx-border-radius: 3; -fx-cursor: hand;" textAlignment="CENTER" textFill="#04852f">
+                                             <HBox.margin>
+                                                <Insets left="2.0" />
+                                             </HBox.margin>
+                                             <font>
+                                                <Font name="System Bold" size="12.0" />
+                                             </font>
+                                             <padding>
+                                                <Insets left="5.0" />
+                                             </padding>
+                                          </Label>
+                                       
+                                    </HBox>
+                                 
+                              </HBox>
+                              <HBox spacing="10.0">
+                                 
+                                    <HBox>
+                                       
+                                          <Label minWidth="100.0" prefHeight="19.0" prefWidth="60.0" text="Guardian Name :">
+                                             <font>
+                                                <Font name="Arial Bold" size="12.0" />
+                                             </font>
+                                          </Label>
+                                          <Label fx:id="guardianNameL" alignment="CENTER" style="-fx-border-radius: 3; -fx-cursor: hand;" textAlignment="CENTER" textFill="#04852f" wrapText="true">
+                                             <font>
+                                                <Font name="System Bold" size="12.0" />
+                                             </font>
+                                             <padding>
+                                                <Insets left="5.0" />
+                                             </padding>
+                                          </Label>
+                                       
+                                    </HBox>
+                                    <HBox spacing="15.0">
+                                       
+                                          <Label minWidth="65.0" prefHeight="19.0" prefWidth="60.0" text="Address   :">
+                                             <font>
+                                                <Font name="Arial Bold" size="12.0" />
+                                             </font>
+                                          </Label>
+                                          <Label fx:id="patientAddressL" alignment="CENTER" style="-fx-border-radius: 3; -fx-cursor: hand;" textAlignment="CENTER" textFill="#04852f">
+                                             <HBox.margin>
+                                                <Insets left="2.0" />
+                                             </HBox.margin>
+                                             <font>
+                                                <Font name="System Bold" size="12.0" />
+                                             </font>
+                                             <padding>
+                                                <Insets left="5.0" />
+                                             </padding>
+                                          </Label>
+                                       
+                                       <padding>
+                                          <Insets bottom="5.0" left="5.0" right="5.0" />
+                                       </padding>
+                                    </HBox>
+                                 
+                              </HBox>
+                           
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </VBox>
+                        <VBox fx:id="admissionDetailsContainer" maxWidth="780.0" minWidth="780.0" spacing="5.0" style="-fx-border-color: grey; -fx-border-radius: 4;">
+                  <HBox fx:id="errorMesageContainer" prefHeight="100.0" prefWidth="200.0" spacing="50.0" style="-fx-border-color: red; -fx-border-radius: 3;">
                      <children>
-                        <HBox alignment="CENTER_LEFT">
+                        <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
                            <children>
-                              <Label minWidth="90.0" prefWidth="90.0" text="Patient Name :">
-                                 <font>
-                                    <Font name="Arial Bold" size="12.0" />
-                                 </font>
-                              </Label>
-                              <Label fx:id="patientNameL" alignment="CENTER" layoutX="10.0" layoutY="10.0" style="-fx-border-radius: 3; -fx-cursor: hand;" textAlignment="CENTER" textFill="#04852f">
-                                 <HBox.margin>
-                                    <Insets left="2.0" />
-                                 </HBox.margin>
-                                 <font>
-                                    <Font name="System Bold" size="12.0" />
-                                 </font>
-                                 <padding>
-                                    <Insets left="5.0" />
-                                 </padding>
-                              </Label>
+                              <Label fx:id="errorMessageL" textFill="RED" />
                            </children>
-                        </HBox>
-                        <HBox alignment="CENTER_LEFT" layoutX="122.0" layoutY="10.0">
+                        </VBox>
+                        <VBox minWidth="50.0" prefHeight="200.0" prefWidth="100.0">
                            <children>
-                              <Label minWidth="50.0" prefHeight="19.0" prefWidth="10.0" text="Gender :">
-                                 <font>
-                                    <Font name="Arial Bold" size="12.0" />
-                                 </font>
-                              </Label>
-                              <Label fx:id="genderL" alignment="CENTER" layoutX="10.0" layoutY="10.0" style="-fx-border-radius: 3; -fx-cursor: hand;" textAlignment="CENTER" textFill="#04852f">
-                                 <HBox.margin>
-                                    <Insets left="2.0" />
-                                 </HBox.margin>
-                                 <font>
-                                    <Font name="System Bold" size="12.0" />
-                                 </font>
-                                 <padding>
-                                    <Insets left="5.0" />
-                                 </padding>
-                              </Label>
-                              <Label fx:id="patientAgeL1" alignment="CENTER" layoutX="69.0" layoutY="10.0" minWidth="50.0" style="-fx-border-radius: 3; -fx-cursor: hand;" text=" / " textAlignment="CENTER" textFill="#04852f">
-                                 <font>
-                                    <Font name="System Bold" size="12.0" />
-                                 </font>
-                                 <padding>
-                                    <Insets left="5.0" />
-                                 </padding>
-                              </Label>
-                              <Label fx:id="patientAgeL" alignment="CENTER" minWidth="50.0" style="-fx-border-radius: 3; -fx-cursor: hand;" textAlignment="CENTER" textFill="#04852f">
-                                 <HBox.margin>
-                                    <Insets left="2.0" />
-                                 </HBox.margin>
-                                 <font>
-                                    <Font name="System Bold" size="12.0" />
-                                 </font>
-                                 <padding>
-                                    <Insets left="5.0" />
-                                 </padding>
-                              </Label>
+                              <HBox>
+                                 <children>
+                                    <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                    <Button lineSpacing="5.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#updatePatientDetails" style="-fx-background-color: transparent;" text="UPDATE NOW" textFill="#04852f" />
+                                 </children>
+                              </HBox>
                            </children>
-                        </HBox>
-                        <HBox alignment="CENTER_LEFT" layoutX="223.0" layoutY="10.0">
-                           <children>
-                              <Label minWidth="60.0" prefHeight="19.0" prefWidth="60.0" text="Address :">
-                                 <font>
-                                    <Font name="Arial Bold" size="12.0" />
-                                 </font>
-                              </Label>
-                              <Label fx:id="patientAddressL" alignment="CENTER" layoutX="10.0" layoutY="10.0" style="-fx-border-radius: 3; -fx-cursor: hand;" textAlignment="CENTER" textFill="#04852f">
-                                 <HBox.margin>
-                                    <Insets left="2.0" />
-                                 </HBox.margin>
-                                 <font>
-                                    <Font name="System Bold" size="12.0" />
-                                 </font>
-                                 <padding>
-                                    <Insets left="5.0" />
-                                 </padding>
-                              </Label>
-                           </children>
-                        </HBox>
+                        </VBox>
                      </children>
+                     <padding>
+                        <Insets bottom="8.0" left="8.0" right="1.0" top="8.0" />
+                     </padding>
                   </HBox>
-               </children>
-               <padding>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </padding>
-            </HBox>
-            <Separator />
-         </children>
+                           
+                              <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                                 
+                                    <Separator prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                    <Label text="Admission Details" textFill="#04852f">
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator layoutX="10.0" layoutY="10.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                 
+                              </HBox>
+                              <HBox spacing="5.0">
+                                 
+                                    <VBox fillWidth="false" minWidth="160.0" spacing="2.0">
+                                       
+                                          <Label minWidth="43.0" text="Adm Date:">
+                                             <font>
+                                                <Font name="Arial Bold" size="12.0" />
+                                             </font>
+                                          </Label>
+                                          <DatePicker fx:id="admissionDateDT" minHeight="24.0" style="-fx-border-color: grey; -fx-border-radius: 3;" />
+                                       
+                                    </VBox>
+                                    <VBox fillWidth="false" layoutX="10.0" layoutY="10.0" spacing="2.0">
+                                       
+                                          <Label minWidth="43.0" text="Time :">
+                                             <font>
+                                                <Font name="Arial Bold" size="12.0" />
+                                             </font>
+                                          </Label>
+                                          <HBox alignment="CENTER" maxWidth="139.0" minHeight="26.0" minWidth="100.0" prefHeight="24.0" prefWidth="183.0" style="-fx-border-color: grey; -fx-border-radius: 3;">
+                                             
+                                                <ComboBox fx:id="hourCB" maxHeight="24.0" maxWidth="44.0" minHeight="24.0" minWidth="30.0" promptText="HH" style="-fx-background-color: transparent;" styleClass="custom-combo-box" HBox.hgrow="ALWAYS" />
+                                                <ComboBox fx:id="minuteCB" layoutX="103.0" layoutY="12.0" maxHeight="24.0" maxWidth="44.0" minHeight="24.0" minWidth="30.0" prefWidth="58.0" promptText="MM" style="-fx-background-color: transparent;" styleClass="custom-combo-box">
+                                                   <padding>
+                                                      <Insets right="-6.0" top="-2.0" />
+                                                   </padding>
+                                                </ComboBox>
+                                                <ComboBox fx:id="amPmCB" layoutX="117.0" layoutY="12.0" maxHeight="22.0" maxWidth="47.0" minHeight="22.0" minWidth="30.0" promptText="PM" style="-fx-background-color: transparent; -fx-border-color: transparent transparent transparent grey;" styleClass="custom-combo-box" />
+                                             
+                                          </HBox>
+                                       
+                                    </VBox>
+                                    <VBox alignment="CENTER_LEFT" layoutX="198.0" layoutY="10.0" spacing="2.0" HBox.hgrow="ALWAYS">
+                                       
+                                          <Label text="Refer By :">
+                                             <font>
+                                                <Font name="Arial Bold" size="11.0" />
+                                             </font>
+                                          </Label>
+                                          <HBox>
+                                             
+                                                <ComboBox fx:id="referByCom" maxWidth="1.7976931348623157E308" minHeight="26.0" minWidth="285.0" prefHeight="26.0" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
+                                             
+                                          </HBox>
+                                       
+                                    </VBox>
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                                 
+                              </HBox>
+                              <HBox spacing="5.0">
+                                 
+                                    <VBox alignment="CENTER_LEFT" maxWidth="280.0" prefHeight="42.0" spacing="2.0" HBox.hgrow="ALWAYS">
+                                       
+                                          <Label text="Department :">
+                                             <font>
+                                                <Font name="Arial Bold" size="11.0" />
+                                             </font>
+                                          </Label>
+                                          <HBox>
+                                             
+                                                <ComboBox fx:id="departmentCom" minHeight="26.0" minWidth="270.0" prefHeight="26.0" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="SOMETIMES" />
+                                             
+                                          </HBox>
+                                       
+                                    </VBox>
+                                    <VBox alignment="CENTER_LEFT" spacing="2.0" HBox.hgrow="ALWAYS">
+                                       
+                                          <Label text="Consultant Name (Doctor Name ) : ">
+                                             <font>
+                                                <Font name="Arial Bold" size="11.0" />
+                                             </font>
+                                          </Label>
+                                          <HBox>
+                                             
+                                                <ComboBox fx:id="consultNameCom" maxWidth="1.7976931348623157E308" minHeight="26.0" minWidth="400.0" prefHeight="26.0" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
+                                             
+                                          </HBox>
+                                       
+                                    </VBox>
+                                 
+                              </HBox>
+                              <HBox layoutX="10.0" layoutY="32.0" spacing="5.0">
+                                 
+                                    <VBox alignment="CENTER_LEFT" layoutX="198.0" layoutY="10.0" spacing="2.0">
+                                       
+                                          <Label text="Case(s) :">
+                                             <font>
+                                                <Font name="Arial Bold" size="11.0" />
+                                             </font>
+                                          </Label>
+                                          <HBox>
+                                             
+                                                <ComboBox fx:id="caseCom" minHeight="26.0" minWidth="180.0" prefHeight="26.0" style="-fx-border-color: grey; -fx-border-radius: 3;" HBox.hgrow="ALWAYS" />
+                                             
+                                          </HBox>
+                                       
+                                    </VBox>
+                                    <VBox alignment="CENTER_LEFT" prefHeight="42.0" spacing="2.0" HBox.hgrow="ALWAYS">
+                                       
+                                          <Label text="Dependent On:">
+                                             <font>
+                                                <Font name="Arial Bold" size="11.0" />
+                                             </font>
+                                          </Label>
+                                          <VBox prefHeight="28.0" prefWidth="545.0">
+                                             
+                                                <HBox>
+                                                   
+                                                      <ComboBox fx:id="dependentRelationCom" minHeight="26.0" minWidth="172.0" prefHeight="26.0" prefWidth="172.0" promptText="Relation Type" style="-fx-border-color: grey  transparent grey grey; -fx-border-radius: 3 0 0 3;" HBox.hgrow="ALWAYS" />
+                                                      <TextField fx:id="dependentNameTF" minHeight="26.0" promptText="Enter name" style="-fx-border-color: grey  grey grey transparent; -fx-border-radius: 0 3 3 0;" HBox.hgrow="ALWAYS" />
+                                                   
+                                                </HBox>
+                                             
+                                          </VBox>
+                                       
+                                    </VBox>
+                                 
+                              </HBox>
+                              <HBox layoutX="10.0" layoutY="127.0" spacing="5.0">
+                                 
+                                    <VBox alignment="CENTER_LEFT" prefHeight="42.0" spacing="2.0" HBox.hgrow="ALWAYS">
+                                       
+                                          <Label text="Attendant Name">
+                                             <font>
+                                                <Font name="Arial Bold" size="11.0" />
+                                             </font>
+                                          </Label>
+                                          <VBox prefHeight="28.0" prefWidth="35.0">
+                                             
+                                                <HBox>
+                                                   
+                                                      <ComboBox fx:id="attendedRelationCom" minHeight="26.0" minWidth="140.0" prefHeight="26.0" promptText="Relation Type" style="-fx-border-color: grey  transparent grey grey; -fx-border-radius: 3 0 0 3;" HBox.hgrow="ALWAYS" />
+                                                      <TextField fx:id="attendedNameTF" minHeight="26.0" promptText="Enter attendant name" style="-fx-border-color: grey  grey grey transparent; -fx-border-radius: 0 3 3 0;" HBox.hgrow="ALWAYS" />
+                                                   
+                                                </HBox>
+                                             
+                                          </VBox>
+                                       
+                                    </VBox>
+                                    <VBox alignment="CENTER_LEFT" spacing="2.0">
+                                       
+                                          <Label text="Attendant Mobile # :">
+                                             <font>
+                                                <Font name="Arial Bold" size="11.0" />
+                                             </font>
+                                          </Label>
+                                          <TextField fx:id="attendedMobileNumTF" maxWidth="140.0" minWidth="140.0" prefHeight="27.0" style="-fx-border-color: grey; -fx-border-radius: 3;" />
+                                       
+                                    </VBox>
+                                    <VBox alignment="CENTER_LEFT" layoutX="579.0" layoutY="10.0" spacing="2.0" HBox.hgrow="ALWAYS">
+                                       
+                                          <Label text="Attendant Address :">
+                                             <font>
+                                                <Font name="Arial Bold" size="11.0" />
+                                             </font>
+                                          </Label>
+                                          <TextField fx:id="attendedAddressTF" style="-fx-border-color: grey; -fx-border-radius: 3;" />
+                                       
+                                    </VBox>
+                                 
+                              </HBox>
+                              <VBox>
+                                 
+                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                                       
+                                          <Separator prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                          <Label text="Bed Details" textFill="#04852f">
+                                             <font>
+                                                <Font name="System Bold" size="12.0" />
+                                             </font>
+                                          </Label>
+                                          <Separator layoutX="10.0" layoutY="10.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                       
+                                    </HBox>
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                                 
+                              </VBox>
+                              <VBox prefHeight="200.0" prefWidth="100.0">
+                                 
+                                    <HBox spacing="15.0">
+                                       
+                                          <HBox alignment="CENTER_LEFT">
+                                             
+                                                <Label minWidth="55.0" prefHeight="15.0" prefWidth="55.0" text="Facility :">
+                                                   <font>
+                                                      <Font name="Arial Bold" size="12.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label fx:id="facilityL" layoutX="10.0" layoutY="10.0" maxWidth="150.0" minWidth="50.0" style="-fx-border-radius: 3; -fx-cursor: hand;" textAlignment="CENTER" textFill="#04852f">
+                                                   <HBox.margin>
+                                                      <Insets left="2.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                   <padding>
+                                                      <Insets left="5.0" />
+                                                   </padding>
+                                                </Label>
+                                             
+                                          </HBox>
+                                          <HBox alignment="CENTER_LEFT" layoutX="259.0" layoutY="10.0">
+                                             
+                                                <Label minWidth="46.0" prefHeight="15.0" prefWidth="46.0" text="Floor :">
+                                                   <font>
+                                                      <Font name="Arial Bold" size="12.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label fx:id="floorL" layoutX="10.0" layoutY="10.0" maxWidth="150.0" minWidth="50.0" style="-fx-border-radius: 3; -fx-cursor: hand;" textAlignment="CENTER" textFill="#04852f">
+                                                   <HBox.margin>
+                                                      <Insets left="2.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                   <padding>
+                                                      <Insets left="5.0" />
+                                                   </padding>
+                                                </Label>
+                                             
+                                          </HBox>
+                                          <HBox alignment="CENTER_LEFT">
+                                             
+                                                <Label minWidth="57.0" prefHeight="15.0" prefWidth="57.0" text="Room # : ">
+                                                   <font>
+                                                      <Font name="Arial Bold" size="12.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label fx:id="roomL" layoutX="10.0" layoutY="10.0" minWidth="50.0" prefHeight="90.0" style="-fx-border-radius: 3; -fx-cursor: hand;" textAlignment="CENTER" textFill="#04852f">
+                                                   <HBox.margin>
+                                                      <Insets left="2.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                   <padding>
+                                                      <Insets left="5.0" />
+                                                   </padding>
+                                                </Label>
+                                             
+                                          </HBox>
+                                          <HBox alignment="CENTER_LEFT" layoutX="259.0" layoutY="10.0">
+                                             <Label minWidth="50.0" prefHeight="15.0" prefWidth="50.0" text="Bed # : ">
+                                                <font>
+                                                   <Font name="Arial Bold" size="12.0" />
+                                                </font>
+                                             </Label>
+                                             <Label fx:id="bedNumL" layoutX="10.0" layoutY="10.0" minWidth="122.0" style="-fx-border-radius: 3; -fx-cursor: hand;" textAlignment="CENTER" textFill="#04852f">
+                                                <HBox.margin>
+                                                   <Insets left="2.0" />
+                                                </HBox.margin>
+                                                <font>
+                                                   <Font name="System Bold" size="12.0" />
+                                                </font>
+                                                <padding>
+                                                   <Insets left="5.0" />
+                                                </padding>
+                                             </Label>
+                                          </HBox>
+                                          <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                                             <Button fx:id="selectBedBn" minWidth="20.0" mnemonicParsing="false" onAction="#selectBedOnClick" prefHeight="20.0" style="-fx-background-color: #04852f;" text="Select Bed" textFill="WHITE" />
+                                          </HBox>
+                                       
+                                    </HBox>
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                                 
+                              </VBox>
+                              <VBox layoutX="16.0" layoutY="228.0">
+                                 <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                                    <Separator prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                    <Label text="Additional Details" textFill="#04852f">
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator layoutX="10.0" layoutY="10.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                 </HBox>
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                              </VBox>
+                              <HBox spacing="10.0">
+                                 <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                                    <Label minWidth="43.0" text="Reason for Admission :">
+                                       <font>
+                                          <Font name="Arial Bold" size="12.0" />
+                                       </font>
+                                    </Label>
+                                    <TextField fx:id="reasonForAdmissionTF" style="-fx-border-color: grey; -fx-border-radius: 3;" />
+                                 </VBox>
+                                 <VBox alignment="CENTER_LEFT" spacing="2.0" HBox.hgrow="ALWAYS">
+                                    <Label text="Patient Condition :">
+                                       <font>
+                                          <Font name="Arial Bold" size="11.0" />
+                                       </font>
+                                    </Label>
+                                    <TextField fx:id="patientConditionTF" style="-fx-border-color: grey; -fx-border-radius: 3;" />
+                                 </VBox>
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                              </HBox>
+                              <HBox spacing="10.0">
+                                 <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                                    <Label minWidth="43.0" text="Allergies :">
+                                       <font>
+                                          <Font name="Arial Bold" size="12.0" />
+                                       </font>
+                                    </Label>
+                                    <TextField fx:id="allergiesTF" layoutX="10.0" layoutY="27.0" style="-fx-border-color: grey; -fx-border-radius: 3;" />
+                                 </VBox>
+                                 <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                                    <Label minWidth="43.0" text="Remarks :">
+                                       <font>
+                                          <Font name="Arial Bold" size="12.0" />
+                                       </font>
+                                    </Label>
+                                    <TextField fx:id="remarkTF" style="-fx-border-color: grey; -fx-border-radius: 3;" />
+                                 </VBox>
+                              </HBox>
+                              <Separator prefWidth="200.0">
+                                 <VBox.margin>
+                                    <Insets top="10.0" />
+                                 </VBox.margin>
+                              </Separator>
+                              <HBox alignment="CENTER" spacing="200.0">
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                                 <VBox.margin>
+                                    <Insets top="20.0" />
+                                 </VBox.margin>
+                                 <Button mnemonicParsing="false" onAction="#resetAdmissionDetail" prefHeight="25.0" prefWidth="161.0" style="-fx-border-radius: 3; -fx-border-color: red;" text="RESET" />
+                                 <Button layoutX="15.0" layoutY="15.0" mnemonicParsing="false" onAction="#submitDetails" prefHeight="25.0" prefWidth="161.0" style="-fx-border-radius: 3; -fx-background-color: #04852f;" text="SUBMIT" textFill="WHITE" />
+                              </HBox>
+                           
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </VBox>
+                     
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                  </VBox>
+               
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </VBox>
+         
+         <BorderPane.margin>
+            <Insets left="5.0" />
+         </BorderPane.margin>
       </VBox>
-   </left>
+   </center>
 </BorderPane>

@@ -8,15 +8,15 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.master.Master">
+<BorderPane xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.master.Master">
     <center>
         <TabPane fx:id="containerTabPane" style="-fx-tab-selected-color: #04852f;">
             <tabs>
-                <Tab fx:id="bedMasterTab" closable="false" text="Bed Master" />
-                <Tab fx:id="roomMasterReportTab" closable="false" text="Ward/Room Master" />
-                <Tab fx:id="wardFacilityTab" closable="false" text="Facility" />
-                <Tab fx:id="floorMasterTab" closable="false" text="Floor Master" />
                 <Tab fx:id="buildingMasterTab" closable="false" text="Building Master" />
+                <Tab fx:id="floorMasterTab" closable="false" text="Floor Master" />
+                <Tab fx:id="roomMasterReportTab" closable="false" text="Ward/Room Master" />
+                <Tab fx:id="bedMasterTab" closable="false" text="Bed Master" />
+                <Tab fx:id="wardFacilityTab" closable="false" text="Facility" />
                 <Tab fx:id="discountMasterTab" closable="false" text="Discount Master" />
                 <Tab fx:id="gstMasterTab" closable="false" text="Gst Master" />
                 <Tab fx:id="pharmaCompanyMasterTab" closable="false" text="Pharma Companies Master" />

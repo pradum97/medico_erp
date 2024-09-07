@@ -1,6 +1,16 @@
 .body{
     -fx-font-size: 10px;
 }
+
+.custom-combo-box .list-cell {
+    -fx-padding: 0 0 0 2;
+    -fx-font-size: 11px;
+}
+
+.custom-combo-box .list-cell .text {
+    -fx-graphic-text-gap: 0;  /* Remove gap between icon and text */
+}
+
 .consult_status_cancel .list-cell
 {
     -fx-background: white;

@@ -5,6 +5,7 @@ import com.techwhizer.medicalshop.controller.common.model.DepartmentModel;
 import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.model.ConsultationSetupModel;
 import com.techwhizer.medicalshop.model.DoctorModel;
+import com.techwhizer.medicalshop.model.RelationModel;
 import com.techwhizer.medicalshop.model.SalutationModel;
 import com.techwhizer.medicalshop.util.type.DoctorType;
 import com.victorlaerte.asynctask.AsyncTask;
@@ -329,6 +330,7 @@ public class CommonUtil {
                 DBConnection.closeConnection(connection,ps,null);
             }
 
+
         }
         @Override
         public void onPostExecute(Boolean success) {
@@ -343,4 +345,47 @@ public class CommonUtil {
 
         }
     }
+
+    public static ObservableList<RelationModel> getRelations(int relationId) {
+
+        ObservableList<RelationModel> relationList = FXCollections.observableArrayList();
+
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            connection = new DBConnection().getConnection();
+
+            String qry = "";
+
+            if (relationId > 0) {
+                qry = "select relation_id,relation_code,relation_type,description FROM tbl_family_relation where relation_id =" + relationId;
+            } else {
+
+                qry = "select relation_id,relation_code,relation_type,description FROM tbl_family_relation";
+            }
+
+            ps = connection.prepareStatement(qry);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                int relation_id = rs.getInt("relation_id");
+                String relation_code = rs.getString("relation_code");
+                String relation_type = rs.getString("relation_type");
+                String description = rs.getString("description");
+
+               RelationModel rm = new RelationModel(relation_id,relation_code,relation_type,description);
+               relationList.add(rm);
+            }
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            DBConnection.closeConnection(connection, ps, rs);
+        }
+        return relationList;
+    }
+
 }

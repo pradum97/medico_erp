@@ -123,6 +123,8 @@ module com.techwhizer.medicalshop {
 
     exports com.techwhizer.medicalshop.controller.patient.admission;
     opens com.techwhizer.medicalshop.controller.patient.admission to javafx.fxml;
+    exports com.techwhizer.medicalshop.setting;
+    opens com.techwhizer.medicalshop.setting to javafx.fxml;
 
 
 }

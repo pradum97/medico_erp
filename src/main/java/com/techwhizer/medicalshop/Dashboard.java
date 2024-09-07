@@ -4,6 +4,7 @@ import com.techwhizer.medicalshop.controller.auth.Login;
 import com.techwhizer.medicalshop.method.GetUserProfile;
 import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.model.UserDetails;
+import com.techwhizer.medicalshop.setting.ProjectType;
 import com.techwhizer.medicalshop.util.DBConnection;
 import com.techwhizer.medicalshop.util.RoleKey;
 import javafx.event.ActionEvent;
@@ -25,6 +26,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.ResourceBundle;
+
+import static com.techwhizer.medicalshop.setting.Setting.PROJECT_TYPE;
 
 public class Dashboard implements Initializable {
     @FXML
@@ -138,6 +141,7 @@ public class Dashboard implements Initializable {
     }
     private void setting() {
 
+
         setVisible(homeBn, Objects.equals(Login.currentRoleName, RoleKey.ADMIN));
         setVisible(saleReportBn, Objects.equals(Login.currentRoleName, RoleKey.ADMIN));
         setVisible(returnProductBn, (Objects.equals(Login.currentRoleName, RoleKey.ADMIN) ||
@@ -146,6 +150,11 @@ public class Dashboard implements Initializable {
         // top
         setVisible(billingBnTop, Objects.equals(Login.currentRoleName, RoleKey.ADMIN) ||
                 Objects.equals(Login.currentRoleName, RoleKey.STAFF));
+
+        if(ProjectType.OPD.name().equals(PROJECT_TYPE)){
+            setVisible(patientAdmissionHl,false);
+            setVisible(consultListBn,false);
+        }
     }
 
     private void setVisible(Node node, boolean isVisible) {
@@ -163,6 +172,8 @@ public class Dashboard implements Initializable {
         Menu productMenu = new Menu("PRODUCT");
         Menu ipdMenu = new Menu("IPD");
         masterMenu.getItems().addAll(productMenu,ipdMenu);
+
+
 
         MenuItem discount = new MenuItem("DISCOUNT MASTER");
         MenuItem gst = new MenuItem("GST MASTER");
@@ -199,10 +210,13 @@ public class Dashboard implements Initializable {
         MenuItem backup = new MenuItem("BACKUP");
         MenuItem logout = new MenuItem("LOGOUT");
 
+
         // prescription
         MenuItem frequency = new MenuItem("FREQUENCY");
         MenuItem timing = new MenuItem("TIMING");
         prescription.getItems().addAll(frequency,timing);
+
+
 
         // role control
 
@@ -216,6 +230,8 @@ public class Dashboard implements Initializable {
 
         users.setVisible(Objects.equals(Login.currentRoleName, RoleKey.ADMIN));
 
+
+
         settingMenuButton.getItems().addAll(masterMenuItem, prescription, profile, users, shopData, doctor,
                 returnHistory,purchaseHistory, dues,dealer, backup, logout);
 
@@ -226,6 +242,11 @@ public class Dashboard implements Initializable {
             customDialog.showFxmlFullDialog("master/master.fxml","");
         });
 
+        if(ProjectType.OPD.name().equals(PROJECT_TYPE)){
+            prescription.setVisible(false);
+            frequency.setVisible(false);
+            timing.setVisible(false);
+        }
     }
 
     private void productMenuOnclick(MenuItem discount, MenuItem gst,

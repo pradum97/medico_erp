@@ -74,7 +74,7 @@ public class GenerateInvoice {
                                   else coalesce(tsi.sale_rate,0) end )*coalesce(tsi.discount,0)/100 as discountAmount,
 
                            tsi.expiry_date,tsi.pack,tsi.discount,
-                           tsm.invoice_number ,(TO_CHAR(tsm.sale_date, 'DD-MM-YYYY')) as sale_date,
+                           tsm.invoice_number ,(TO_CHAR(tsm.sale_date, 'DD-MM-YYYY HH12:MI AM')) as sale_date,
                           (tsi.strip*tsi.strip_tab)+tsi.pcs as totalTab,
                            tsi.sgst, tsi.cgst,tsi.igst , tsi.hsn_sac ,
                            tsm.additional_discount_amount as additional_discount_amount,
@@ -346,7 +346,7 @@ public class GenerateInvoice {
                 param.put("phone", phone);
                 param.put("invoiceNumber",prescriptionNum);
                 param.put("uhidNum",uhid_no);
-                param.put("age",String.valueOf(age));
+                param.put("age",String.valueOf(age == 0?"" : age));
 
                 ConsultationSetupModel csm = CommonUtil.getConsultationSetup();
                 param.put("fee_valid_days",csm==null?25:csm.getFee_valid_days());

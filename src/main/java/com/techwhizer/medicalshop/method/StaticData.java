@@ -14,6 +14,18 @@ public class StaticData {
         return FXCollections.observableArrayList("Male", "Female", "Other");
     }
 
+    public static ObservableList<String> getPmAm() {
+        return FXCollections.observableArrayList("AM", "PM");
+    }
+
+    public static ObservableList<String> getIpdOpdFilterType() {
+        return FXCollections.observableArrayList("Registration", "Admission");
+    }
+
+    public static ObservableList<String> getCaseType() {
+        return FXCollections.observableArrayList("General","Delivery Case", "Accidental Case","Police Case","Emergency Case");
+    }
+
     public ObservableList<Integer> getYear() {
 
         int year = Year.now().getValue();

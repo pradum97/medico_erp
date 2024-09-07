@@ -58,7 +58,7 @@ public class PatientRegistrationForm implements Initializable {
     public Button submitBn;
     private Method method;
     private CustomDialog customDialog;
-    private   PatientModel pm;
+    private PatientModel pm;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -66,7 +66,7 @@ public class PatientRegistrationForm implements Initializable {
         customDialog = new CustomDialog();
         method.hideElement(progressBar);
         method.convertDateFormat_2(dobDb);
-        callTask("START",null);
+        callTask("START", null);
         config();
     }
 
@@ -74,18 +74,27 @@ public class PatientRegistrationForm implements Initializable {
 
         ageTf.textProperty().addListener((observable, oldValue, newValue) -> {
 
-            try {
-                dobDb.setValue(CommonUtil.calculateDOBFromAge(Integer.parseInt(newValue.isEmpty()?"0":newValue)));
-            }catch (Exception e){
-                dobDb.setValue(null);
-                method.show_popup("Please enter valid age",ageTf, Side.RIGHT);
+            if(ageTf.getText() != null){
+                if(ageTf.getText().isEmpty()){
+                    dobDb.setValue(null);
+                }else {
+                    try {
+                        dobDb.setValue(CommonUtil.calculateDOBFromAge(Integer.parseInt(newValue.isEmpty() ? "0" : newValue)));
+                    } catch (Exception e) {
+                        dobDb.setValue(null);
+                        dobDb.requestFocus();
+                        method.show_popup("Please enter valid age", ageTf, Side.RIGHT);
+                    }
+                }
+
             }
+
         });
     }
 
     private void setData() {
 
-        Platform.runLater(()->{
+        Platform.runLater(() -> {
 
             submitBn.setText("UPDATE");
 
@@ -115,18 +124,18 @@ public class PatientRegistrationForm implements Initializable {
 
     public void enterPress(KeyEvent ev) {
         if (ev.getCode() == KeyCode.ENTER) {
-           addNewPatient();
+            addNewPatient();
         }
     }
 
     public void submit_bn(ActionEvent event) {
-       addNewPatient();
+        addNewPatient();
     }
 
     private void closeStage() {
         Stage stage = (Stage) firstNameTf.getScene().getWindow();
         if (null != stage && stage.isShowing()) {
-          Platform.runLater(stage::close);
+            Platform.runLater(stage::close);
         }
     }
 
@@ -142,7 +151,6 @@ public class PatientRegistrationForm implements Initializable {
         LocalDate dob = dobDb.getValue();
 
 
-
         String phone = phoneTf.getText();
         String idType = idTypeCom.getSelectionModel().getSelectedItem();
         String idNumber = idNumberTf.getText();
@@ -152,7 +160,7 @@ public class PatientRegistrationForm implements Initializable {
         String pulse = pulseTf.getText();
         String sugar = sugarTf.getText();
         String spo2 = spo2Tf.getText();
-        String temp  = tempTf.getText();
+        String temp = tempTf.getText();
         String cvs = cvsTf.getText();
         String cns = cnsTf.getText();
         String chest = chestTf.getText();
@@ -160,26 +168,28 @@ public class PatientRegistrationForm implements Initializable {
         if (salutationCom.getSelectionModel().isEmpty()) {
             method.show_popup("Please salutation", salutationCom, Side.RIGHT);
             return;
-        }else
-        if (firstName.isEmpty()) {
+        } else if (firstName.isEmpty()) {
             method.show_popup("Please enter patient first name", firstNameTf, Side.RIGHT);
             return;
-        }else if (genderCom.getSelectionModel().isEmpty()) {
+        } else if (genderCom.getSelectionModel().isEmpty()) {
             method.show_popup("Please select gender", genderCom, Side.RIGHT);
             return;
-        } else if (address.isEmpty()) {
-            method.show_popup("Please enter patient address", addressTf, Side.RIGHT);
-            return;
-        }else if (null == dob || age.isEmpty()) {
-            method.show_popup("Please enter AGE OR DOB", ageTf, Side.RIGHT);
-            return;
         }
+//        else if (address.isEmpty()) {
+//            method.show_popup("Please enter patient address", addressTf, Side.RIGHT);
+//            return;
+//        }else if (null == dob || age.isEmpty()) {
+//            method.show_popup("Please enter AGE OR DOB", ageTf, Side.RIGHT);
+//            return;
+//        }
 
-        try {
-            Integer.parseInt(age);
-        } catch (NumberFormatException e) {
-            method.show_popup("Please enter valid age",ageTf, Side.RIGHT);
-            return;
+        if ( age != null && !age.isEmpty()) {
+            try {
+                Integer.parseInt(age);
+            } catch (NumberFormatException e) {
+                method.show_popup("Please enter valid age", ageTf, Side.RIGHT);
+                return;
+            }
         }
 
         if (!phone.isEmpty()) {
@@ -213,12 +223,11 @@ public class PatientRegistrationForm implements Initializable {
         ButtonType button = result.orElse(ButtonType.CANCEL);
         if (button == ButtonType.OK) {
 
-            PatientInsertUpdateModel pium = new  PatientInsertUpdateModel(salutationId,firstName, middleName, lastName, gender, age, address, dob,
+            PatientInsertUpdateModel pium = new PatientInsertUpdateModel(salutationId, firstName, middleName, lastName, gender, age, address, dob,
                     phone, idType, idNumber, guardianName, weight, bp, pulse, sugar,
                     spo2, temp, cvs, cns, chest);
 
-            callTask("ADDING_UPDATING",pium);
-
+            callTask("ADDING_UPDATING", pium);
 
 
         } else {
@@ -226,7 +235,7 @@ public class PatientRegistrationForm implements Initializable {
         }
     }
 
-    private void patientInsertUpdate(PatientInsertUpdateModel pium){
+    private void patientInsertUpdate(PatientInsertUpdateModel pium) {
 
         Connection connection = null;
         PreparedStatement ps = null;
@@ -240,27 +249,31 @@ public class PatientRegistrationForm implements Initializable {
 
             String qry = "";
 
-            if (null == pm){
+            if (null == pm) {
 
                 qry = """
-
-                            INSERT INTO tbl_patient(
-                                 salutation_id, first_name, middle_name, last_name, gender, address, dob, phone, id_type, id_number,
-                                  guardian_name, weight, bp, pulse, sugar, spo2, temp, cvs, cns, chest, created_by, last_update, last_update_by,
-                                  patient_number,UHID_NO)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,  ?, ?, ?, ?,?,?)
-                            """;
-            }else {
+                        
+                        INSERT INTO tbl_patient(
+                             salutation_id, first_name, middle_name, last_name, gender, address, dob, phone, id_type, id_number,
+                              guardian_name, weight, bp, pulse, sugar, spo2, temp, cvs, cns, chest, created_by, last_update, last_update_by,
+                              patient_number,UHID_NO)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,  ?, ?, ?, ?,?,?)
+                        """;
+            } else {
 
                 qry = """
-                                                        
-                            UPDATE tbl_patient
-                            SET salutation_id=?, first_name=?, middle_name=?, last_name=?, gender=?, address=?, dob=?,
-                                phone=?, id_type=?, id_number=?, guardian_name=?, weight=?, bp=?, pulse=?, sugar=?, spo2=?, temp=?, cvs=?, cns=?, chest=?,\s
-                                last_update_by=?, last_update=?
-                            WHERE patient_id = ?;
-                            """;
+                        
+                        UPDATE tbl_patient
+                        SET salutation_id=?, first_name=?, middle_name=?, last_name=?, gender=?, address=?, dob=?,
+                            phone=?, id_type=?, id_number=?, guardian_name=?, weight=?, bp=?, pulse=?, sugar=?, spo2=?, temp=?, cvs=?, cns=?, chest=?,\s
+                            last_update_by=?, last_update=?
+                        WHERE patient_id = ?;
+                        """;
 
+            }
+            Date dob = null;
+            if (pium.getDob() != null) {
+                dob = Date.valueOf(pium.getDob());
             }
 
             ps = connection.prepareStatement(qry);
@@ -270,7 +283,7 @@ public class PatientRegistrationForm implements Initializable {
             ps.setString(4, pium.getLastName());
             ps.setString(5, pium.getGender());
             ps.setString(6, pium.getAddress());
-            ps.setDate(7, Date.valueOf(pium.getDob()));
+            ps.setDate(7, dob);
             ps.setString(8, pium.getPhone());
             ps.setString(9, pium.getIdType());
             ps.setString(10, pium.getIdNumber());
@@ -291,25 +304,25 @@ public class PatientRegistrationForm implements Initializable {
             ps.setTimestamp(22, timestamp);
             if (null == pm) {
                 ps.setInt(23, Login.currentlyLogin_Id);
-                ps.setString(24,new  GenerateBillNumber().generatorPatientNumber());
-                ps.setString(25,new  GenerateBillNumber().generateUHIDNum());
+                ps.setString(24, new GenerateBillNumber().generatorPatientNumber());
+                ps.setString(25, new GenerateBillNumber().generateUHIDNum());
             } else {
                 ps.setInt(23, pm.getPatientId());
             }
             int res = ps.executeUpdate();
             if (res > 0) {
 
-                if(null != pm){
-                    customDialog.showAlertBox("","Patient successfully updated.");
-                }else {
-                    customDialog.showAlertBox("","Patient successfully created.");
+                if (null != pm) {
+                    customDialog.showAlertBox("", "Patient successfully updated.");
+                } else {
+                    customDialog.showAlertBox("", "Patient successfully created.");
                 }
 
                 Main.primaryStage.setUserData(true);
                 closeStage();
             }
         } catch (SQLException e) {
-            customDialog.showAlertBox("","An error occurred during patient registration");
+            customDialog.showAlertBox("", "An error occurred during patient registration");
         } finally {
             method.hideElement(progressBar);
             submitBn.setVisible(true);
@@ -322,9 +335,9 @@ public class PatientRegistrationForm implements Initializable {
     }
 
 
-    private void callTask(String type,PatientInsertUpdateModel pium) {
+    private void callTask(String type, PatientInsertUpdateModel pium) {
 
-        MyAsyncTask myAsyncTask = new MyAsyncTask(type,pium);
+        MyAsyncTask myAsyncTask = new MyAsyncTask(type, pium);
         myAsyncTask.setDaemon(false);
         myAsyncTask.execute();
     }
@@ -353,7 +366,7 @@ public class PatientRegistrationForm implements Initializable {
             switch (type) {
 
                 case "START" -> init();
-                case "ADDING_UPDATING" ->patientInsertUpdate(pium);
+                case "ADDING_UPDATING" -> patientInsertUpdate(pium);
             }
 
             return false;
@@ -372,14 +385,14 @@ public class PatientRegistrationForm implements Initializable {
                 }
             }
 
-            ObservableList<SalutationModel> salutationList =(CommonUtil.getSalutation(0));
+            ObservableList<SalutationModel> salutationList = (CommonUtil.getSalutation(0));
             salutationCom.setItems(salutationList);
 
             if (null != pm) {
 
                 SalutationModel sm = CommonUtil.getSalutation(pm.getSalutation_id()).get(0);
                 for (int i = 0; i < salutationList.size(); i++) {
-                    if (salutationList.get(i).getSalutationName().equals(sm.getSalutationName())){
+                    if (salutationList.get(i).getSalutationName().equals(sm.getSalutationName())) {
                         int finalI = i;
                         Platform.runLater(() -> salutationCom.getSelectionModel().select(finalI));
                     }
@@ -399,7 +412,8 @@ public class PatientRegistrationForm implements Initializable {
         }
     }
 }
- class PatientInsertUpdateModel {
+
+class PatientInsertUpdateModel {
     private int salutation_id;
     private String firstName;
     private String middleName;
@@ -423,11 +437,11 @@ public class PatientRegistrationForm implements Initializable {
     private String chest;
 
     // Constructor
-    public PatientInsertUpdateModel(int salutation_id,String firstName, String middleName, String lastName, String gender,
-                   String age, String address, LocalDate dob, String phone, String idType,
-                   String idNumber, String guardianName, String weight, String bp,
-                   String pulse, String sugar, String spo2, String temp, String cvs,
-                   String cns, String chest) {
+    public PatientInsertUpdateModel(int salutation_id, String firstName, String middleName, String lastName, String gender,
+                                    String age, String address, LocalDate dob, String phone, String idType,
+                                    String idNumber, String guardianName, String weight, String bp,
+                                    String pulse, String sugar, String spo2, String temp, String cvs,
+                                    String cns, String chest) {
         this.salutation_id = salutation_id;
         this.firstName = firstName;
         this.middleName = middleName;
@@ -452,11 +466,11 @@ public class PatientRegistrationForm implements Initializable {
     }
 
 
-     public int getSalutation_id() {
-         return salutation_id;
-     }
+    public int getSalutation_id() {
+        return salutation_id;
+    }
 
-     public String getFirstName() {
+    public String getFirstName() {
         return firstName;
     }
 

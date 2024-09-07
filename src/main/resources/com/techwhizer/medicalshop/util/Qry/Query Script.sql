@@ -146,27 +146,27 @@ CREATE TABLE tbl_mr_list
 
 CREATE TABLE TBL_ITEMS_MASTER
 (
-    ITEM_ID      SERIAL PRIMARY KEY,
-    ITEMS_NAME   VARCHAR(300) NOT NULL,
-    UNIT         VARCHAR(100) NOT NULL,
-    STRIP_TAB    NUMERIC   default 0,
-    PACKING      VARCHAR(100) NOT NULL,
-    COMPANY_ID   INT,
-    MFR_ID       INT,
-    DISCOUNT_ID  INT,
-    MR_ID        INT,
-    GST_ID       INT          NOT NULL,
-    TYPE         VARCHAR(50)  NOT NULL,
-    NARCOTIC     VARCHAR(50)  NOT NULL,
-    ITEM_TYPE    VARCHAR(50)  NOT NULL,
-    STATUS       INT          NOT NULL,
-    CREATED_BY   INT,
-    CREATED_DATE TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    IS_ACTIVE    INT       DEFAULT 1,
-    COMPOSITION  VARCHAR(300) NOT NULL,
-    DOSE         VARCHAR(200) NOT NULL,
-    TAG          VARCHAR(300) NOT NULL,
-    is_stockable boolean,
+    ITEM_ID         SERIAL PRIMARY KEY,
+    ITEMS_NAME      VARCHAR(300) NOT NULL,
+    UNIT            VARCHAR(100) NOT NULL,
+    STRIP_TAB       NUMERIC   default 0,
+    PACKING         VARCHAR(100) NOT NULL,
+    COMPANY_ID      INT,
+    MFR_ID          INT,
+    DISCOUNT_ID     INT,
+    MR_ID           INT,
+    GST_ID          INT          NOT NULL,
+    TYPE            VARCHAR(50)  NOT NULL,
+    NARCOTIC        VARCHAR(50)  NOT NULL,
+    ITEM_TYPE       VARCHAR(50)  NOT NULL,
+    STATUS          INT          NOT NULL,
+    CREATED_BY      INT,
+    CREATED_DATE    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    IS_ACTIVE       INT       DEFAULT 1,
+    COMPOSITION     VARCHAR(300) NOT NULL,
+    DOSE            VARCHAR(200) NOT NULL,
+    TAG             VARCHAR(300) NOT NULL,
+    is_stockable    boolean,
     department_code VARCHAR(50),
     foreign key (GST_ID) REFERENCES tbl_product_tax (TAX_ID),
     foreign key (CREATED_BY) REFERENCES tbl_users (user_id),
@@ -177,33 +177,33 @@ CREATE TABLE TBL_ITEMS_MASTER
 CREATE TABLE TBL_PURCHASE_MAIN
 (
     PURCHASE_MAIN_ID SERIAL PRIMARY KEY,
-    DEALER_ID        INT         ,
+    DEALER_ID        INT,
     BILL_NUM         VARCHAR(50) NOT NULL,
     DEALER_BILL_NUM  VARCHAR(50),
     BILL_DATE        VARCHAR(15) NOT NULL,
     CREATED_DATE     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     IS_ACTIVE        INT       DEFAULT 1,
-    created_by int,
-    updated_by int,
-    updated_date timestamp
+    created_by       int,
+    updated_by       int,
+    updated_date     timestamp
 );
 
 CREATE TABLE TBL_PURCHASE_ITEMS
 (
     PURCHASE_ITEMS_ID SERIAL PRIMARY KEY,
-    PURCHASE_MAIN_ID  INT          NOT NULL,
-    ITEM_ID           INT          NOT NULL,
-    BATCH             VARCHAR(100) ,
-    EXPIRY_DATE       VARCHAR(50) ,
+    PURCHASE_MAIN_ID  INT         NOT NULL,
+    ITEM_ID           INT         NOT NULL,
+    BATCH             VARCHAR(100),
+    EXPIRY_DATE       VARCHAR(50),
     LOT_NUMBER        VARCHAR(50),
     PURCHASE_RATE     NUMERIC,
     MRP               NUMERIC,
     SALE_PRICE        NUMERIC,
-    QUANTITY          NUMERIC      NOT NULL,
-    QUANTITY_UNIT     VARCHAR(20)  NOT NULL,
-    created_by int,
-    updated_by int,
-    updated_date timestamp,
+    QUANTITY          NUMERIC     NOT NULL,
+    QUANTITY_UNIT     VARCHAR(20) NOT NULL,
+    created_by        int,
+    updated_by        int,
+    updated_date      timestamp,
     FOREIGN KEY (PURCHASE_MAIN_ID) REFERENCES TBL_PURCHASE_MAIN (PURCHASE_MAIN_ID),
     FOREIGN KEY (ITEM_ID) REFERENCES TBL_ITEMS_MASTER (ITEM_ID)
 );
@@ -217,10 +217,10 @@ CREATE TABLE TBL_STOCK
     QUANTITY          NUMERIC     NOT NULL,
     QUANTITY_UNIT     VARCHAR(20) NOT NULL,
     UPDATE_DATE       VARCHAR(20) NOT NULL,
-    created_date timestamp default current_timestamp,
-    created_by int,
-    updated_by int,
-    updated_date timestamp,
+    created_date      timestamp default current_timestamp,
+    created_by        int,
+    updated_by        int,
+    updated_date      timestamp,
     FOREIGN KEY (ITEM_ID) REFERENCES TBL_ITEMS_MASTER (ITEM_ID),
     FOREIGN KEY (PURCHASE_MAIN_ID) REFERENCES TBL_PURCHASE_MAIN (PURCHASE_MAIN_ID),
     FOREIGN KEY (PURCHASE_ITEMS_ID) REFERENCES TBL_PURCHASE_ITEMS (PURCHASE_ITEMS_ID)
@@ -262,7 +262,7 @@ CREATE TABLE TBL_CART
     MRP          NUMERIC               NOT NULL,
     STRIP        INT,
     PCS          INT,
-    created_by int not null,
+    created_by   int                   not null,
     CREATED_DATE TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -270,7 +270,7 @@ CREATE TABLE TBL_SALE_MAIN
 (
     SALE_MAIN_ID                   SERIAL PRIMARY KEY                  NOT NULL,
     PATIENT_ID                     INTEGER                             NOT NULL,
-    REFERRED_BY                      INT,
+    REFERRED_BY                    INT,
     SELLER_ID                      INTEGER                             NOT NULL,
     ADDITIONAL_DISCOUNT_AMOUNT     NUMERIC,
     ADDITIONAL_DISCOUNT_PERCENTAGE NUMERIC,
@@ -282,7 +282,7 @@ CREATE TABLE TBL_SALE_MAIN
     BILL_TYPE                      VARCHAR(100)                        NOT NULL,
     sale_date                      timestamp default CURRENT_TIMESTAMP NOT NULL,
     RECEIVED_AMOUNT                NUMERIC,
-    consultation_doctor_id int ,
+    consultation_doctor_id         int,
     FOREIGN KEY (SELLER_ID)
         REFERENCES tbl_users (user_id)
 );
@@ -312,8 +312,8 @@ CREATE TABLE TBL_SALE_ITEMS
     TAX_AMOUNT                     NUMERIC,
     sale_date                      timestamp default CURRENT_TIMESTAMP NOT NULL,
     stock_id                       integer                             not null,
-    is_stockable boolean,
-    ADDITIONAL_DISCOUNT_PERCENTAGE numeric DEFAULT 0,
+    is_stockable                   boolean,
+    ADDITIONAL_DISCOUNT_PERCENTAGE numeric   DEFAULT 0,
 
     FOREIGN KEY (SALE_MAIN_ID)
         REFERENCES TBL_SALE_MAIN (SALE_MAIN_ID),
@@ -353,7 +353,7 @@ CREATE TABLE TBL_RETURN_MAIN
     RETURN_BY_ID   INT          NOT NULL,
     REFUND_AMOUNT  NUMERIC      NOT NULL,
     REMARK         VARCHAR(500) NULL,
-    sale_main_id int,
+    sale_main_id   int,
     FOREIGN KEY (RETURN_BY_ID) REFERENCES tbl_users (user_id),
     RETURN_DATE    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -402,7 +402,7 @@ CREATE TABLE TBL_PATIENT
     FIRST_NAME       VARCHAR(100)       NOT NULL,
     PATIENT_CATEGORY VARCHAR(200) DEFAULT 'GENERAL/CASH',
     UHID_NO          VARCHAR(200),
-    patient_number varchar(50),
+    patient_number   varchar(50),
     MIDDLE_NAME      VARCHAR(100),
     LAST_NAME        VARCHAR(100),
     GENDER           VARCHAR(10),
@@ -443,7 +443,7 @@ CREATE TABLE patient_consultation
     receipt_num            varchar(100),
     receipt_type           varchar(100),
     remarks                varchar(500),
-    sale_main_id int ,
+    sale_main_id           int,
     consultant_status      VARCHAR(100) DEFAULT 'Pending',
     consultation_date      timestamp    DEFAULT CURRENT_TIMESTAMP,
     CREATED_BY             INT,
@@ -487,73 +487,76 @@ ALTER TABLE TBL_SALE_MAIN
     ADD COLUMN CREATED_BY            INT;
 
 
-CREATE  TABLE TBL_DUES(
-    DUES_ID SERIAL PRIMARY KEY ,
-    SOURCE_ID INT,
-    DUES_TYPE VARCHAR(200),
-    DUES_AMOUNT NUMERIC,
-    CREATED_BY INT,
+CREATE TABLE TBL_DUES
+(
+    DUES_ID      SERIAL PRIMARY KEY,
+    SOURCE_ID    INT,
+    DUES_TYPE    VARCHAR(200),
+    DUES_AMOUNT  NUMERIC,
+    CREATED_BY   INT,
     CREATED_DATE timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE TBL_DEPARTMENTS(
-    DEPARTMENT_ID SERIAL PRIMARY KEY ,
+CREATE TABLE TBL_DEPARTMENTS
+(
+    DEPARTMENT_ID   SERIAL PRIMARY KEY,
     DEPARTMENT_NAME VARCHAR(300),
     DEPARTMENT_CODE VARCHAR(50),
-    STATUS BOOLEAN DEFAULT TRUE,
-    CREATED_BY INT,
-    CREATED_DATE timestamp DEFAULT CURRENT_TIMESTAMP
+    STATUS          BOOLEAN   DEFAULT TRUE,
+    CREATED_BY      INT,
+    CREATED_DATE    timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 ----- From 20-03-2024---------
 
-CREATE  TABLE TBL_PRESCRIPTION_MASTER
+CREATE TABLE TBL_PRESCRIPTION_MASTER
 (
     PRESCRIPTION_MASTER_ID SERIAL PRIMARY KEY,
-    CONSULTATION_ID              int,
-    PATIENT_ID                   INT,
-    PRESCRIPTION_NUM             VARCHAR(30),
-    IS_FINAL BOOLEAN,
+    CONSULTATION_ID        int,
+    PATIENT_ID             INT,
+    PRESCRIPTION_NUM       VARCHAR(30),
+    IS_FINAL               BOOLEAN,
     CREATED_BY             INT,
-    REMARKS TEXT NULL,
-    STATUS INT DEFAULT 1,
-    CREATION_DATE          timestamp    default CURRENT_TIMESTAMP,
+    REMARKS                TEXT NULL,
+    STATUS                 INT       DEFAULT 1,
+    CREATION_DATE          timestamp default CURRENT_TIMESTAMP,
     UPDATE_BY              INT,
     LAST_UPDATE_DATE       timestamp
 );
 
 CREATE TABLE TBL_PRESCRIPTION_MEDICATIONS
 (
-    MEDICATION_ID  SERIAL PRIMARY KEY,
-    ITEM_NAME                    VARCHAR(400),
-    ITEM_ID                      INT REFERENCES TBL_ITEMS_MASTER(ITEM_ID),
-    PRESCRIPTION_MASTER_ID INT REFERENCES TBL_PRESCRIPTION_MASTER(PRESCRIPTION_MASTER_ID),
-    IS_ITEM_EXISTS_IN_STOCK      bool,
-    COMPOSITION                  VARCHAR(300),
-    TAG                          VARCHAR(200),
-    REMARK                       VARCHAR(1000),
-    QUANTITY                     VARCHAR(100),
-    TIME                         VARCHAR(500),
-    DOSE                         VARCHAR(200),
-    FREQUENCY                    VARCHAR(400),
-    DURATION                     VARCHAR(100),
-    CREATED_BY             INT,
-    STATUS INT DEFAULT 1,
-    CREATION_DATE          timestamp    default CURRENT_TIMESTAMP,
-    UPDATE_BY              INT,
-    LAST_UPDATE_DATE       timestamp
+    MEDICATION_ID           SERIAL PRIMARY KEY,
+    ITEM_NAME               VARCHAR(400),
+    ITEM_ID                 INT REFERENCES TBL_ITEMS_MASTER (ITEM_ID),
+    PRESCRIPTION_MASTER_ID  INT REFERENCES TBL_PRESCRIPTION_MASTER (PRESCRIPTION_MASTER_ID),
+    IS_ITEM_EXISTS_IN_STOCK bool,
+    COMPOSITION             VARCHAR(300),
+    TAG                     VARCHAR(200),
+    REMARK                  VARCHAR(1000),
+    QUANTITY                VARCHAR(100),
+    TIME                    VARCHAR(500),
+    DOSE                    VARCHAR(200),
+    FREQUENCY               VARCHAR(400),
+    DURATION                VARCHAR(100),
+    CREATED_BY              INT,
+    STATUS                  INT       DEFAULT 1,
+    CREATION_DATE           timestamp default CURRENT_TIMESTAMP,
+    UPDATE_BY               INT,
+    LAST_UPDATE_DATE        timestamp
 );
 
-CREATE TABLE TBL_PRESCRIPTION_INVESTIGATION(
-    INVESTIGATION_ID SERIAL PRIMARY KEY ,
-    ITEM_ID INT REFERENCES TBL_ITEMS_MASTER(ITEM_ID),
-    PRESCRIPTION_MASTER_ID INT REFERENCES TBL_PRESCRIPTION_MASTER(PRESCRIPTION_MASTER_ID),
-    PRESCRIBED_DATE TIMESTAMP,
-    RESULT_DATE TIMESTAMP,
-    RESULT_VALUE TEXT,
+CREATE TABLE TBL_PRESCRIPTION_INVESTIGATION
+(
+    INVESTIGATION_ID       SERIAL PRIMARY KEY,
+    ITEM_ID                INT REFERENCES TBL_ITEMS_MASTER (ITEM_ID),
+    PRESCRIPTION_MASTER_ID INT REFERENCES TBL_PRESCRIPTION_MASTER (PRESCRIPTION_MASTER_ID),
+    PRESCRIBED_DATE        TIMESTAMP,
+    RESULT_DATE            TIMESTAMP,
+    RESULT_VALUE           TEXT,
     CREATED_BY             INT,
-    STATUS INT DEFAULT 1,
-    CREATION_DATE          timestamp    default CURRENT_TIMESTAMP,
+    STATUS                 INT       DEFAULT 1,
+    CREATION_DATE          timestamp default CURRENT_TIMESTAMP,
     UPDATE_BY              INT,
     LAST_UPDATE_DATE       timestamp
 );
@@ -562,110 +565,179 @@ CREATE TABLE TBL_PRESCRIPTION_INVESTIGATION(
 
 CREATE TABLE tbl_building
 (
-    building_id   SERIAL PRIMARY KEY,
-    building_number VARCHAR(10),
-    building_name VARCHAR(100) UNIQUE NOT NULL,
-    address varchar(500),
-    status int default 1,
-    created_by int REFERENCES tbl_users(user_id),
-    created_date timestamp default current_timestamp,
-    last_updated_by int REFERENCES tbl_users(user_id),
+    building_id       SERIAL PRIMARY KEY,
+    building_number   VARCHAR(10),
+    building_name     VARCHAR(100) UNIQUE NOT NULL,
+    address           varchar(500),
+    status            int       default 1,
+    created_by        int REFERENCES tbl_users (user_id),
+    created_date      timestamp default current_timestamp,
+    last_updated_by   int REFERENCES tbl_users (user_id),
     last_updated_date timestamp
 );
 
 
 CREATE TABLE tbl_floor
 (
-    floor_id     SERIAL PRIMARY KEY,
-    floor_number INT NOT NULL,
-    floor_name varchar(200) NOT NULL,
-    building_id  INT REFERENCES tbl_building (building_id),
-    status int default 1,
-    created_by int REFERENCES tbl_users(user_id),
-    created_date timestamp default current_timestamp,
-    last_updated_by int REFERENCES tbl_users(user_id),
+    floor_id          SERIAL PRIMARY KEY,
+    floor_number      INT          NOT NULL,
+    floor_name        varchar(200) NOT NULL,
+    building_id       INT REFERENCES tbl_building (building_id),
+    status            int       default 1,
+    created_by        int REFERENCES tbl_users (user_id),
+    created_date      timestamp default current_timestamp,
+    last_updated_by   int REFERENCES tbl_users (user_id),
     last_updated_date timestamp,
-    UNIQUE (floor_number, building_id,floor_name)
+    UNIQUE (floor_number, building_id, floor_name)
 );
 
 
-CREATE TABLE tbl_ward_facility(
-    ward_facility_id serial primary key ,
-    facility_code varchar(50) NOT NULL,
-    facility_name varchar(200) NOT NULL,
-    status int default 1,
-    created_by int REFERENCES tbl_users(user_id),
-    created_date timestamp default current_timestamp,
-    last_updated_by int REFERENCES tbl_users(user_id),
+CREATE TABLE tbl_ward_facility
+(
+    ward_facility_id  serial primary key,
+    facility_code     varchar(50)  NOT NULL,
+    facility_name     varchar(200) NOT NULL,
+    status            int       default 1,
+    created_by        int REFERENCES tbl_users (user_id),
+    created_date      timestamp default current_timestamp,
+    last_updated_by   int REFERENCES tbl_users (user_id),
     last_updated_date timestamp
 );
 
-INSERT INTO tbl_ward_facility (facility_code, facility_name,created_by)
-VALUES
-    ('ICU', 'Intensive Care Unit',1),
-    ('GENERAL BED', 'General Bed',1),
-    ('DELUXE PRIVATE CABIN', 'Deluxe Private Cabin',1),
-    ('AC DELUXE ROOM', 'AC Deluxe Room',1),
-    ('SEMI PRIVATE', 'Semi Private',1),
-    ('PRIVATE CABIN', 'Private Cabin',1),
-    ('TWIN SHARING NON AC', 'Twin Sharing Non-AC',1),
-    ('NICU', 'Neonatal Intensive Care Unit',1),
-    ('Emergency', 'Emergency',1),
-    ('CASUALTY', 'Casualty',1),
-    ('ECONOMY BED', 'Economy Bed',1),
-    ('HDU', 'High Dependency Unit',1),
-    ('VR Bed', 'Virtual Reality Bed',1);
+INSERT INTO tbl_ward_facility (facility_code, facility_name, created_by)
+VALUES ('ICU', 'Intensive Care Unit', 1),
+       ('GENERAL BED', 'General Bed', 1),
+       ('DELUXE PRIVATE CABIN', 'Deluxe Private Cabin', 1),
+       ('AC DELUXE ROOM', 'AC Deluxe Room', 1),
+       ('SEMI PRIVATE', 'Semi Private', 1),
+       ('PRIVATE CABIN', 'Private Cabin', 1),
+       ('TWIN SHARING NON AC', 'Twin Sharing Non-AC', 1),
+       ('NICU', 'Neonatal Intensive Care Unit', 1),
+       ('Emergency', 'Emergency', 1),
+       ('CASUALTY', 'Casualty', 1),
+       ('ECONOMY BED', 'Economy Bed', 1),
+       ('HDU', 'High Dependency Unit', 1),
+       ('VR Bed', 'Virtual Reality Bed', 1);
 
 CREATE TABLE tbl_wards
 (
-    ward_id   SERIAL PRIMARY KEY,
-    building_id INT REFERENCES tbl_building(building_id),
-    floor_id  INT REFERENCES tbl_floor (floor_id),
-    ward_name VARCHAR(100) NOT NULL,
-    ward_facility_id int REFERENCES tbl_ward_facility(ward_facility_id) ,
-    number_of_beds  BIGINT,
-    status int default 1,
-    created_by int REFERENCES tbl_users(user_id),
-    created_date timestamp default current_timestamp,
-    last_updated_by int REFERENCES tbl_users(user_id),
+    ward_id           SERIAL PRIMARY KEY,
+    building_id       INT REFERENCES tbl_building (building_id),
+    floor_id          INT REFERENCES tbl_floor (floor_id),
+    ward_name         VARCHAR(100) NOT NULL,
+    ward_facility_id  int REFERENCES tbl_ward_facility (ward_facility_id),
+    number_of_beds    BIGINT,
+    status            int       default 1,
+    created_by        int REFERENCES tbl_users (user_id),
+    created_date      timestamp default current_timestamp,
+    last_updated_by   int REFERENCES tbl_users (user_id),
     last_updated_date timestamp
 );
 
-CREATE TABLE tbl_beds(
-    bed_id SERIAL PRIMARY KEY ,
-    ward_id int NOT NULL,
-    row_number int ,
-    column_number int,
-    bed_number varchar(60) NOT NULL,
-    bed_name varchar(100) NOT NULL,
-    bed_type varchar(70)NOT NULL,
-    bed_status varchar(50) default 'Available',
-    bed_for varchar(50) default 'Patient',
-    is_active int default 1,
-    created_by int REFERENCES tbl_users(user_id),
-    created_date timestamp default current_timestamp,
-    last_updated_by int REFERENCES tbl_users(user_id),
+CREATE TABLE tbl_beds
+(
+    bed_id            SERIAL PRIMARY KEY,
+    ward_id           int          NOT NULL,
+    row_number        int,
+    column_number     int,
+    bed_number        varchar(60)  NOT NULL,
+    bed_name          varchar(100) NOT NULL,
+    bed_type          varchar(70)  NOT NULL,
+    bed_status        varchar(50) default 'Available',
+    bed_for           varchar(50) default 'Patient',
+    is_active         int         default 1,
+    created_by        int REFERENCES tbl_users (user_id),
+    created_date      timestamp   default current_timestamp,
+    last_updated_by   int REFERENCES tbl_users (user_id),
     last_updated_date timestamp
 );
 
-CREATE TABLE tbl_bed_history(
+CREATE TABLE tbl_bed_history
+(
     bed_history_id    SERIAL PRIMARY KEY,
     bed_id            INT REFERENCES tbl_beds (bed_id),
-    old_ward_id       INT NOT NULL ,
+    old_ward_id       INT NOT NULL,
     old_bed_id        INT NOT NULL,
     new_ward_id       INT NOT NULL,
     new_bed_id        INT NOT NULL,
     reason            TEXT,
-    transferred_by    INT REFERENCES tbl_users(user_id),
+    transferred_by    INT REFERENCES tbl_users (user_id),
     transfer_date     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_updated_by   int REFERENCES tbl_users(user_id),
+    last_updated_by   int REFERENCES tbl_users (user_id),
     last_updated_date timestamp
 );
 
 
 -- Bed Type 'General', 'ICU', 'Maternity', 'Pediatric', 'Surgical', 'Other'
 
+--02-09-2024
+CREATE TABLE TBL_APP_SETTING
+(
+    APP_SETTING_ID      SERIAL PRIMARY KEY,
+    SETTING_NAME        VARCHAR(200) UNIQUE,
+    SETTING_CODE        VARCHAR(80) UNIQUE,
+    SETTING_DESCRIPTION VARCHAR(500),
+    USER_ID             INT REFERENCES tbl_users (user_id),
+    SQL_QUERY           TEXT,
+    CREATED_BY          INT REFERENCES tbl_users (user_id),
+    CREATED_DATE        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_updated_by     int REFERENCES tbl_users (user_id),
+    last_updated_date   timestamp
+);
 
+CREATE TABLE tbl_family_relation
+(
+    relation_id       SERIAL PRIMARY KEY,
+    relation_code     VARCHAR(30) UNIQUE ,
+    relation_type     VARCHAR(50) UNIQUE ,
+    description       TEXT,
+    CREATED_BY        INT REFERENCES tbl_users (user_id),
+    CREATED_DATE      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_updated_by   int REFERENCES tbl_users (user_id),
+    last_updated_date timestamp
+);
+
+INSERT INTO tbl_family_relation (relation_type, relation_code)
+VALUES
+    ('Father', 'FATHER'),
+    ('Mother', 'MOTHER'),
+    ('Son', 'SON'),
+    ('Daughter', 'DAUGHTER'),
+    ('Brother', 'BROTHER'),
+    ('Sister', 'SISTER'),
+    ('Husband', 'HUSBAND'),
+    ('Wife', 'WIFE'),
+    ('Grandfather', 'GRANDFATHER'),
+    ('Grandmother', 'GRANDMOTHER'),
+    ('Grandson', 'GRANDSON'),
+    ('Granddaughter', 'GRANDDAUGHTER'),
+    ('Uncle', 'UNCLE'),
+    ('Aunt', 'AUNT'),
+    ('Nephew', 'NEPHEW'),
+    ('Niece', 'NIECE'),
+    ('Cousin', 'COUSIN'),
+    ('Brother-in-law', 'BROTHER_IN_LAW'),
+    ('Sister-in-law', 'SISTER_IN_LAW'),
+    ('Father-in-law', 'FATHER_IN_LAW'),
+    ('Mother-in-law', 'MOTHER_IN_LAW'),
+    ('Son-in-law', 'SON_IN_LAW'),
+    ('Daughter-in-law', 'DAUGHTER_IN_LAW'),
+    ('Stepfather', 'STEPFATHER'),
+    ('Stepmother', 'STEPMOTHER'),
+    ('Stepson', 'STEPSON'),
+    ('Stepdaughter', 'STEPDAUGHTER'),
+    ('Half-brother', 'HALF_BROTHER'),
+    ('Half-sister', 'HALF_SISTER'),
+    ('Godfather', 'GODFATHER'),
+    ('Godmother', 'GODMOTHER'),
+    ('Godson', 'GODSON'),
+    ('Goddaughter', 'GODDAUGHTER'),
+    ('Great-grandfather', 'GREAT_GRANDFATHER'),
+    ('Great-grandmother', 'GREAT_GRANDMOTHER'),
+    ('Great-grandson', 'GREAT_GRANDSON'),
+    ('Great-granddaughter', 'GREAT_GRANDDAUGHTER'),
+    ('First Cousin Once Removed', 'FIRST_COUSIN_ONCE_REMOVED'),
+    ('Second Cousin', 'SECOND_COUSIN');
 
 
 

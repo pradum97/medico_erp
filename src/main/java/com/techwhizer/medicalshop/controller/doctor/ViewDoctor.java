@@ -48,7 +48,7 @@ public class ViewDoctor implements Initializable {
     public TableColumn<DoctorModel, String> colAction;
     private Method method;
     private FilteredList<DoctorModel> filteredData;
-    private ObservableList<DoctorModel> doctorList = FXCollections.observableArrayList();
+    private final ObservableList<DoctorModel> doctorList = FXCollections.observableArrayList();
 
 
     @Override
@@ -71,17 +71,13 @@ public class ViewDoctor implements Initializable {
     }
 
     private class MyAsyncTask extends AsyncTask<String, Integer, Boolean> {
-        private String msg;
 
         @Override
         public void onPreExecute() {
-            msg = "";
-
             if (null != tableView) {
                 tableView.setItems(null);
+                tableView.setPlaceholder(method.getProgressBarRed(40, 40));
             }
-            assert tableView != null;
-            tableView.setPlaceholder(method.getProgressBarRed(40, 40));
 
         }
 
@@ -89,17 +85,14 @@ public class ViewDoctor implements Initializable {
         public Boolean doInBackground(String... params) {
             getDoctor();
             return false;
-
         }
 
         @Override
         public void onPostExecute(Boolean success) {
             tableView.setPlaceholder(new Label("Doctor not available"));
-            if (null != doctorList) {
-                if (doctorList.size() > 0) {
-                    pagination.setVisible(true);
-                    search_Item();
-                }
+            if (!doctorList.isEmpty()) {
+                pagination.setVisible(true);
+                search_Item();
             }
         }
 
@@ -110,9 +103,7 @@ public class ViewDoctor implements Initializable {
     }
 
     private void getDoctor() {
-        if (null != doctorList){
-            doctorList.clear();
-        }
+        doctorList.clear();
 
         Connection connection = null;
         PreparedStatement ps = null;
@@ -144,7 +135,6 @@ public class ViewDoctor implements Initializable {
                 doctorList.add(new DoctorModel(id,  Objects.equals(name, "SELF") ?name:"Dr. "+name, phone,
                         address, reg,spec, qly, date, docType));
             }
-
 
         } catch (SQLException e) {
             e.printStackTrace();
