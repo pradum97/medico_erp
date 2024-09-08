@@ -119,11 +119,17 @@ public class WardFacilityMaster implements Initializable {
             DBConnection.closeConnection(connection, ps, null);
         }
     }
+
+    public void refresh(ActionEvent actionEvent) {
+        new MyAsyncTask().execute();
+    }
+
     private void clear() {
         facilityCodeTf.setText("");
         facilityNameTf.setText("");
         facilityMasterId.setValue(0);
     }
+
 
     private class MyAsyncTask extends AsyncTask<String, Integer, Boolean> {
 

@@ -91,6 +91,10 @@ public class FloorMaster implements Initializable {
         });
     }
 
+    public void refresh(ActionEvent actionEvent) {
+        new MyAsyncTask(0,Type.INIT).execute();
+    }
+
     public void saveUpdateButtonClick(ActionEvent actionEvent) {
 
         String floorNumber = floorNumberTf.getText();
@@ -182,6 +186,7 @@ public class FloorMaster implements Initializable {
         public void onPreExecute() {
             switch (type){
                 case GET -> tableview.setPlaceholder(method.getProgressBarRed(40, 40));
+                case INIT -> buildingList.clear();
             }
         }
 
@@ -316,8 +321,6 @@ public class FloorMaster implements Initializable {
     }
 
     private void getBuildings() {
-        buildingList.clear();
-        buildingNameFilterCom.getSelectionModel().select(0);
 
         Connection connection = null;
         PreparedStatement ps = null;
@@ -344,6 +347,7 @@ public class FloorMaster implements Initializable {
             }
             buildingNameCom.setItems(buildingList);
             buildingNameFilterCom.setItems(buildingList);
+            Platform.runLater(() -> buildingNameFilterCom.getSelectionModel().select(0));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {

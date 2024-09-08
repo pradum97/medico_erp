@@ -1,0 +1,14 @@
+.card-wrapper {
+    -fx-border-color:  #04852f;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+    -fx-cursor: hand;-fx-padding: 5
+}
+
+.card-wrapper:hover {
+    -fx-background-color:  #04852f;
+}
+
+.card-wrapper:hover .label {
+    -fx-text-fill: white;
+}

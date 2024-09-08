@@ -54,6 +54,8 @@ public class DateTimePicker extends HBox implements Initializable {
 	public DateTimePicker(final LocalDateTime dateTime) {
 
 		this(dateTime, DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT));
+		System.out.println("Pradum----"+dateTime.toLocalTime());
+
 	}
 	public DateTimePicker(final LocalDateTime dateTime, final DateTimeFormatter formatter) {
 

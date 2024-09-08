@@ -73,6 +73,10 @@ module com.techwhizer.medicalshop {
     opens com.techwhizer.medicalshop.controller.product.purchase to javafx.fxml;
     exports com.techwhizer.medicalshop.controller.chooser;
     opens com.techwhizer.medicalshop.controller.chooser to javafx.fxml;
+
+    exports com.techwhizer.medicalshop.controller.chooser.ipd;
+    opens com.techwhizer.medicalshop.controller.chooser.ipd to javafx.fxml;
+
     exports com.techwhizer.medicalshop.controller.product.mr;
     opens com.techwhizer.medicalshop.controller.product.mr to javafx.fxml;
     exports com.techwhizer.medicalshop.controller.update;

@@ -402,12 +402,18 @@ public class PatientList implements Initializable {
 
                     bnUpdate.setOnMouseClicked(mouseEvent -> {
                         PatientModel pm = tableView.getSelectionModel().getSelectedItem();
-                        Main.primaryStage.setUserData(pm);
+                        Main.primaryStage.setUserData(pm.getPatientId());
                         customDialog.showFxmlDialog2("patient/registration/patient_registration_form.fxml", "Update Patient Details");
-                        Main.primaryStage.setUserData(null);
-                        callThread();
-                    });
 
+                        if (Main.primaryStage.getUserData() instanceof Boolean idUpdated) {
+                            if(idUpdated){
+                                callThread();
+                                Main.primaryStage.setUserData(null);
+                            }
+
+                        }
+
+                    });
 
                     HBox managebtn = new HBox(viewDetails, bnUpdate);
                     managebtn.setStyle("-fx-alignment:center-left");

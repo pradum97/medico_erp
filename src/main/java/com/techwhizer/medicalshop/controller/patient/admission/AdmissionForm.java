@@ -1,16 +1,15 @@
 package com.techwhizer.medicalshop.controller.patient.admission;
 
 import com.techwhizer.medicalshop.CustomDialog;
+import com.techwhizer.medicalshop.DateTimePicker;
 import com.techwhizer.medicalshop.Main;
 import com.techwhizer.medicalshop.controller.common.model.DepartmentModel;
-import com.techwhizer.medicalshop.controller.master.bed.BedMaster;
 import com.techwhizer.medicalshop.controller.master.model.BedModel;
 import com.techwhizer.medicalshop.method.Method;
 import com.techwhizer.medicalshop.method.StaticData;
 import com.techwhizer.medicalshop.model.DoctorModel;
 import com.techwhizer.medicalshop.model.PatientModel;
 import com.techwhizer.medicalshop.model.RelationModel;
-import com.techwhizer.medicalshop.model.chooserModel.StockItemChooserModel;
 import com.techwhizer.medicalshop.util.CommonUtil;
 import com.techwhizer.medicalshop.util.DBConnection;
 import com.techwhizer.medicalshop.util.type.DoctorType;
@@ -22,6 +21,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 
 import java.net.URL;
@@ -29,28 +29,24 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class AdmissionForm implements Initializable {
-    public ComboBox<Integer> hourCB;
-    public ComboBox<Integer> minuteCB;
     public Label admissionNumL;
-    public ComboBox<String> amPmCB;
     public ComboBox<String> filterTypeCom;
     public Label guardianNameL;
     public Label patientNameL;
     public Label ageGenderL;
     public Label registrationNumL;
     public Label patientAddressL;
-    public DatePicker admissionDateDT;
     public ComboBox<DoctorModel> referByCom;
     public ComboBox<DepartmentModel> departmentCom;
     public ComboBox<DoctorModel> consultNameCom;
@@ -74,11 +70,14 @@ public class AdmissionForm implements Initializable {
     public VBox admissionDetailsContainer;
     public HBox errorMesageContainer;
     public Label errorMessageL;
+    public HBox admDateTimeDT;
     private Method method;
     private CustomDialog customDialog;
     private ObjectProperty<Integer> selectedPatientId;
     private ObjectProperty<BedModel> selectedBedDetails;
     private ObjectProperty<StringBuilder> validationMessage;
+    private ObjectProperty<Boolean> isAdmissionContainerVisible;
+    private ObjectProperty<LocalDateTime> admissonDateTime;
 
     private enum OperationType {
         INIT, SEARCH_PATIENT, RESET_PATIENT
@@ -88,29 +87,63 @@ public class AdmissionForm implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         method = new Method();
         customDialog = new CustomDialog();
-        initDateTime();
         callThread(OperationType.INIT, null);
         admissionDetailsContainer.setDisable(true);
 
+        objectPropertyInit();
 
+        dateTimeInit();
+
+
+    }
+
+    private void dateTimeInit() {
+
+        AtomicReference<DateTimePicker> dateTimePicker = new AtomicReference<>(new DateTimePicker(LocalDateTime.now()));
+        addDateTime(dateTimePicker.get());
+
+        admissonDateTime.addListener((observableValue, old, newVal) -> {
+            addDateTime(new DateTimePicker(newVal));
+        });
+        dateTimePicker.get().dateTimeProperty().addListener((observableValue,
+                                                             localDateTime, dateTimeString) -> {
+            System.out.println("Pradum----");
+            admissonDateTime.setValue(dateTimeString);
+                }
+        );
+    }
+
+    private void  addDateTime(Node node){
+        admDateTimeDT.getChildren().clear();
+        admDateTimeDT.getChildren().add(node);
+    }
+
+    private void objectPropertyInit() {
         method.hideElement(errorMesageContainer);
+
         validationMessage = new SimpleObjectProperty<>(new StringBuilder());
         selectedBedDetails = new SimpleObjectProperty<>(null);
         selectedPatientId = new SimpleObjectProperty<>(0);
+        isAdmissionContainerVisible = new SimpleObjectProperty<>(false);
+        admissonDateTime = new SimpleObjectProperty<>(LocalDateTime.now());
+
+        isAdmissionContainerVisible.addListener((observableValue, old, newVal) -> {
+            admissionDetailsContainer.setDisable(newVal);
+        });
+
         selectedPatientId.addListener((observableValue, integer, newVal) -> {
-            admissionDetailsContainer.setDisable(!validationMessage.getValue().toString().isEmpty() && newVal < 1);
+            isAdmissionContainerVisible.setValue(newVal < 1);
         });
 
         validationMessage.addListener((observableValue, integer, newVal) -> {
 
             String errorMsg = validationMessage.getValue().toString();
-
-            System.out.println("validationMessage-tt " + errorMsg);
-
+            admissionDetailsContainer.setDisable(!errorMsg.isEmpty());
 
             if (newVal != null && !errorMsg.isEmpty()) {
                 errorMesageContainer.setVisible(true);
                 errorMessageL.setText(errorMsg);
+
             } else {
                 method.hideElement(errorMesageContainer);
                 errorMessageL.setText("");
@@ -173,7 +206,6 @@ public class AdmissionForm implements Initializable {
 
     private void bind() {
 
-        amPmCB.setItems(StaticData.getPmAm());
         referByCom.setItems(CommonUtil.getDoctor(DoctorType.OUT_SIDE));
         departmentCom.setItems(CommonUtil.getDepartmentsList());
         consultNameCom.setItems(CommonUtil.getDoctor(DoctorType.IN_HOUSE));
@@ -192,24 +224,22 @@ public class AdmissionForm implements Initializable {
         });
     }
 
-    public void initDateTime() {
-        for (int i = 1; i <= 12; i++) {
-            hourCB.getItems().add(i);
-        }
-        for (int i = 0; i < 60; i++) {
-            minuteCB.getItems().add(i);
-        }
-        Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR);
-        int minutes = calendar.get(Calendar.MINUTE);
-        String amPm = (calendar.get(Calendar.AM_PM) == Calendar.AM) ? "AM" : "PM";
-        hourCB.getSelectionModel().select(hour);
-        minuteCB.getSelectionModel().select(minutes);
-        amPmCB.getSelectionModel().select(amPm);
-    }
-
     public void updatePatientDetails(ActionEvent actionEvent) {
 
+        int pId = selectedPatientId.get();
+        if (pId > 0) {
+
+            Main.primaryStage.setUserData(pId);
+            customDialog.showFxmlDialog2("patient/registration/patient_registration_form.fxml", "Update Patient Details");
+
+            if (Main.primaryStage.getUserData() instanceof Boolean idUpdated) {
+                if (idUpdated) {
+                    searchPatient(null);
+                    Main.primaryStage.setUserData(null);
+                }
+
+            }
+        }
 
     }
 
@@ -320,19 +350,29 @@ public class AdmissionForm implements Initializable {
     }
 
     public void selectPatient(ActionEvent actionEvent) {
-        customDialog.showFxmlDialog2("chooser/patientChooser.fxml", "Select Patient");
-        if (Main.primaryStage.getUserData() instanceof PatientModel patientModel) {
-            if (patientModel != null && patientModel.getUhidNum() != null) {
-                Map<String, Object> data = new HashMap<>();
-                data.put("registration_num", patientModel.getUhidNum());
-                callThread(OperationType.SEARCH_PATIENT, data);
-            }
 
-        }
+        selectBedOnClick(null);
+
+//        customDialog.showFxmlDialog2("chooser/patientChooser.fxml", "Select Patient");
+//        if (Main.primaryStage.getUserData() instanceof PatientModel patientModel) {
+//            if (patientModel != null && patientModel.getUhidNum() != null) {
+//
+//                filterTypeCom.getSelectionModel().select("Registration");
+//                referenceNumTF.setText(patientModel.getUhidNum());
+//
+//                Map<String, Object> data = new HashMap<>();
+//                data.put("registration_num", patientModel.getUhidNum());
+//                callThread(OperationType.SEARCH_PATIENT, data);
+//            }
+//
+//        }
     }
 
     public void selectBedOnClick(ActionEvent actionEvent) {
-
+        customDialog.showFxmlDialog2("chooser/ipd/bedChooser.fxml","Please select bed");
+        if (Main.primaryStage.getUserData() instanceof BedModel bedModel) {
+            selectedBedDetails.set(bedModel);
+        }
     }
 
     public void clearPatient(ActionEvent actionEvent) {
@@ -381,9 +421,8 @@ public class AdmissionForm implements Initializable {
     }
 
     private void clearAdmDetails() {
-        admissionDateDT.setValue(LocalDate.now());
         validationMessage.set(new StringBuilder());
-        initDateTime();
+        admissonDateTime.setValue(LocalDateTime.now());
         referByCom.getSelectionModel().clearSelection();
         departmentCom.getSelectionModel().clearSelection();
         consultNameCom.getSelectionModel().clearSelection();

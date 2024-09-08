@@ -10,7 +10,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.master.Master">
     <center>
-        <TabPane fx:id="containerTabPane" style="-fx-tab-selected-color: #04852f;">
+        <TabPane fx:id="containerTabPane" rotateGraphic="true" style="-fx-tab-selected-color: #04852f;" tabClosingPolicy="UNAVAILABLE">
             <tabs>
                 <Tab fx:id="buildingMasterTab" closable="false" text="Building Master" />
                 <Tab fx:id="floorMasterTab" closable="false" text="Floor Master" />

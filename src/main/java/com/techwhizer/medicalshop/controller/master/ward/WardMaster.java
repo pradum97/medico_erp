@@ -47,6 +47,7 @@ public class WardMaster implements Initializable {
     public Button searchBn;
     public Button addWardBn;
 
+
     private enum Type{
         INIT,SEARCH
     }
@@ -82,6 +83,10 @@ public class WardMaster implements Initializable {
 
             }
         });
+    }
+
+    public void refresh(ActionEvent actionEvent) {
+        callThread(Type.INIT,new HashMap<>());
     }
 
     public void searchBnClick(ActionEvent actionEvent) {
@@ -293,7 +298,12 @@ public class WardMaster implements Initializable {
     }
 
     private void getBuildings() {
-        buildingList.clear();
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                buildingList.clear();
+            }
+        });
 
         Connection connection = null;
         PreparedStatement ps = null;

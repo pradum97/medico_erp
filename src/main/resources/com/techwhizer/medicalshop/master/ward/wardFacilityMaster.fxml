@@ -7,12 +7,14 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.master.ward.WardFacilityMaster">
+<BorderPane xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.techwhizer.medicalshop.controller.master.ward.WardFacilityMaster">
     <center>
         <VBox minWidth="285.0" BorderPane.alignment="CENTER">
             <children>
@@ -45,7 +47,7 @@
                               <Font name="System Bold" size="12.0" />
                            </font>
                         </Label>
-                              <TextField fx:id="facilityCodeTf" prefHeight="26.0" prefWidth="250.0" promptText="Enter Facility Code" style="-fx-border-color: grey; -fx-border-radius: 3;" />
+                              <TextField fx:id="facilityCodeTf" prefHeight="26.0" prefWidth="230.0" promptText="Enter Facility Code" style="-fx-border-color: grey; -fx-border-radius: 3;" />
                      </children>
                   </VBox>
                   <VBox layoutX="20.0" layoutY="18.0">
@@ -55,21 +57,30 @@
                               <Font name="System Bold" size="12.0" />
                            </font>
                         </Label>
-                        <TextField fx:id="facilityNameTf" prefHeight="26.0" prefWidth="250.0" promptText="Enter Facility Name" style="-fx-border-color: grey; -fx-border-radius: 3;" />
+                        <TextField fx:id="facilityNameTf" prefHeight="26.0" prefWidth="230.0" promptText="Enter Facility Name" style="-fx-border-color: grey; -fx-border-radius: 3;" />
                      </children>
                   </VBox>
                   <HBox spacing="10.0">
                      <children>
-                              <Button fx:id="saveUpdateBn" minHeight="26.0" minWidth="80.0" mnemonicParsing="false" onAction="#saveUpdateButtonClick" style="-fx-background-color: #04852f; -fx-background-radius: 500;" text="SAVE" textFill="WHITE">
+                              <Button fx:id="saveUpdateBn" minHeight="26.0" minWidth="68.0" mnemonicParsing="false" onAction="#saveUpdateButtonClick" prefHeight="26.0" prefWidth="68.0" style="-fx-background-color: #04852f; -fx-background-radius: 500;" text="SAVE" textFill="WHITE">
                                   <font>
                                       <Font name="Arial Black" size="11.0" />
                                   </font>
                               </Button>
-                              <Button fx:id="clearBn" minHeight="26.0" minWidth="80.0" mnemonicParsing="false" onAction="#clearBnClick" style="-fx-background-color: red; -fx-background-radius: 500;" text="CLEAR" textFill="WHITE">
+                              <Button fx:id="clearBn" minHeight="26.0" minWidth="64.0" mnemonicParsing="false" onAction="#clearBnClick" prefHeight="26.0" prefWidth="64.0" style="-fx-background-color: red; -fx-background-radius: 500;" text="CLEAR" textFill="WHITE">
                                   <font>
                                       <Font name="Arial Black" size="11.0" />
                                   </font>
                               </Button>
+                        <Button fx:id="refresh_bn" minHeight="26.0" mnemonicParsing="false" onAction="#refresh" prefHeight="26.0" prefWidth="52.0" style="-fx-border-color: grey; -fx-border-radius: 3; -fx-background-radius: 3;">
+                           <graphic>
+                              <ImageView fitHeight="22.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../img/icon/refresh_ic_red.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
                      </children>
                      <HBox.margin>
                         <Insets top="13.0" />

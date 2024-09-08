@@ -121,7 +121,7 @@ public class AddWard  implements Initializable {
         try {
             numberOfBeds = Integer.parseInt(noOfBeds);
         } catch (NumberFormatException e) {
-            method.show_popup("Please enter valid no of beds",facilityCom, Side.RIGHT);
+            method.show_popup("Please enter valid no of beds",numOfBedsTf, Side.RIGHT);
             return;
         }
 

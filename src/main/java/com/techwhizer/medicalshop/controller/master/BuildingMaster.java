@@ -126,6 +126,10 @@ public class BuildingMaster implements Initializable {
         }
     }
 
+    public void refresh(ActionEvent actionEvent) {
+        new MyAsyncTask().execute();
+    }
+
     private void clear() {
         buildingNameTF.setText("");
         buildingAddressTF.setText("");

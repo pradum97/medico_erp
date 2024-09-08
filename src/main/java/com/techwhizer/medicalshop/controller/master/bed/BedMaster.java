@@ -102,6 +102,11 @@ public class BedMaster implements Initializable {
                 });
     }
 
+    public void refresh(ActionEvent actionEvent) {
+
+        callThread(Type.INIT,new HashMap<>());
+    }
+
     public void searchBnClick(ActionEvent actionEvent) {
 
         if (buildingCom.getSelectionModel().isEmpty()){
@@ -313,7 +318,7 @@ public class BedMaster implements Initializable {
     }
 
     private void getBuildings() {
-        buildingList.clear();
+        Platform.runLater(() -> buildingList.clear());
 
         Connection connection = null;
         PreparedStatement ps = null;

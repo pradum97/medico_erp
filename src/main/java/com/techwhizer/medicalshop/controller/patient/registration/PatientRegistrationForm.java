@@ -58,7 +58,8 @@ public class PatientRegistrationForm implements Initializable {
     public Button submitBn;
     private Method method;
     private CustomDialog customDialog;
-    private PatientModel pm;
+    private PatientModel pm1;
+    private int selectedPatientId = 0;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -92,34 +93,117 @@ public class PatientRegistrationForm implements Initializable {
         });
     }
 
-    private void setData() {
+    private void setPatientData() {
 
-        Platform.runLater(() -> {
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
 
-            submitBn.setText("UPDATE");
+        try {
+            connection = new DBConnection().getConnection();
 
-            genderCom.getSelectionModel().select((pm.getGender()));
-            idTypeCom.getSelectionModel().select((pm.getIdType()));
+            String qry = "select * from patient_v where patient_id = ?" ;
 
-        });
+            ps = connection.prepareStatement(qry);
+            ps.setInt(1, selectedPatientId);
+            rs = ps.executeQuery();
 
-        firstNameTf.setText(pm.getFirstName());
-        middleNameTf.setText(pm.getMiddleName());
-        lastNameTf.setText(pm.getLastName());
-        ageTf.setText(pm.getAge());
-        addressTf.setText(pm.getAddress());
-        phoneTf.setText(pm.getPhone());
-        idNumberTf.setText(pm.getIdNumber());
-        guardianNameTf.setText(pm.getGuardianName());
-        weightTf.setText(pm.getWeight());
-        bpTf.setText(pm.getBp());
-        pulseTf.setText(pm.getPulse());
-        sugarTf.setText(pm.getSugar());
-        spo2Tf.setText(pm.getSpo2());
-        tempTf.setText(pm.getTemp());
-        cvsTf.setText(pm.getCvs());
-        cnsTf.setText(pm.getCns());
-        chestTf.setText(pm.getChest());
+            if(rs.next()) {
+
+                int patient_id = rs.getInt("PATIENT_ID");
+                int salutation_id = rs.getInt("salutation_id");
+                int created_by = rs.getInt("created_by");
+                int last_update_by = rs.getInt("last_update_by");
+
+                String salutation_name = rs.getString("salutation_name");
+                String first_name = rs.getString("first_name");
+                String middle_name = rs.getString("middle_name");
+                String last_name = rs.getString("last_name");
+
+                String fullName = rs.getString("fullName");
+
+                String gender = rs.getString("gender");
+                String age = rs.getString("age");
+                String address = rs.getString("address");
+                String dob = rs.getString("dob");
+                String phone = rs.getString("phone");
+
+                String idType = rs.getString("id_type");
+                String idNum = rs.getString("id_number");
+                String guardianName = rs.getString("guardian_name");
+
+                String weight = rs.getString("weight");
+                String bp = rs.getString("bp");
+                String pulse = rs.getString("pulse");
+                String sugar = rs.getString("sugar");
+                String spo2 = rs.getString("SPO2");
+                String temp = rs.getString("temp");
+                String cvs = rs.getString("cvs");
+                String cns = rs.getString("cns");
+                String chest = rs.getString("chest");
+                String creationDate = rs.getString("creation_date");
+                String lastUpdate = rs.getString("last_update");
+                String patient_number = rs.getString("patient_number");
+                String uhidNum = rs.getString("uhid_no");
+
+
+                PatientModel pm = new PatientModel(patient_id, salutation_id, created_by, last_update_by, salutation_name, first_name,
+                        middle_name, last_name, fullName, gender, age, address, dob, phone, idType, idNum, guardianName, weight, bp, pulse,
+                        sugar, spo2, temp, cvs, cns, chest, creationDate, lastUpdate,patient_number,uhidNum);
+
+
+                Platform.runLater(() -> {
+
+                    submitBn.setText("UPDATE");
+
+                    genderCom.getSelectionModel().select((pm.getGender()));
+                    idTypeCom.getSelectionModel().select((pm.getIdType()));
+                    firstNameTf.setText(pm.getFirstName());
+                    middleNameTf.setText(pm.getMiddleName());
+                    lastNameTf.setText(pm.getLastName());
+                    ageTf.setText(pm.getAge());
+                    addressTf.setText(pm.getAddress());
+                    phoneTf.setText(pm.getPhone());
+                    idNumberTf.setText(pm.getIdNumber());
+                    guardianNameTf.setText(pm.getGuardianName());
+                    weightTf.setText(pm.getWeight());
+                    bpTf.setText(pm.getBp());
+                    pulseTf.setText(pm.getPulse());
+                    sugarTf.setText(pm.getSugar());
+                    spo2Tf.setText(pm.getSpo2());
+                    tempTf.setText(pm.getTemp());
+                    cvsTf.setText(pm.getCvs());
+                    cnsTf.setText(pm.getCns());
+                    chestTf.setText(pm.getChest());
+
+                    if (pm != null) {
+
+                        ObservableList<SalutationModel> salutationList = salutationCom.getItems();
+
+                        Optional<SalutationModel> salutationM = salutationList.stream()
+                                .filter(p -> p.getSalutationId() == pm.getSalutation_id())
+                                .findFirst();
+
+                        if( salutationM != null && salutationM.get() != null){
+                            int salIndex = salutationList.indexOf(salutationM.get());
+                            salutationCom.getSelectionModel().select(salIndex);
+                        }
+
+                    }
+
+                });
+
+
+
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            DBConnection.closeConnection(connection, ps, rs);
+        }
+
+
     }
 
     public void enterPress(KeyEvent ev) {
@@ -249,7 +333,17 @@ public class PatientRegistrationForm implements Initializable {
 
             String qry = "";
 
-            if (null == pm) {
+            if (selectedPatientId > 0) {
+                qry = """
+                        
+                        UPDATE tbl_patient
+                        SET salutation_id=?, first_name=?, middle_name=?, last_name=?, gender=?, address=?, dob=?,
+                            phone=?, id_type=?, id_number=?, guardian_name=?, weight=?, bp=?, pulse=?, sugar=?, spo2=?, temp=?, cvs=?, cns=?, chest=?,\s
+                            last_update_by=?, last_update=?
+                        WHERE patient_id = ?;
+                        """;
+
+            } else {
 
                 qry = """
                         
@@ -258,16 +352,6 @@ public class PatientRegistrationForm implements Initializable {
                               guardian_name, weight, bp, pulse, sugar, spo2, temp, cvs, cns, chest, created_by, last_update, last_update_by,
                               patient_number,UHID_NO)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,  ?, ?, ?, ?,?,?)
-                        """;
-            } else {
-
-                qry = """
-                        
-                        UPDATE tbl_patient
-                        SET salutation_id=?, first_name=?, middle_name=?, last_name=?, gender=?, address=?, dob=?,
-                            phone=?, id_type=?, id_number=?, guardian_name=?, weight=?, bp=?, pulse=?, sugar=?, spo2=?, temp=?, cvs=?, cns=?, chest=?,\s
-                            last_update_by=?, last_update=?
-                        WHERE patient_id = ?;
                         """;
 
             }
@@ -302,17 +386,18 @@ public class PatientRegistrationForm implements Initializable {
             Calendar cal = Calendar.getInstance();
             Timestamp timestamp = new Timestamp(cal.getTimeInMillis());
             ps.setTimestamp(22, timestamp);
-            if (null == pm) {
+            if (selectedPatientId > 0) {
+                ps.setInt(23, selectedPatientId);
+            } else {
                 ps.setInt(23, Login.currentlyLogin_Id);
                 ps.setString(24, new GenerateBillNumber().generatorPatientNumber());
                 ps.setString(25, new GenerateBillNumber().generateUHIDNum());
-            } else {
-                ps.setInt(23, pm.getPatientId());
             }
+
             int res = ps.executeUpdate();
             if (res > 0) {
 
-                if (null != pm) {
+                if (selectedPatientId > 0) {
                     customDialog.showAlertBox("", "Patient successfully updated.");
                 } else {
                     customDialog.showAlertBox("", "Patient successfully created.");
@@ -333,7 +418,6 @@ public class PatientRegistrationForm implements Initializable {
     public void cancelBn(ActionEvent event) {
         closeStage();
     }
-
 
     private void callTask(String type, PatientInsertUpdateModel pium) {
 
@@ -378,25 +462,16 @@ public class PatientRegistrationForm implements Initializable {
             genderCom.setItems(new StaticData().getGender());
             idTypeCom.setItems(CommonUtil.getDocumentType());
 
-            if (Main.primaryStage.getUserData() instanceof PatientModel) {
-                pm = (PatientModel) Main.primaryStage.getUserData();
-                if (null != pm) {
-                    setData();
-                }
-            }
-
             ObservableList<SalutationModel> salutationList = (CommonUtil.getSalutation(0));
             salutationCom.setItems(salutationList);
 
-            if (null != pm) {
-
-                SalutationModel sm = CommonUtil.getSalutation(pm.getSalutation_id()).get(0);
-                for (int i = 0; i < salutationList.size(); i++) {
-                    if (salutationList.get(i).getSalutationName().equals(sm.getSalutationName())) {
-                        int finalI = i;
-                        Platform.runLater(() -> salutationCom.getSelectionModel().select(finalI));
-                    }
+            if (Main.primaryStage.getUserData() instanceof Integer patientId) {
+                if(patientId > 0){
+                    selectedPatientId = patientId;
+                    setPatientData();
                 }
+            }else {
+                selectedPatientId = 0;
             }
 
         }
